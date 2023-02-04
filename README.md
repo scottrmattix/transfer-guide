@@ -1,6 +1,3 @@
-# Django Practice Assessment
+# Team B-27 Transfer Guide Project
 
-__Name:__
-
-__Computing ID:__
-
+A website to assist students transferring into UVA transfer their credits
