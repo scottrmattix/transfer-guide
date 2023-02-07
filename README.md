@@ -8,19 +8,19 @@ The live site of the project can be found at <https://transfer-guide.herokuapp.c
 ## Development Environment
 It is recommended to use a virtual environment when working on Python projects to keep dependencies local. Create one with
 ```
-$ python -m venv env
+python -m venv env
 ```
 Then source the activation script
 ```
-$ source ./env/bin/activate
+source ./env/bin/activate
 ```
 Then run
 ```
-$ python -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 to install dependencies
 ```
-$ deactivate
+deactivate
 ```
 to end the virtual environment session
 
