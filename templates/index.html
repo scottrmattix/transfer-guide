@@ -1,0 +1,28 @@
+{% load socialaccount %}
+
+<html>
+<body>
+<h1>My Google OAuth Project </h1>
+{% if user.is_authenticated%}
+	{% if user.groups.all.0.name == 'users' %}
+		<p>WELCOME USER!</p>
+	{% elif user.groups.all.0.name == 'admins' %}
+		<p>WELCOME ADMIN!</p>
+	{% else %}
+		<p>YOU ARE NOBODY</p>
+		<form action="{% url 'set_group' user.id %}" method="post">
+			{% csrf_token %}
+			<input type="radio" id="adminselect" name="usertype" value="admins" required>
+			<label for="adminselect">Sign Up As Admin </label><br>
+			<input type="radio" id="userselect" name="usertype" value="users">
+			<label for="userselect">Sign Up As User </label><br>
+			<input type="submit"/><br>
+		</form>
+	{% endif %}
+  <p>Welcome, You are logged in as {{ user.username }}</p>
+	<a href="{% url 'logout' %}">Logout</a>
+{% else %}
+		<a href="{% provider_login_url 'google' %}">GOOGLE LOGIN</a><br>
+{% endif %}
+</body>
+</html>
