@@ -4,14 +4,18 @@ cffi==1.15.1
 charset-normalizer==3.0.1
 cryptography==39.0.1
 defusedxml==0.7.1
+dj-database-url==1.2.0
 Django==4.1.6
 django-allauth==0.52.0
+django-heroku==0.3.1
 django-stubs==1.15.0
 django-stubs-ext==0.7.0
+gunicorn==20.1.0
 idna==3.4
 mypy==1.0.1
 mypy-extensions==1.0.0
 oauthlib==3.2.2
+psycopg2==2.9.5
 pycparser==2.21
 PyJWT==2.6.0
 python3-openid==3.2.0
@@ -23,3 +27,4 @@ types-pytz==2022.7.1.2
 types-PyYAML==6.0.12.8
 typing_extensions==4.5.0
 urllib3==1.26.14
+whitenoise==6.4.0

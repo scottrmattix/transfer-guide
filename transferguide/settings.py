@@ -79,14 +79,24 @@ WSGI_APPLICATION = 'transferguide.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dbj09bvgm4ee41',
+        'USER': 'pmhjgrqsgtjmdm',
+        'PASSWORD': 'cb5c3691d5efa83a41f250fb4dcfa5f08edd481cecd2b673074e6bfbe188a6cc',
+        'HOST': 'ec2-34-194-158-176.compute-1.amazonaws.com',
+        'PORT': '5432',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -158,7 +168,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SITE_ID = 3
+#SITE_ID = 5 
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
