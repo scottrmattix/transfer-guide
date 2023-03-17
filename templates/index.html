@@ -8,22 +8,30 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
 
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="css/custom.css">
+
+
 <html>
-	<body class="min-vh-100 bg-dark d-flex flex-column align-items-center">
+	<body class="min-vh-100 bg-dark d-flex flex-column align-items-center" id="hg">
+
 		{% if user.is_authenticated%}
-		<header class="navbar navbar-default bg-dark-subtle w-100 ">
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<ul class="px-3">
-						<a href="#" class="navbar-brand">Home</a>
-						<a href="#" class="navbar-brand">Request Form</a>
-						<a href="#" class="navbar-brand">{{ user.username }}</a>
-					</ul>   
-				</div>
-			</div>
+		<header class="navbar bg-light w-100 h-auto">
+			<ul class="h-100 mx-lg-4 d-flex align-items-center">
+				<a href="#" class="navbar-brand px-2">Home</a>
+				<a href="#" class="navbar-brand px-3">Request Form</a>
+				<a href="#" class="navbar-brand px-3">Help
+				</a>
+			</ul>   
+			<ul class="h-100 d-flex align-items-center mx-3">
+				<img width="30px"
+					src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png">
+				<a href="#" class="navbar-brand">{{ user.username }}</a>
+			</ul>
 		</header>
 		{% endif %}
-		<div class="d-flex flex-column align-items-center justify-content-center">
+
+		<div class="min-vh-100 d-flex flex-column align-items-center justify-content-center text-light">
 			{% if user.is_authenticated%}
 				{% if user.groups.all.0.name == 'users' %}
 					<p>WELCOME USER!</p>
@@ -40,7 +48,6 @@
 						<input type="submit"/><br>
 					</form>
 				{% endif %}
-			<p>Welcome, You are logged in as {{ user.username }}</p>
 				<a href="{% url 'logout' %}">Logout</a>
 			{% else %}
 				<h1 class="text-light">Welcome to the UVA Transfer Guide</h1>
