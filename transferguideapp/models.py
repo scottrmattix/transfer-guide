@@ -7,7 +7,7 @@ class ExternalCollege(models.Model):
 
 #Model representing an external Course from an external university
 class ExternalCourse(models.Model):
-    university = models.ForeignKey(ExternalCollege, on_delete=models.CASCADE)
+    college = models.ForeignKey(ExternalCollege, on_delete=models.CASCADE)
     mnemonic = models.CharField(max_length=30)
     course_number = models.CharField(max_length=30)
     course_name = models.CharField(max_length=60)
