@@ -4,46 +4,57 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
 
-<!-- Compiled and minified CSS -->
+<!-- Google login styling stuff -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
-
-<!-- Compiled and minified JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
 
 <html>
-<body class="h-100 bg-dark d-flex flex-column align-items-center justify-content-center">
-	<div class="d-flex flex-column align-items-center justify-content-center">
-		<h1 class="text-light">Welcome to the UVA Transfer Guide</h1>
+	<body class="min-vh-100 bg-dark d-flex flex-column align-items-center">
 		{% if user.is_authenticated%}
-			{% if user.groups.all.0.name == 'users' %}
-				<p>WELCOME USER!</p>
-			{% elif user.groups.all.0.name == 'admins' %}
-				<p>WELCOME ADMIN!</p>
-			{% else %}
-				<p>YOU ARE NOBODY</p>
-				<form action="{% url 'set_group' user.id %}" method="post">
-					{% csrf_token %}
-					<input type="radio" id="adminselect" name="usertype" value="admins" required>
-					<label for="adminselect">Sign Up As Admin </label><br>
-					<input type="radio" id="userselect" name="usertype" value="users">
-					<label for="userselect">Sign Up As User </label><br>
-					<input type="submit"/><br>
-				</form>
-			{% endif %}
-		<p>Welcome, You are logged in as {{ user.username }}</p>
-			<a href="{% url 'logout' %}">Logout</a>
-		{% else %}
-				<!-- <a href="{% provider_login_url 'google' %}" class="g-signin2">GOOGLE LOGIN</a><br> -->
-				<div>
-					<a class="oauth-container btn white black-text m-3 h-15" href="{% provider_login_url 'google' %} style="text-transform:none">
-						<div class="left">
-							<img width="20px" style="margin-top:7px; margin-right:8px" alt="Google sign-in" 
-								src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
-						</div>
-						Continue with Google
-					</a>
+		<header class="navbar navbar-default bg-dark-subtle w-100 ">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<ul class="px-3">
+						<a href="#" class="navbar-brand">Home</a>
+						<a href="#" class="navbar-brand">Request Form</a>
+						<a href="#" class="navbar-brand">{{ user.username }}</a>
+					</ul>   
 				</div>
+			</div>
+		</header>
 		{% endif %}
-	</div>
-</body>
+		<div class="d-flex flex-column align-items-center justify-content-center">
+			{% if user.is_authenticated%}
+				{% if user.groups.all.0.name == 'users' %}
+					<p>WELCOME USER!</p>
+				{% elif user.groups.all.0.name == 'admins' %}
+					<p>WELCOME ADMIN!</p>
+				{% else %}
+					<p>YOU ARE NOBODY</p>
+					<form action="{% url 'set_group' user.id %}" method="post">
+						{% csrf_token %}
+						<input type="radio" id="adminselect" name="usertype" value="admins" required>
+						<label for="adminselect">Sign Up As Admin </label><br>
+						<input type="radio" id="userselect" name="usertype" value="users">
+						<label for="userselect">Sign Up As User </label><br>
+						<input type="submit"/><br>
+					</form>
+				{% endif %}
+			<p>Welcome, You are logged in as {{ user.username }}</p>
+				<a href="{% url 'logout' %}">Logout</a>
+			{% else %}
+				<h1 class="text-light">Welcome to the UVA Transfer Guide</h1>
+					<!-- <a href="{% provider_login_url 'google' %}" class="g-signin2">GOOGLE LOGIN</a><br> -->
+					<div>
+						<a class="oauth-container btn white black-text m-3 h-15" href="{% provider_login_url 'google' %}" style="text-transform:none">
+							<div class="left">
+								<img width="20px" style="margin-top:7px; margin-right:8px" alt="Google sign-in" 
+									src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
+							</div>
+							Continue with Google
+						</a>
+					</div>
+			{% endif %}
+		</div>
+	</body>
 </html>
