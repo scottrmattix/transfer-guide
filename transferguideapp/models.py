@@ -5,12 +5,18 @@ class ExternalCollege(models.Model):
     college_name =  models.CharField(max_length=60)
     domestic_college = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f"{self.college_name}" 
+
 #Model representing an external Course from an external university
 class ExternalCourse(models.Model):
     college = models.ForeignKey(ExternalCollege, on_delete=models.CASCADE)
     mnemonic = models.CharField(max_length=20)
     course_number = models.CharField(max_length=20)
     course_name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.mnemonic} ({self.course_number}): {self.course_name} from {self.college.college_name}"
 
 #Model representing an internal UVA course
 class InternalCourse(models.Model):
@@ -27,6 +33,9 @@ class CourseTransfer(models.Model):
     external_course = models.ForeignKey(ExternalCourse, on_delete=models.CASCADE)
     internal_course = models.ForeignKey(InternalCourse, on_delete=models.CASCADE)
     accepted = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"External Course : {self.external_course} \n Internal Course: {self.internal_course} \n Accepted: {self.accepted}"
 
 # UVA Course Model
 class Course(models.Model):
@@ -43,8 +52,6 @@ class Course(models.Model):
                      descr=descr)
         return course
 
-
     def __str__(self):
         s = f"{self.subject} {self.catalog_nbr}-{self.class_section}: {self.descr}"
         return s
-
