@@ -42,6 +42,8 @@ class CourseSearch(generic.ListView):
 def submit_search(request):
     global setMnemonic
     global setName
+    setMnemonic = ""
+    setName = ""
 
     try:
         mnemonic = request.POST['mnemonic']
@@ -51,9 +53,6 @@ def submit_search(request):
             'error_message': "An error occurred…",
         })
     else:
-        setMnemonic = ""
-        setName = ""
-
         if not mnemonic.isalpha() and not name.isalpha():
             return render(request, 'search.html', {'error_message': "Invalid input detected."})
         if mnemonic != "":

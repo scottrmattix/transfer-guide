@@ -15,46 +15,40 @@
     {# Display django.contrib.messages as Bootstrap alerts #}
     {% bootstrap_messages %}
 
-
     <content>
-    <div class="container-fluid p-5" align="left">
+      <div class="container-fluid p-5" align="left">
         <h2>Search Courses</h2>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% else %}<br>{% endif %}
-    <form action="{% url 'submit_search' %}" method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-          <label for="mnemonic" class="form-label">Mnemonic:</label>
-          <input type="text" id="mnemonic" name="mnemonic" maxlength="200" class="form-control" placeholder="MATH" style="width: 500px;">
-          <div class="form-text">Mnemonics must not exceed 30 characters.</div>
-        </div>
-        <div class="mb-3">
-          <label for="name" class="form-label">Course Title:</label>
-          <input type="text" id="name" name="name" maxlength="200" class="form-control" placeholder="Introduction to Programming" style="width: 500px;">
-          <div class="form-text">Try full course titles or keywords.</div>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-    </div>
-</content>
-
-    <content>
-    <div class="container-fluid p-5" align="center">
-<h2>Course List </h2>
-
-{% if course_list %}
-    <div class="list-group">
-    {% for course in course_list.all %}
-        <div class="list-group-item list-group-item-action flex-column align-items-start">
-            <p class="mb-1">{{ course }}</p>
-        </div>
-    {% endfor %}
-    </div>
-
-{% else %}
-    <p>No Courses Available.</p>
-{% endif %}
-</div>
+        <form action="{% url 'submit_search' %}" method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="mnemonic" class="form-label">Mnemonic:</label>
+            <input type="text" id="mnemonic" name="mnemonic" maxlength="200" class="form-control" placeholder="MATH" style="width: 500px;">
+            <div class="form-text">Mnemonics must not exceed 30 characters.</div>
+          </div>
+          <div class="mb-3">
+            <label for="name" class="form-label">Course Title:</label>
+            <input type="text" id="name" name="name" maxlength="200" class="form-control" placeholder="Introduction to Programming" style="width: 500px;">
+            <div class="form-text">Try full course titles or keywords.</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+      <div class="container-fluid p-5" align="center">
+        <h2>Course List </h2>
+        {% if course_list %}
+          <div class="list-group">
+            {% for course in course_list.all %}
+            <div class="list-group-item list-group-item-action flex-column align-items-start">
+              <p class="mb-1">{{ course }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p>No Courses Available.</p>
+        {% endif %}
+      </div>
     </content>
-
-
+</body>
+</html>
 
