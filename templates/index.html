@@ -1,6 +1,5 @@
 {% load socialaccount %}
 
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
 
@@ -8,27 +7,29 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
 
-<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="css/custom.css">
-
-
 <html>
-	<body class="min-vh-100 bg-dark d-flex flex-column align-items-center" id="hg">
+	<body class="min-vh-100 bg-dark d-flex flex-column align-items-center">
 
 		{% if user.is_authenticated%}
-		<header class="navbar bg-light w-100 h-auto">
-			<ul class="h-100 mx-lg-4 d-flex align-items-center">
-				<a href="#" class="navbar-brand px-2">Home</a>
-				<a href="#" class="navbar-brand px-3">Request Form</a>
-				<a href="#" class="navbar-brand px-3">Help
-				</a>
+		<nav class="navbar bg-light w-100 fixed-top d-flex">
+			<ul class="h-100 d-flex align-items-center">
+				<a href="#" class="navbar-brand mx-0"> &nbsp;Home&nbsp; </a>
+				<a href="#" class="navbar-brand mx-0"> &nbsp;Request Form&nbsp; </a>
+				<a href="#" class="navbar-brand mx-0"> &nbsp;Help&nbsp; </a>
 			</ul>   
-			<ul class="h-100 d-flex align-items-center mx-3">
-				<img width="30px"
-					src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png">
-				<a href="#" class="navbar-brand">{{ user.username }}</a>
+			<ul class="h-100 d-flex align-items-center dropdown">
+				<a class="navbar-brand d-flex flex-row align-items-center mx-0 dropdown-toggle" data-bs-toggle="dropdown">
+					<img width="40px" height="40px" href="#"
+						src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"> {{ user.username }}
+					<div class="dropdown-menu">
+						<a class="dropdown-item" href="#">Action</a>
+						<a class="dropdown-item" href="#">Another action</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="#">Log Out</a>
+					</div>
+				</a>
 			</ul>
-		</header>
+		</nav>
 		{% endif %}
 
 		<div class="min-vh-100 d-flex flex-column align-items-center justify-content-center text-light">
@@ -51,7 +52,6 @@
 				<a href="{% url 'logout' %}">Logout</a>
 			{% else %}
 				<h1 class="text-light">Welcome to the UVA Transfer Guide</h1>
-					<!-- <a href="{% provider_login_url 'google' %}" class="g-signin2">GOOGLE LOGIN</a><br> -->
 					<div>
 						<a class="oauth-container btn white black-text m-3 h-15" href="{% provider_login_url 'google' %}" style="text-transform:none">
 							<div class="left">
