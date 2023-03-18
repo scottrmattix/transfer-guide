@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-y#x6@#b=amu1t66jbcs9kb5zym!-**m_3h7bi&av_x#yr=1ca8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True 
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'transfer-guide.herokuapp.com']
 
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'bootstrap5'
 ]
 
 MIDDLEWARE = [
@@ -79,13 +80,14 @@ WSGI_APPLICATION = 'transferguide.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-"""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 """
 DATABASES = {
     'default': {
@@ -97,6 +99,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+"""
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -168,7 +171,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-#SITE_ID = 5 
+#SITE_ID = 5
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

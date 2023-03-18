@@ -21,6 +21,7 @@
 	{% endif %}
   <p>Welcome, You are logged in as {{ user.username }}</p>
 	<a href="{% url 'logout' %}">Logout</a>
+  <a href="{% url 'courseSearch' %}">Courses</a>
 {% else %}
 		<a href="{% provider_login_url 'google' %}">GOOGLE LOGIN</a><br>
 {% endif %}

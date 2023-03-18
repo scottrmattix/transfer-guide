@@ -24,3 +24,24 @@ class CourseTransfer(models.Model):
     external_course = models.ForeignKey(ExternalCourse, on_delete=models.CASCADE)
     internal_course = models.ForeignKey(InternalCourse, on_delete=models.CASCADE)
     accepted = models.BooleanField(default=False)
+
+# UVA Course Model
+class Course(models.Model):
+    subject = models.CharField(max_length=200, default="a")
+    catalog_nbr = models.CharField(max_length=200, default="b")
+    class_section = models.CharField(max_length=200, default="c")
+    descr = models.CharField(max_length=200, default="d")
+
+    @classmethod
+    def create(cls, subject, catalog_nbr, class_section, descr):
+        course = cls(subject=subject,
+                     catalog_nbr=catalog_nbr,
+                     class_section=class_section,
+                     descr=descr)
+        return course
+
+
+    def __str__(self):
+        s = f"{self.subject} {self.catalog_nbr}-{self.class_section}: {self.descr}"
+        return s
+
