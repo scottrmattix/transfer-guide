@@ -7,7 +7,7 @@ defusedxml==0.7.1
 dj-database-url==1.2.0
 Django==4.1.6
 django-allauth==0.52.0
-django-boostrap-v5==1.0.11
+django-bootstrap-v5==1.0.11
 django-forms-bootstrap==3.1.0
 django-heroku==0.3.1
 django-stubs==1.15.0
