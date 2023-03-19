@@ -20,6 +20,7 @@ class ExternalCourse(models.Model):
 
 #Model representing an internal UVA course
 class InternalCourse(models.Model):
+    id = models.BigAutoField(primary_key=True)
     mnemonic = models.CharField(max_length=30)
     #needs to support text characters for courses like 1000T
     course_number = models.CharField(max_length=30)
