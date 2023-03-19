@@ -16,5 +16,6 @@ class TransferRequestForm(Form):
 
 class SisSearchForm(Form):
     mnemonic = CharField(required=False)
-    course_name = CharField(required=False)
+#    course_name = CharField(required=False)
     course_number = CharField(required=False)
+    page = CharField()

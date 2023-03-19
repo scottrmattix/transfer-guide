@@ -65,3 +65,12 @@ def request_data(paramList):
     else:
         raise Exception('Api call failed with ' + str(r.status_code))
 
+def unique_id(r):
+    used_ids = []
+    sanitized = []
+    for c in r:
+        if not c['crse_id'] in used_ids:
+            used_ids.append(c['crse_id'])
+            sanitized.append(c)
+    return sanitized
+

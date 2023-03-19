@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group, User
 
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
 from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer 
-from .sis import request_data 
+from .sis import request_data, unique_id 
 
 
 
@@ -60,8 +60,13 @@ def handle_sis_request(request):
     if sis_form.is_valid():
         mnemonic = sis_form.cleaned_data['mnemonic']
         course_number = sis_form.cleaned_data['course_number']
-        course_name = sis_form.cleaned_data['course_name']
-        r = request_data({'subject' : mnemonic, 'catalog_nbr' : course_number, 'page' : '1'})
+        page = sis_form.cleaned_data['page']
+        query = {'page' : page}
+        if not mnemonic == "":
+            query['subject'] = mnemonic
+        if not course_number == "":
+            query['catalog_nbr'] = course_number
+        r = unique_id(request_data(query))
     return render(request, 'request.html', {'transfer_form' : transfer_form , 'sis_form' : sis_form, 'r' : r})
 
 def submit_transfer_request(request):
