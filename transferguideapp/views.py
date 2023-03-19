@@ -53,7 +53,7 @@ def submit_search(request):
             'error_message': "An error occurred…",
         })
     else:
-        if not mnemonic.isalpha() and not all(x.isalpha() or x.isspace() for x in name):
+        if not all(x.isalpha() or x.isspace() for x in name + mnemonic):
             return render(request, 'search.html', {'error_message': "Invalid input detected."})
         if mnemonic != "":
             setMnemonic = mnemonic.upper()
