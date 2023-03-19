@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views import generic
 import requests
 import json
-from .models import Course
+from .models import InternalCourse
 
 # Global variables for search parameters (this probably needs to be replaced)
 setMnemonic = ""
@@ -24,20 +24,20 @@ def set_group(request, user_id):
 
 class CourseSearch(generic.ListView):
     template_name = 'search.html'
-    model = Course
+    model = InternalCourse
     context_object_name = 'course_list'
 
     def get_queryset(self):
         if setMnemonic == "" and setName == "":
             return None
 
-        courses = Course.objects
+        courses = InternalCourse.objects
         if setMnemonic != "":
-            courses = courses.filter(subject=setMnemonic)
+            courses = courses.filter(mnemonic=setMnemonic)
         if setName != "":
-            courses = courses.filter(descr__icontains=setName)
+            courses = courses.filter(course_name__icontains=setName)
 
-        return courses.order_by('catalog_nbr').order_by('subject')
+        return courses.order_by('course_number').order_by('mnemonic')
 
 def submit_search(request):
     global setMnemonic
@@ -53,7 +53,7 @@ def submit_search(request):
             'error_message': "An error occurred…",
         })
     else:
-        if not mnemonic.isalpha() and not name.isalpha():
+        if not mnemonic.isalpha() and not all(x.isalpha() or x.isspace() for x in name):
             return render(request, 'search.html', {'error_message': "Invalid input detected."})
         if mnemonic != "":
             setMnemonic = mnemonic.upper()
