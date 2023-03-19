@@ -16,14 +16,17 @@
 	#profile-dropdown:hover{
 		background-color: rgb(207, 207, 207);
 	}
+	body{
+		padding-top:10vh;
+	}
 </style>
 
 <html>
-	<body class="min-vh-100 bg-dark d-flex flex-column align-items-center">
+	<body class="min-vh-100 bg-dark d-flex flex-column align-items-center mt-lg-5">
 		{% if user.is_authenticated%}
 		<nav class="navbar fixed-top w-100 bg-light d-flex align-items-center">
 			<ul class="d-flex flex-row align-items-center">
-				<a href="#" class="nav-link pt-2 mx-0">Home</a>
+				<a href="/" class="nav-link pt-2 mx-0">Home</a>
 				<a href="#" class="nav-link pt-2 mx-5">Request Form</a>
 				<a href="#" class="nav-link pt-2 mx-0">Help</a>
 			</ul>   
