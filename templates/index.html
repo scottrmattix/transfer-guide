@@ -12,6 +12,9 @@
 	#profile-dropdown:hover{
 		background-color: rgb(207, 207, 207);
 	}
+	body{
+		padding-top:12vh;
+	}
 </style>
 
 <html>
@@ -19,7 +22,7 @@
 		{% if user.is_authenticated%}
 		<nav class="navbar fixed-top w-100 bg-light d-flex align-items-center">
 			<ul class="d-flex flex-row align-items-center">
-				<a href="#" class="nav-link pt-2 mx-0">Home</a>
+				<a href="/" class="nav-link pt-2 mx-0">Home</a>
 				<a href="{% url 'request' %}" class="nav-link pt-2 mx-5">Request Form</a>
 				<a href="#" class="nav-link pt-2 mx-0">Help</a>
 			</ul>   
