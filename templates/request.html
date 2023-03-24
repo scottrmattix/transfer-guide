@@ -37,7 +37,7 @@
 			<div class="dropdown-menu dropdown-menu-end">
 				<a class="dropdown-item" href="#">Account Information</a>
 				<a class="dropdown-item" href="#">Pending Requests</a>
-				<a class="dropdown-item" href="#">Favorites</a>
+				<a class="dropdown-item" href="favorites/">Favorites</a>
 				<div class="dropdown-divider"></div>
 				<a class="dropdown-item" href="{% url 'logout' %}">Log Out</a>
 			</div>
@@ -71,6 +71,13 @@
 					<td>{{c.subject}}</td>
 					<td>{{c.catalog_nbr}}</td>
 					<td>{{c.descr}}</td>
+					<!-- {% if c.crse_id %}
+						<form method="post" action="{% url 'add_favorite/' course_id=c.crese_id %}">
+							{% csrf_token %}
+							<button type="submit">Add to Favorites</button>
+						</form>
+					{% endif %} -->
+					  
 				</tr>
 				<br>
 				{% endfor %}

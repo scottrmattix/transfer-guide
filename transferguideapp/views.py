@@ -3,9 +3,9 @@ from django.urls import reverse
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Group, User
-
+from django.shortcuts import get_object_or_404
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
-from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer 
+from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites 
 from .sis import request_data, unique_id 
 
 
@@ -85,3 +85,14 @@ def submit_transfer_request(request):
         transfer_form = TransferRequestForm()
         sis_form = SisSearchForm()
     return render(request, 'request.html', {'transfer_form' : transfer_form , 'sis_form' : sis_form, 'r' : r})
+
+def favorites(request):
+    f = Favorites.objects.filter(user=request.user)
+    print(f)
+    return render(request, 'favorites.html', {'favorites': f})
+
+def add_favorite(request, item_id):
+    course = get_object_or_404(InternalCourse, pk=item_id)
+    favorite = Favorites(user=request.user, course=course)
+    favorite.save()
+    return redirect('favorites')

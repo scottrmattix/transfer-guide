@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-y#x6@#b=amu1t66jbcs9kb5zym!-**m_3h7bi&av_x#yr=1ca8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True 
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'transfer-guide.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'transfer-guide.herokuapp.com', 'testserver']
 
 
 # Application definition
@@ -83,26 +83,26 @@ WSGI_APPLICATION = 'transferguide.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-"""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-"""
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd91okdepde0qki',
-        'USER': 'rtvsisurfamdhr',
-        'PASSWORD': '39772c6d00d368f0c4f6fa5779b24f28570b0c5a7bc00010b9b1f7010b62d509',
-        'HOST': 'ec2-54-227-248-71.compute-1.amazonaws.com',
-        'PORT': '5432',
-    }
-}
-"""
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'd91okdepde0qki',
+#         'USER': 'rtvsisurfamdhr',
+#         'PASSWORD': '39772c6d00d368f0c4f6fa5779b24f28570b0c5a7bc00010b9b1f7010b62d509',
+#         'HOST': 'ec2-54-227-248-71.compute-1.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -173,17 +173,17 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-#SITE_ID = 5 
+SITE_ID = 5 
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-dotenv_file = os.path.join(BASE_DIR, ".env")
-if os.path.isfile(dotenv_file):
-    dotenv.load_dotenv(dotenv_file)
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+# dotenv_file = os.path.join(BASE_DIR, ".env")
+# if os.path.isfile(dotenv_file):
+#     dotenv.load_dotenv(dotenv_file)
+# DATABASES = {}
+# DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
-if 'test' in sys.argv:
-    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
+# if 'test' in sys.argv:
+#     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 

@@ -1,0 +1,10 @@
+{% block content %}
+  <h1>Favorite Courses</h1>
+  <ul>
+    {% for f in favorites %}
+      <li>{{f}}</li>
+    {% empty %}
+      <li>No favorite courses.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
