@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 #Model representing an external University that may or may not be accepted
 class ExternalCollege(models.Model):
@@ -37,3 +38,12 @@ class CourseTransfer(models.Model):
 
     def __str__(self):
         return f"External Course : {self.external_course} \n Internal Course: {self.internal_course} \n Accepted: {self.accepted}"
+
+#model for favorited courses
+class Favorites(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_items')
+    in_course = models.ForeignKey(InternalCourse, on_delete=models.CASCADE)
+    ex_course = models.ForeignKey(ExternalCourse, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.in_course.mnemonic} {self.in_course.course_number}: {self.in_course.course_name} = {self.ex_course.college} {self.ex_course.mnemonic} {self.ex_course.course_number}: {self.ex_course.course_name} "

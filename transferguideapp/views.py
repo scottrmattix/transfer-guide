@@ -1,11 +1,11 @@
 from django.db import IntegrityError
 from django.urls import reverse
 from django.shortcuts import redirect, render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.models import Group, User
-
+from django.shortcuts import get_object_or_404
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
-from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer 
+from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites 
 from .sis import request_data, unique_id 
 
 
@@ -85,3 +85,26 @@ def submit_transfer_request(request):
         transfer_form = TransferRequestForm()
         sis_form = SisSearchForm()
     return render(request, 'request.html', {'transfer_form' : transfer_form , 'sis_form' : sis_form, 'r' : r})
+
+
+def favorites(request):
+    f = Favorites.objects.filter(user=request.user)
+    # f is the entire query set, to access individual fields do:
+    # f[0].in_course.course_name, f[0].ex_course.course_id, etc  
+
+    return render(request, 'favorites.html', {'favorites': f})
+
+def add_favorite(request, in_course_id=None, ex_course_id=None):
+    if in_course_id and ex_course_id:
+        in_course = get_object_or_404(InternalCourse, pk=in_course_id)
+        ex_course = get_object_or_404(ExternalCourse, pk=ex_course_id)
+        favorite = Favorites(user=request.user, in_course=in_course, ex_course=ex_course)
+        favorite.save()
+        return redirect('favorites')
+    else:
+        raise Http404("Missing course ID")
+
+def delete_favorite(request, favorite_id):
+    favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
+    favorite.delete()
+    return 
