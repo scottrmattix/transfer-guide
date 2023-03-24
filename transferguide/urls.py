@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
-from transferguideapp.views import set_group
+
+from transferguideapp.views import set_group, submit_transfer_request
 from transferguideapp.views import CourseSearch, submit_search
 
 urlpatterns = [
@@ -25,8 +26,8 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name="index.html"), name="home"),
     path('accounts/', include('allauth.urls')),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('set_group/<int:user_id>', set_group, name='set_group'),
-
+    path('request/', submit_transfer_request , name='request'),
+    path('set_group/<int:user_id>', set_group , name='set_group'),
     path('search/', CourseSearch.as_view(), name='courseSearch'),
     path('search/error/', submit_search, name='submit_search'),
 ]
