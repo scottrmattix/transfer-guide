@@ -23,13 +23,18 @@
           {% csrf_token %}
           <div class="mb-3">
             <label for="mnemonic" class="form-label">Mnemonic:</label>
-            <input type="text" id="mnemonic" name="mnemonic" maxlength="200" class="form-control" placeholder="MATH" style="width: 500px;">
-            <div class="form-text">Mnemonics must not exceed 30 characters.</div>
+            <input type="text" id="mnemonic" name="mnemonic" maxlength="200" class="form-control" placeholder="MATH"  onkeydown="return /[a-zA-Z0-9]/i.test(event.key)" style="width: 500px;">
+            <div class="form-text">Mnemonics must exactly match those in SIS.
+          </div>
+          <div class="mb-3">
+            <label for="mnemonic" class="form-label">Number:</label>
+            <input type="text" id="number" name="number" maxlength="200" class="form-control" placeholder="1000" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)" style="width: 500px;">
+            <div class="form-text">Enter a full or partial course number </div>
           </div>
           <div class="mb-3">
             <label for="name" class="form-label">Course Title:</label>
-            <input type="text" id="name" name="name" maxlength="200" class="form-control" placeholder="Introduction to Programming" style="width: 500px;">
-            <div class="form-text">Try full course titles or keywords.</div>
+            <input type="text" id="name" name="name" maxlength="200" class="form-control" placeholder="Introduction to Programming" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)" style="width: 500px;">
+            <div class="form-text">Try full titles or key terms.</div>
           </div>
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
@@ -39,9 +44,7 @@
         {% if course_list %}
           <div class="list-group">
             {% for course in course_list.all %}
-            <div class="list-group-item list-group-item-action flex-column align-items-start">
-              <p class="mb-1">{{ course }}</p>
-            </div>
+              <a href="{% url 'coursePage' course.id %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ course }}</a>
             {% endfor %}
           </div>
         {% else %}

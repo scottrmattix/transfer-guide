@@ -7,14 +7,17 @@ from django.contrib.auth.models import Group, User
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
-from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer 
-from .sis import request_data, unique_id 
+from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer
+from .sis import request_data, unique_id
 import requests
 import json
+from django.db.models import Q
+import re
 
 # Global variables for search parameters (this probably needs to be replaced)
 setMnemonic = ""
 setName = ""
+setNumber = ""
 
 def set_group(request, user_id):
     if(request.method == 'POST'):
@@ -25,43 +28,64 @@ def set_group(request, user_id):
         user.save()
     return redirect('home')
 
+class CoursePage(generic.DetailView):
+    template_name = 'course.html'
+    model = InternalCourse
+    context_object_name = 'course'
+
 class CourseSearch(generic.ListView):
     template_name = 'search.html'
     model = InternalCourse
     context_object_name = 'course_list'
 
     def get_queryset(self):
-        if setMnemonic == "" and setName == "":
+        if setMnemonic == "" and setName == "" and setNumber == "":
             return None
 
         courses = InternalCourse.objects
         if setMnemonic != "":
             courses = courses.filter(mnemonic=setMnemonic)
+        if setNumber != "":
+            courses = courses.filter(course_number__startswith=setNumber)
         if setName != "":
-            courses = courses.filter(course_name__icontains=setName)
+            words = re.sub(r"[,/&:.()?!]", " ", setName).strip().split()
+            for w in words:
+                if w.isnumeric():
+                    n = int(w)
+                    if 0 < n < 6:
+                        r = ["I", "II", "III", "IV", "V"][n-1]
+                        courses = courses.filter(Q(course_name__icontains=w) |
+                                                 Q(course_name__endswith=f" {r}") |
+                                                 Q(course_name__icontains=f" {r} ") |
+                                                 Q(course_name__icontains=f" {r}:"))
+                        continue
+                courses = courses.filter(course_name__icontains=w)
 
         return courses.order_by('course_number').order_by('mnemonic')
 
 def submit_search(request):
     global setMnemonic
     global setName
+    global setNumber
     setMnemonic = ""
     setName = ""
+    setNumber = ""
 
     try:
         mnemonic = request.POST['mnemonic']
         name = request.POST['name']
+        number = request.POST['number']
     except Exception:
         return render(request, 'search.html', {
             'error_message': "An error occurred…",
         })
     else:
-        if not all(x.isalpha() or x.isspace() for x in name + mnemonic):
-            return render(request, 'search.html', {'error_message': "Invalid input detected."})
         if mnemonic != "":
             setMnemonic = mnemonic.upper()
         if name != "":
             setName = name
+        if number != "":
+            setNumber = number.upper()
         return HttpResponseRedirect(reverse('courseSearch'))
 
 def handle_transfer_request(request):
@@ -95,7 +119,7 @@ def handle_transfer_request(request):
         except IntegrityError:
             pass
 
-        
+
         return redirect('home')
 
 def handle_sis_request(request):
