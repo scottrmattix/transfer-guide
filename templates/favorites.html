@@ -14,7 +14,9 @@
     <tbody>
       {% for f in favorites %}
       <tr>
+        
         <th scope="row">{{f}}</th>
+        <td><a href="{% url 'delete_favorite' f.id %}"><button>X</button></a></td>
       </tr>
       {% empty %}
       <tr>

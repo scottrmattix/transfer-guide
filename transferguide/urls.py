@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
-from transferguideapp.views import set_group, submit_transfer_request, favorites, add_favorite 
+from transferguideapp.views import set_group, submit_transfer_request, favorites, add_favorite, delete_favorite 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +27,7 @@ urlpatterns = [
     path('request/', submit_transfer_request , name='request'),
     path('set_group/<int:user_id>', set_group , name='set_group'),
     path('favorites/', favorites, name='favorites'),
-    path('add_favorite/<int:course_id>/', add_favorite, name='add_favorite'),
-]
+    path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),
+    path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),
+
+    ]

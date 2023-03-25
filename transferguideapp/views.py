@@ -94,17 +94,18 @@ def favorites(request):
 
     return render(request, 'favorites.html', {'favorites': f})
 
-def add_favorite(request, in_course_id=None, ex_course_id=None):
-    if in_course_id and ex_course_id:
-        in_course = get_object_or_404(InternalCourse, pk=in_course_id)
-        ex_course = get_object_or_404(ExternalCourse, pk=ex_course_id)
+#not super sure if this is the best way to do it. need to test on the real database
+def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_course_mnemonic=None, ex_course_number=None):
+    if in_course_mnemonic and in_course_number and ex_course_mnemonic and ex_course_number:
+        in_course = get_object_or_404(InternalCourse, mnemonic=in_course_mnemonic, course_number=in_course_number)
+        ex_course = get_object_or_404(ExternalCourse, mnemonic=ex_course_mnemonic, course_number=ex_course_number)
         favorite = Favorites(user=request.user, in_course=in_course, ex_course=ex_course)
         favorite.save()
         return redirect('favorites')
     else:
-        raise Http404("Missing course ID")
+        raise Http404("Missing course information")
 
 def delete_favorite(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
     favorite.delete()
-    return 
+    return redirect('favorites')
