@@ -21,6 +21,11 @@
           {% csrf_token %}
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-1 pb-2 mb-1 border-bottom"></div>
           <div class="col-auto">
+            <label for="college" class="form-label">College:</label>
+            <input type="text" id="college" name="college" maxlength="200" class="form-control" placeholder="University of Virginia"  onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
+            <div class="form-text">Defaults to UVA.</div>
+          </div>
+          <div class="col-auto">
             <label for="mnemonic" class="form-label">Mnemonic:</label>
             <input type="text" id="mnemonic" name="mnemonic" maxlength="200" class="form-control" placeholder="MATH"  onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
             <div class="form-text">Accepts SIS mnemonics only.</div>
@@ -44,11 +49,16 @@
       </div>
 
 
-      <div class="container-fluid px-5" align="left">
+      <div class="container-fluid px-5 pb-2" align="left">
         {% if course_list %}
           <div class="list-group">
             {% for course in course_list.all %}
-              <a href="{% url 'coursePage' course.id %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ course }}</a>
+              {%if course.get_model == 'internalcourse'%}
+                <a href="{% url 'internalCourse' course.id %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ course }}</a>
+              {% endif %}
+              {%if course.get_model == 'externalcourse'%}
+                <a href="{% url 'externalCourse' course.id %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ course }}</a>
+              {% endif %}
             {% endfor %}
           </div>
         {% else %}

@@ -20,7 +20,7 @@ from django.contrib.auth.views import LogoutView
 
 from transferguideapp.views import set_group, submit_transfer_request
 from transferguideapp.views import CourseSearch, submit_search
-from transferguideapp.views import CoursePage
+from transferguideapp.views import InternalCoursePage, ExternalCoursePage
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +30,7 @@ urlpatterns = [
     path('request/', submit_transfer_request , name='request'),
     path('set_group/<int:user_id>', set_group , name='set_group'),
     path('search/', CourseSearch.as_view(), name='courseSearch'),
-    path('search/<int:pk>', CoursePage.as_view(), name='coursePage'),
+    path('search/internal/<int:pk>', InternalCoursePage.as_view(), name='internalCourse'),
+    path('search/external/<int:pk>', ExternalCoursePage.as_view(), name='externalCourse'),
     path('search/error/', submit_search, name='submit_search'),
 ]

@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Internal Course Page</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {# Load the tag library #}
+    {% load bootstrap5 %}
+
+    {# Load CSS and JavaScript #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    {# Display django.contrib.messages as Bootstrap alerts #}
+    {% bootstrap_messages %}
+    <content>
+      <div class="container-fluid p-5" align="left">
+        {% if course %} <h6>{{ course }}</h6> {% endif %}
+        <h3>Course Attributes</h3>
+        <ul>
+        {% for name, value in course.get_fields %}
+          {% if value %}
+            <li>{{ name }}: {{ value }}</li>
+          {% endif %}
+        {% endfor %}
+        </ul>
+      </div>
+
+      <div class="container-fluid p-5" align="left">
+        {% if course %} <h6>{{ course }}</h6> {% endif %}
+        <h3>Course Equivalencies</h3>
+        {% if course %}
+          <div class="list-group">
+            {% for ext in course.get_equivalent %}
+              <a href="{% url 'externalCourse' ext.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ ext }}</a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p>No Accepted Course Equivalencies Found.</p>
+        {% endif %}
+      </div>
+    </content>
+</body>
+</html>
+
+

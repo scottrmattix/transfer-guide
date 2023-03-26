@@ -18,6 +18,7 @@ import re
 setMnemonic = ""
 setName = ""
 setNumber = ""
+setCollege = ""
 
 def set_group(request, user_id):
     if(request.method == 'POST'):
@@ -28,9 +29,14 @@ def set_group(request, user_id):
         user.save()
     return redirect('home')
 
-class CoursePage(generic.DetailView):
-    template_name = 'course.html'
+class InternalCoursePage(generic.DetailView):
+    template_name = 'internalCourse.html'
     model = InternalCourse
+    context_object_name = 'course'
+
+class ExternalCoursePage(generic.DetailView):
+    template_name = 'externalCourse.html'
+    model = ExternalCourse
     context_object_name = 'course'
 
 class CourseSearch(generic.ListView):
@@ -39,10 +45,21 @@ class CourseSearch(generic.ListView):
     context_object_name = 'course_list'
 
     def get_queryset(self):
+        aliases = ["", "UVA", "UNIVERSITY OF VIRGINIA"]
+        uva = True if (setCollege in aliases) else False
+
         if setMnemonic == "" and setName == "" and setNumber == "":
             return None
 
-        courses = InternalCourse.objects
+        if uva:
+            courses = InternalCourse.objects
+        else:
+            college = ExternalCollege.objects.filter(college_name=setCollege).first()
+            if college is None:
+                return None
+            else:
+                courses = ExternalCourse.objects.filter(college=college)
+
         if setMnemonic != "":
             courses = courses.filter(mnemonic=setMnemonic)
         if setNumber != "":
@@ -67,25 +84,26 @@ def submit_search(request):
     global setMnemonic
     global setName
     global setNumber
+    global setCollege
     setMnemonic = ""
     setName = ""
     setNumber = ""
+    setCollege = ""
 
     try:
         mnemonic = request.POST['mnemonic']
         name = request.POST['name']
         number = request.POST['number']
+        college = request.POST['college']
     except Exception:
         return render(request, 'search.html', {
             'error_message': "An error occurred…",
         })
     else:
-        if mnemonic != "":
-            setMnemonic = mnemonic.upper()
-        if name != "":
-            setName = name
-        if number != "":
-            setNumber = number.upper()
+        setMnemonic = mnemonic.upper()
+        setName = name
+        setNumber = number.upper()
+        setCollege = college.upper()
         return HttpResponseRedirect(reverse('courseSearch'))
 
 def handle_transfer_request(request):
