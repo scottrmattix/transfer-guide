@@ -32,5 +32,5 @@ urlpatterns = [
     path('search/', CourseSearch.as_view(), name='courseSearch'),
     path('search/internal/<int:pk>', InternalCoursePage.as_view(), name='internalCourse'),
     path('search/external/<int:pk>', ExternalCoursePage.as_view(), name='externalCourse'),
-    path('search/error/', submit_search, name='submit_search'),
+    path('search/error/', submit_search, name='submit_search'), # probably can be removed after submit_search was refactored
 ]

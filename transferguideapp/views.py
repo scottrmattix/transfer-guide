@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Group, User
 
+
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
@@ -11,14 +12,8 @@ from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTrans
 from .sis import request_data, unique_id
 import requests
 import json
-from django.db.models import Q
-import re
 
-# Global variables for search parameters (this probably needs to be replaced)
-setMnemonic = ""
-setName = ""
-setNumber = ""
-setCollege = ""
+from .searchfilters import search
 
 def set_group(request, user_id):
     if(request.method == 'POST'):
@@ -45,66 +40,31 @@ class CourseSearch(generic.ListView):
     context_object_name = 'course_list'
 
     def get_queryset(self):
-        aliases = ["", "UVA", "UNIVERSITY OF VIRGINIA"]
-        uva = True if (setCollege in aliases) else False
-
-        if setMnemonic == "" and setName == "" and setNumber == "":
-            return None
-
-        if uva:
-            courses = InternalCourse.objects
-        else:
-            college = ExternalCollege.objects.filter(college_name=setCollege).first()
-            if college is None:
-                return None
-            else:
-                courses = ExternalCourse.objects.filter(college=college)
-
-        if setMnemonic != "":
-            courses = courses.filter(mnemonic=setMnemonic)
-        if setNumber != "":
-            courses = courses.filter(course_number__startswith=setNumber)
-        if setName != "":
-            words = re.sub(r"[,/&:.()?!]", " ", setName).strip().split()
-            for w in words:
-                if w.isnumeric():
-                    n = int(w)
-                    if 0 < n < 6:
-                        r = ["I", "II", "III", "IV", "V"][n-1]
-                        courses = courses.filter(Q(course_name__icontains=w) |
-                                                 Q(course_name__endswith=f" {r}") |
-                                                 Q(course_name__icontains=f" {r} ") |
-                                                 Q(course_name__icontains=f" {r}:"))
-                        continue
-                courses = courses.filter(course_name__icontains=w)
-
+        college = self.request.session["search"]["college"]
+        mnemonic = self.request.session["search"]["mnemonic"]
+        number = self.request.session["search"]["number"]
+        name = self.request.session["search"]["name"]
+        courses = search(college, mnemonic, number, name)
         return courses.order_by('course_number').order_by('mnemonic')
 
 def submit_search(request):
-    global setMnemonic
-    global setName
-    global setNumber
-    global setCollege
-    setMnemonic = ""
-    setName = ""
-    setNumber = ""
-    setCollege = ""
-
-    try:
-        mnemonic = request.POST['mnemonic']
-        name = request.POST['name']
-        number = request.POST['number']
-        college = request.POST['college']
-    except Exception:
-        return render(request, 'search.html', {
-            'error_message': "An error occurred…",
-        })
+    request.session["search"] = {"college": "", "mnemonic": "", "number": "", "name": ""}
+    if request.method == "POST":
+        try:
+            college = request.POST["college"]
+            mnemonic = request.POST["mnemonic"]
+            number = request.POST["number"]
+            name = request.POST["name"]
+        except Exception as e:
+            return render(request, 'search.html', {'error_message': f"An error occurred: {e}"})
+        else:
+            request.session["search"]["college"] = college.upper()
+            request.session["search"]["mnemonic"] = mnemonic.upper()
+            request.session["search"]["number"] = number.upper()
+            request.session["search"]["name"] = name
+            return HttpResponseRedirect(reverse('courseSearch'))
     else:
-        setMnemonic = mnemonic.upper()
-        setName = name
-        setNumber = number.upper()
-        setCollege = college.upper()
-        return HttpResponseRedirect(reverse('courseSearch'))
+        return render(request, 'search.html')
 
 def handle_transfer_request(request):
     transfer_form = TransferRequestForm(request.POST)

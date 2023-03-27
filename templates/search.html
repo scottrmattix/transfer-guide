@@ -22,26 +22,29 @@
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-1 pb-2 mb-1 border-bottom"></div>
           <div class="col-auto">
             <label for="college" class="form-label">College:</label>
-            <input type="text" id="college" name="college" maxlength="200" class="form-control" placeholder="University of Virginia"  onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
+            <input type="text" id="college" name="college" maxlength="200" class="form-control" value="{{request.session.search.college}}" placeholder="University of Virginia"  onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
             <div class="form-text">Defaults to UVA.</div>
           </div>
           <div class="col-auto">
             <label for="mnemonic" class="form-label">Mnemonic:</label>
-            <input type="text" id="mnemonic" name="mnemonic" maxlength="200" class="form-control" placeholder="MATH"  onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
+            <input type="text" id="mnemonic" name="mnemonic" maxlength="4" class="form-control" value="{{request.session.search.mnemonic}}" placeholder="MATH"  onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
             <div class="form-text">Accepts SIS mnemonics only.</div>
           </div>
           <div class="col-auto">
             <label for="number" class="form-label">Number:</label>
-            <input type="text" id="number" name="number" maxlength="200" class="form-control" placeholder="1000" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
+            <input type="text" id="number" name="number" maxlength="4" class="form-control" value="{{request.session.search.number}}" placeholder="1320" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
             <div class="form-text">Enter a full or partial course number.</div>
           </div>
           <div class="col-auto">
             <label for="name" class="form-label">Title:</label>
-            <input type="text" id="name" name="name" maxlength="200" class="form-control" placeholder="Calculus II" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)">
+            <input type="text" id="name" name="name" maxlength="200" class="form-control" value="{{request.session.search.name}}" placeholder="Calculus II" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)">
             <div class="form-text">Try full names or key terms.</div>
           </div>
           <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Search</button>
+          </div>
+          <div class="col-auto">
+            <a href="{% url 'submit_search' %}" class="btn btn-danger" role="button" aria-pressed="true">Clear</a>
           </div>
           {% if error_message %}<p class="text-danger"><strong>{{ error_message }}</strong></p>{% endif %}
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-1 pb-2 mb-1 border-bottom"></div>

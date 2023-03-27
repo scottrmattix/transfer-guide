@@ -17,15 +17,23 @@
     {% bootstrap_messages %}
     <content>
       <div class="container-fluid p-5" align="left">
-        {% if course %} <h6>{{ course }}</h6> {% endif %}
+        {% if course %} <h6>{{ course }}</h6>
         <h3>Course Attributes</h3>
         <ul>
-        {% for name, value in course.get_fields %}
-          {% if value %}
-            <li>{{ name }}: {{ value }}</li>
-          {% endif %}
-        {% endfor %}
+          <li>College: The University of Virginia</li>
+          <li>Mnemonic: {{ course.mnemonic }}</li>
+          <li>Number: {{ course.course_number }}</li>
+          <li>Title: {{ course.course_name }}</li>
         </ul>
+        <form action="{% url 'submit_search' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" id="college" name="college" value="">
+          <input type="hidden" id="mnemonic" name="mnemonic" value="{{ course.mnemonic }}">
+          <input type="hidden" id="number" name="number" value="">
+          <input type="hidden" id="name" name="name" value="">
+          <button type="submit" class="btn btn-primary">Search Similar Courses</button>
+        </form>
+        {% endif %}
       </div>
 
       <div class="container-fluid p-5" align="left">
