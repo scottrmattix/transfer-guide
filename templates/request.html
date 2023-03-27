@@ -1,80 +1,42 @@
-{% load bootstrap5 %}
+{% extends "base.html" %}
+
 {% load socialaccount %}
+{% load bootstrap5 %}
 {% bootstrap_messages %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+{% block title %}Request{% endblock %}
 
-<style>
-	#profile-dropdown{
-		border-color: black;
-		background-color: rgb(234, 234, 234);
-		color: black;
-	}
-	#profile-dropdown:hover{
-		background-color: rgb(207, 207, 207);
-	}
-	body{
-		padding-top:12vh;
-	}
-</style>
-
-<html>
-	<body class="min-vh-100 bg-dark d-flex flex-column align-items-center">
-		{% if user.is_authenticated%}
-		<nav class="navbar fixed-top w-100 bg-light d-flex align-items-center">
-			<ul class="d-flex flex-row align-items-center">
-				<a href="/" class="nav-link pt-2 mx-0">Home</a>
-				<a href="{% url 'request' %}" class="nav-link pt-2 mx-5">Request Form</a>
-				<a href="#" class="nav-link pt-2 mx-0">Help</a>
-			</ul>   
-			<button class="d-flex fkex-row align-items-center dropdown mx-2 btn" id="profile-dropdown" data-bs-toggle="dropdown">
-				<a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
-					<img width="40px" height="40px" href="#"
-						src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"> {{ user.username }}
-				</a>
-			</button>
-			<div class="dropdown-menu dropdown-menu-end">
-				<a class="dropdown-item" href="#">Account Information</a>
-				<a class="dropdown-item" href="#">Pending Requests</a>
-				<a class="dropdown-item" href="#">Favorites</a>
-				<div class="dropdown-divider"></div>
-				<a class="dropdown-item" href="{% url 'logout' %}">Log Out</a>
-			</div>
-		</nav>
-		{% endif %}
-
-		<div class="min-vh-100 w-75 d-flex flex-row align-items-baseline justify-content-between">
-			<div></div><div></div><div></div><div></div> <!-- Spacer -->
-			<div class="d-flex flex-column align-items-center justify-content-center text-light mx-5">
-				<h3>
-					Transfer Request Form
-				</h3>
-				<form action="{% url 'request' %}" method="post" class="form">
-					{% csrf_token %}
-					{% bootstrap_form transfer_form %}
-					<input type="submit" value="Save", name="transfer">
-				</form>
-			</div>
-			<div class="d-flex flex-column align-items-center justify-content-center text-light mx-5">
-				<h3>
-					SIS Lookup
-				</h3>
-				<form action="{% url 'request' %}" method="get" class="form">
-					{% csrf_token %}
-					{% bootstrap_form sis_form %}
-					<input type="submit" value="Save", name="sis">
-				</form>
-				{% for c in r %}
-				<tr>
-					<td>{{c.crse_id}}</td>
-					<td>{{c.subject}}</td>
-					<td>{{c.catalog_nbr}}</td>
-					<td>{{c.descr}}</td>
-				</tr>
-				<br>
-				{% endfor %}
-			</div>
-		</div>
-	</body>
-</html>
+{% block content %}
+<div class="min-vh-100 w-75 d-flex flex-row align-items-baseline justify-content-between">
+	<div></div><div></div><div></div><div></div> <!-- Spacer -->
+	<div class="d-flex flex-column align-items-center justify-content-center text-light mx-5">
+		<h3>
+			Transfer Request Form
+		</h3>
+		<form action="{% url 'request' %}" method="post" class="form">
+			{% csrf_token %}
+			{% bootstrap_form transfer_form %}
+			<input type="submit" value="Save", name="transfer">
+		</form>
+	</div>
+	<div class="d-flex flex-column align-items-center justify-content-center text-light mx-5">
+		<h3>
+			SIS Lookup
+		</h3>
+		<form action="{% url 'request' %}" method="get" class="form">
+			{% csrf_token %}
+			{% bootstrap_form sis_form %}
+			<input type="submit" value="Save", name="sis">
+		</form>
+		{% for c in r %}
+		<tr>
+			<td>{{c.crse_id}}</td>
+			<td>{{c.subject}}</td>
+			<td>{{c.catalog_nbr}}</td>
+			<td>{{c.descr}}</td>
+		</tr>
+		<br>
+		{% endfor %}
+	</div>
+</div>
+{% endblock %}
