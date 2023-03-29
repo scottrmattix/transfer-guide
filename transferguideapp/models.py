@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 #Model representing an external University that may or may not be accepted
 class ExternalCollege(models.Model):
@@ -24,14 +25,19 @@ class ExternalCourse(models.Model):
     def get_model(self):
         return self._meta.model_name
 
-    def get_fields(self):
-        return [(field.name, field.value_to_string(self)) for field in ExternalCourse._meta.fields]
+    def get_transfers(self):
+        return self.coursetransfer_set.filter(accepted=True)
 
     def get_equivalent(self):
-        transfers = CourseTransfer.objects.all().filter(accepted=True, external_course=self)
-        internalIDs = transfers.values_list('internal_course', flat=True)
-        internals = InternalCourse.objects.all().filter(id__in=internalIDs)
-        return internals
+        transfers = self.coursetransfer_set.filter(accepted=True)
+        intIDs = transfers.values_list('internal_course', flat=True).distinct()
+        return InternalCourse.objects.filter(id__in=intIDs).order_by('course_number')
+
+    def get_users(self):
+        transfers = self.get_transfers()
+        faves = Favorites.objects.filter(transfer__in=transfers)
+        userIDs = faves.values_list('user', flat=True).distinct()
+        return User.objects.filter(id__in=userIDs)
 
 #Model representing an internal UVA course
 class InternalCourse(models.Model):
@@ -47,14 +53,19 @@ class InternalCourse(models.Model):
     def get_model(self):
         return self._meta.model_name
 
-    def get_fields(self):
-        return [(field.name, field.value_to_string(self)) for field in InternalCourse._meta.fields]
+    def get_transfers(self):
+        return self.coursetransfer_set.filter(accepted=True)
 
     def get_equivalent(self):
-        transfers = CourseTransfer.objects.all().filter(accepted=True, internal_course=self)
-        externalIDs = transfers.values_list('external_course', flat=True)
-        externals = ExternalCourse.objects.all().filter(id__in=externalIDs)
-        return externals
+        transfers = self.coursetransfer_set.filter(accepted=True)
+        extIDs = transfers.values_list('external_course', flat=True).distinct()
+        return ExternalCourse.objects.filter(id__in=extIDs).order_by('course_number', 'college__college_name')
+
+    def get_users(self):
+        transfers = self.get_transfers()
+        faves = Favorites.objects.filter(transfer__in=transfers)
+        userIDs = faves.values_list('user', flat=True).distinct()
+        return User.objects.filter(id__in=userIDs)
 
 #Model representing a courses transfer
 class CourseTransfer(models.Model):
@@ -64,3 +75,16 @@ class CourseTransfer(models.Model):
 
     def __str__(self):
         return f"External Course : {self.external_course} \n Internal Course: {self.internal_course} \n Accepted: {self.accepted}"
+
+    def get_users(self):
+        faves = self.favorites_set.all()
+        userIDs = faves.values_list('user', flat=True).distinct()
+        return User.objects.filter(id__in=userIDs)
+
+#model for favorited courses
+class Favorites(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_items', default=None)
+    transfer = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
+
+    def __str__(self):
+        return f"{self.transfer.internal_course.mnemonic} {self.transfer.internal_course.course_number}: {self.transfer.internal_course.course_name} = {self.transfer.external_course.college} {self.transfer.external_course.mnemonic} {self.transfer.external_course.course_number}: {self.transfer.external_course.course_name} "

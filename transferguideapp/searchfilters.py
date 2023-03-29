@@ -6,45 +6,60 @@ from django.db.models import Q
 # less cluttered. Calling search() allows us to filter courses by college, mnemonic
 # number, and name.
 
-def chooseCollege(inputCollege):
+def setCollege(request, inputCollege):
     aliases = ["", "UVA", "UNIVERSITY OF VIRGINIA"]
     if inputCollege in aliases:
         courses = InternalCourse.objects
+        q = Q()
     else:
         college = ExternalCollege.objects.filter(college_name=inputCollege).first()
-        courses = ExternalCourse.objects.none() if (college is None) else ExternalCourse.objects.filter(college=college)
-    return courses
+        courses = ExternalCourse.objects
+        q = Q(college=college)
+        if courses.count() > 0:
+            request.session['user_college'] = college.college_name
+    return q, courses
 
-def filterMnemonic(courses, inputMnemonic):
-    return courses if (inputMnemonic == "") else courses.filter(mnemonic=inputMnemonic)
+def filterMnemonic(inputMnemonic):
+    return Q(mnemonic=inputMnemonic) if inputMnemonic else Q()
 
-def filterNumber(courses, inputNumber):
-    return courses if (inputNumber == "") else courses.filter(course_number__startswith=inputNumber)
+def filterNumber(inputNumber):
+    return Q(course_number__startswith=inputNumber) if inputNumber else Q()
 
-def filterName(courses, inputName):
-    if inputName == "":
-        return courses
-
-    words = re.sub(r"[,/&:.()?!]", " ", inputName).strip().split()
-    for w in words:
-        if w.isnumeric():
-            n = int(w)
+def filterName(inputName):
+    q = Q()
+    cleanName = re.sub(r"[,/&:.()?!'-]", " ", inputName).strip()
+    if not cleanName:
+        return q
+    for word in cleanName.split():
+        if word.isnumeric():
+            n = int(word)
             if 0 < n < 6:
                 r = ["I", "II", "III", "IV", "V"][n - 1]
-                courses = courses.filter(Q(course_name__icontains=w) |
-                                         Q(course_name__endswith=f" {r}") |
-                                         Q(course_name__icontains=f" {r} ") |
-                                         Q(course_name__icontains=f" {r}:"))
-                continue
-        courses = courses.filter(course_name__icontains=w)
-    return courses
+                qU = Q(course_name__icontains=word) | Q(course_name__endswith=f" {r}") | Q(course_name__icontains=f" {r} ")
+                q = q & qU
+        else:
+            q = q & Q(course_name__icontains=word)
+    return q
 
 
-def search(inputCollege, inputMnemonic, inputNumber, inputName):
-    if inputMnemonic + inputNumber + inputName == "":
-        return InternalCourse.objects.none()
-    courses = chooseCollege(inputCollege)
-    courses = filterMnemonic(courses, inputMnemonic)
-    courses = filterNumber(courses, inputNumber)
-    courses = filterName(courses, inputName)
-    return courses
+def search(request):
+    inputCollege = request.session["search"]["college"]
+    inputMnemonic = request.session["search"]["mnemonic"]
+    inputNumber = request.session["search"]["number"]
+    inputName = request.session["search"]["name"]
+
+    q1, courses = setCollege(request, inputCollege)
+    q2 = filterMnemonic(inputMnemonic)
+    q3 = filterNumber(inputNumber)
+    q4 = filterName(inputName)
+
+    # WARNING: this is not true comparison, just the string representation
+    # this is only good to check if they're empty
+    if q1 == q2 == q3 == q4:
+        return courses.none()
+    else:
+        return courses.filter(q1 & q2 & q3 & q4)
+
+def debug(request):
+    for key, value in request.session.items():
+        print('{} => {}'.format(key, value))

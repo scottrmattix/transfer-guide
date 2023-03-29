@@ -17,6 +17,7 @@
     <content>
       <div class="container-fluid px-5 py-2" align="left">
         <h3>Course Search</h3>
+        <!--Form for entering a course search-->
         <form class="row gy-1 gx-15 align-items-center" action="{% url 'submit_search' %}" method="post">
           {% csrf_token %}
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-1 pb-2 mb-1 border-bottom"></div>
@@ -57,10 +58,11 @@
           <div class="list-group">
             {% for course in course_list.all %}
               {%if course.get_model == 'internalcourse'%}
-                <a href="{% url 'internalCourse' course.id %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ course }}</a>
-              {% endif %}
-              {%if course.get_model == 'externalcourse'%}
-                <a href="{% url 'externalCourse' course.id %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ course }}</a>
+                  <!--Link to InternalCourse-->
+                  <a href="{% url 'internalCourse' course.id %}" class="list-group-item list-group-item-{% if user in course.get_users %}success{% else %}light{% endif %} list-group-item-action flex-column align-items-start">{{ course }}</a>
+              {% else %}
+                <!--Link to ExternalCourse-->
+                <a href="{% url 'externalCourse' course.id %}" class="list-group-item list-group-item-{% if user in course.get_users %}success{% else %}light{% endif %} list-group-item-action flex-column align-items-start">{{ course }}</a>
               {% endif %}
             {% endfor %}
           </div>

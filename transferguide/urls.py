@@ -18,9 +18,8 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
 
-from transferguideapp.views import set_group, submit_transfer_request
-from transferguideapp.views import CourseSearch, submit_search
-from transferguideapp.views import InternalCoursePage, ExternalCoursePage
+from transferguideapp.views import set_group, submit_transfer_request, favorites, add_favorite, delete_favorite, delete_favorite2, CourseSearch, submit_search, create_favorite, InternalCoursePage, ExternalCoursePage
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,8 +28,17 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('request/', submit_transfer_request , name='request'),
     path('set_group/<int:user_id>', set_group , name='set_group'),
+
     path('search/', CourseSearch.as_view(), name='courseSearch'),
     path('search/internal/<int:pk>', InternalCoursePage.as_view(), name='internalCourse'),
     path('search/external/<int:pk>', ExternalCoursePage.as_view(), name='externalCourse'),
-    path('search/error/', submit_search, name='submit_search'), # probably can be removed after submit_search was refactored
-]
+    path('search/clear/', submit_search, name='submit_search'), # this is for error handling
+
+    path('create/', create_favorite, name='create_favorite'),
+    path('delete/', delete_favorite2, name='delete_favorite2'),
+
+    path('favorites/', favorites, name='favorites'),
+    path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),
+    path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),
+    ]
+

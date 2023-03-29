@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Page</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {# Load the tag library #}
+    {% load bootstrap5 %}
+
+    {# Load CSS and JavaScript #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    {# Display django.contrib.messages as Bootstrap alerts #}
+    {% bootstrap_messages %}
+    <content>
+      <div class="container-fluid p-5" align="left">
+        <h3>Favorites</h3>
+
+        <!--List the course equivalencies-->
+        {% if favorites %}
+          <div class="list-group">
+            {% for f in favorites %}
+                <!--Define destination of post request (create or delete favorite)-->
+                <form action="{% url 'delete_favorite2' %}" method="post">
+                  {% csrf_token %}
+                  <!--Hidden form fields for favorite creation/deletion-->
+                  <input type="hidden" id="external" name="primary" value="{{ f.transfer.internal_course.pk }}">
+                  <input type="hidden" id="internal" name="secondary" value="{{ f.transfer.external_course.pk }}">
+                  <input type="hidden" id="type" name="type" value="favorites">
+                  <div class="row">
+                    <!--Link to course equivalency-->
+                    <div class="col-md-5"><a href="{% url 'externalCourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action flex-column align-items-start">{{ f.transfer.external_course }}</a></div>
+                    <div class="col-md-5"><a href="{% url 'internalCourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action flex-column align-items-start">{{ f.transfer.internal_course }}</a></div>
+                    <!--Favoite / Unfavorite Button-->
+                    <div class="col-md"><button class="list-group-item list-group-item-light list-group-item-action flex-column align-items-center">Unfavorite</button></div>
+                  </div>
+                </form>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p>No Favorites Found.</p>
+        {% endif %}
+      </div>
+    </content>
+</body>
+</html>
+
+
+

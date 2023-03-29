@@ -39,10 +39,18 @@
       <div class="container-fluid p-5" align="left">
         {% if course %} <h6>{{ course }}</h6> {% endif %}
         <h3>Course Equivalencies</h3>
-        {% if course.get_equivalent %}
+        {% if course.get_transfers %}
           <div class="list-group">
-            {% for ext in course.get_equivalent %}
-              <a href="{% url 'externalCourse' ext.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ ext }}</a>
+            {% for ct in course.get_transfers %}
+              {% if ct.external_course.college.college_name == request.session.user_college %}
+              <a href="{% url 'externalCourse' ct.external_course.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ ct.external_course }}</a>
+              <form action="{% url 'create_favorite' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" id="transfer" name="transfer" value="{{ ct.pk }}">
+                <input type="hidden" id="type" name="type" value="internal">
+                <button type="submit" class="btn btn-primary">Favorite</button>
+              </form>
+              {% endif %}
             {% endfor %}
           </div>
         {% else %}

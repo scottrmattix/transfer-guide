@@ -39,10 +39,10 @@
       <div class="container-fluid p-5" align="left">
         {% if course %} <h6>{{ course }}</h6> {% endif %}
         <h3>Course Equivalencies</h3>
-        {% if course.get_equivalent %}
+        {% if course.get_transfers %}
           <div class="list-group">
-            {% for int in course.get_equivalent %}
-              <a href="{% url 'internalCourse' int.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ int }}</a>
+            {% for ct in course.get_transfers %}
+              <a href="{% url 'internalCourse' ct.internal_course.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">{{ ct.internal_course }}</a>
             {% endfor %}
           </div>
         {% else %}

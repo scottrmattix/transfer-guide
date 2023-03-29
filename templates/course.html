@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Page</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {# Load the tag library #}
+    {% load bootstrap5 %}
+
+    {# Load CSS and JavaScript #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    {# Display django.contrib.messages as Bootstrap alerts #}
+    {% bootstrap_messages %}
+    <content>
+      <div class="container-fluid p-5" align="left">
+        {% if course %} <h6>{{ course }}</h6>
+        <h3>Course Attributes</h3>
+        <ul>
+          <li>College: {{ college_name}} {{foreign}}</li>
+          <li>Mnemonic: {{ course.mnemonic }}</li>
+          <li>Number: {{ course.course_number }}</li>
+          <li>Title: {{ course.course_name }}</li>
+        </ul>
+        <form action="{% url 'submit_search' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" id="college" name="college" value="{{ college_name }}">
+          <input type="hidden" id="mnemonic" name="mnemonic" value="{{ course.mnemonic }}">
+          <input type="hidden" id="number" name="number" value="">
+          <input type="hidden" id="name" name="name" value="">
+          <button type="submit" class="btn btn-primary">Search Similar Courses</button>
+        </form>
+        {% endif %}
+      </div>
+
+      <!--For Testing Purposes Only
+      <p>Equivalents: {{ equivalents }}</p>
+      <p>Exclusive: {{ exclusives }}</p>
+      <p>Favorites: {{ favorites }}</p>
+      -->
+
+
+      <div class="container-fluid p-5" align="left">
+
+        {% if course %} <h6>{{ course }}</h6> {% endif %}
+        <div style="float:left;"><h3>Course Equivalencies</h3></div>
+        <div style="float:right;">
+          <!--Checkbox for specifying which colleges are visible-->
+          {% if course.get_model == "internalcourse" %}
+          <input class="form-check-input" type="checkbox" align="right" id="toggle1" checked onclick="toggle();">
+          <label class="form-check-label" for="toggle1">College Specific</label>
+          {% endif %}
+          <!--Javascript for hiding/unhiding elements (hidden by default) -->
+          <script>
+              function toggle() {
+                var x = document.getElementById("exclude");
+                if (x.style.display === "none") {x.style.display = "block";}
+                else { x.style.display = "none";}
+              }
+            </script>
+        </div>
+
+        <!--The following div is only here because it was the only way I could get the styling to reset-->
+        <div style="clear:both;" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-1 pb-1 mb-1 border-bottom"></div>
+
+        <!--List the course equivalencies-->
+        {% if equivalents %}
+          <div class="list-group">
+            {% for e in equivalents %}
+              <!--Define ID for javascript checkbox -->
+              {% if e in exclusives%}<div id="include">{% else %}<div id="exclude" style="display: none;">{% endif %}
+                <!--Define destination of post request (create or delete favorite)-->
+                {% if e in favorites %}<form action="{% url 'delete_favorite2' %}" method="post">{% else %}<form action="{% url 'create_favorite' %}" method="post">{% endif %}
+                  {% csrf_token %}
+                  <!--Hidden form fields for favorite creation/deletion-->
+                  <input type="hidden" id="external" name="secondary" value="{{ e.pk }}">
+                  <input type="hidden" id="internal" name="primary" value="{{ course.pk }}">
+                  <input type="hidden" id="type" name="type" value="{{ course.get_model }}">
+                  <div class="row">
+                    <!--Link to course equivalency-->
+                    <div class="col-md-10"><a href="{% url equiv_url e.pk %}" class="list-group-item list-group-item-{% if e in favorites %}success{% else %}light{% endif %} list-group-item-action flex-column align-items-start">{{ e }}</a></div>
+                    <!--Favoite / Unfavorite Button-->
+                    <div class="col-md"><button class="list-group-item list-group-item-light list-group-item-action flex-column align-items-center">{% if e in favorites %}Unfavorite{% else %}Favorite{% endif %}</button></div>
+                  </div>
+                </form>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p>No Accepted Course Equivalencies Found.</p>
+        {% endif %}
+      </div>
+    </content>
+</body>
+</html>
+
+
+
