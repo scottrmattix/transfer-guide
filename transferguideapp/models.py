@@ -59,7 +59,7 @@ class InternalCourse(models.Model):
     def get_equivalent(self):
         transfers = self.coursetransfer_set.filter(accepted=True)
         extIDs = transfers.values_list('external_course', flat=True).distinct()
-        return ExternalCourse.objects.filter(id__in=extIDs).order_by('course_number', 'college__college_name')
+        return ExternalCourse.objects.filter(id__in=extIDs).order_by('college__college_name', 'course_number')
 
     def get_users(self):
         transfers = self.get_transfers()

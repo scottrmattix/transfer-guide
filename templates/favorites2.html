@@ -24,11 +24,11 @@
           <div class="list-group">
             {% for f in favorites %}
                 <!--Define destination of post request (create or delete favorite)-->
-                <form action="{% url 'delete_favorite2' %}" method="post">
+                <form action="{% url 'update_favorites' %}" method="post">
                   {% csrf_token %}
                   <!--Hidden form fields for favorite creation/deletion-->
-                  <input type="hidden" id="external" name="primary" value="{{ f.transfer.internal_course.pk }}">
-                  <input type="hidden" id="internal" name="secondary" value="{{ f.transfer.external_course.pk }}">
+                  <input type="hidden" id="external" name="primary" value="{{ f.transfer.external_course.pk }}">
+                  <input type="hidden" id="internal" name="secondary" value="{{ f.transfer.internal_course.pk }}">
                   <input type="hidden" id="type" name="type" value="favorites">
                   <div class="row">
                     <!--Link to course equivalency-->

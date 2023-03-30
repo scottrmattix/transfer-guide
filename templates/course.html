@@ -71,18 +71,16 @@
           <div class="list-group">
             {% for e in equivalents %}
               <!--Define ID for javascript checkbox -->
-              {% if e in exclusives%}<div id="include">{% else %}<div id="exclude" style="display: none;">{% endif %}
-                <!--Define destination of post request (create or delete favorite)-->
-                {% if e in favorites %}<form action="{% url 'delete_favorite2' %}" method="post">{% else %}<form action="{% url 'create_favorite' %}" method="post">{% endif %}
+              <div {% if e not in exclusives %} id="exclude" style="display: none;"{% endif %}>
+                <form action="{% url 'update_favorites' %}" method="post">
                   {% csrf_token %}
-                  <!--Hidden form fields for favorite creation/deletion-->
                   <input type="hidden" id="external" name="secondary" value="{{ e.pk }}">
                   <input type="hidden" id="internal" name="primary" value="{{ course.pk }}">
                   <input type="hidden" id="type" name="type" value="{{ course.get_model }}">
                   <div class="row">
                     <!--Link to course equivalency-->
                     <div class="col-md-10"><a href="{% url equiv_url e.pk %}" class="list-group-item list-group-item-{% if e in favorites %}success{% else %}light{% endif %} list-group-item-action flex-column align-items-start">{{ e }}</a></div>
-                    <!--Favoite / Unfavorite Button-->
+                    <!--Favorite / Unfavorite Button-->
                     <div class="col-md"><button class="list-group-item list-group-item-light list-group-item-action flex-column align-items-center">{% if e in favorites %}Unfavorite{% else %}Favorite{% endif %}</button></div>
                   </div>
                 </form>

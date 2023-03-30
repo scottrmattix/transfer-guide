@@ -12,6 +12,7 @@ import json
 import re
 from .searchfilters import search
 from .context import context_internal, context_external
+from .viewhelper import update_favorites_helper
 
 def set_group(request, user_id):
     if(request.method == 'POST'):
@@ -48,7 +49,7 @@ class CourseSearch(generic.ListView):
 
     def get_queryset(self):
         courses = search(self.request)
-        return courses.order_by('course_number', 'mnemonic')
+        return courses.order_by('mnemonic', 'course_number')
 
 # a session error arises when .../search/ is visited without calling submit_search beforehand
 # to bypass the issue, first visit .../search/error/.
@@ -157,90 +158,19 @@ def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_cou
     else:
         raise Http404("Missing course information")
 
-def create_favorite(request):
+def update_favorites(request):
     if request.method == "POST":
         try:
             user = request.user
-            primary_id = request.POST["primary"]
-            secondary_id = request.POST["secondary"]
-            course_type = request.POST["type"]
+            pid = request.POST["primary"]
+            sid = request.POST["secondary"]
+            type = request.POST["type"]
         except Exception as e:
-            return render(request, request.path_info, {'error_message': f"An error occurred: {e}"})
-        else:
-            # InternalCoursePage view
-            if course_type == "internalcourse":
-                transfer = CourseTransfer.objects.get(internal_course=primary_id,
-                                                      external_course=secondary_id)
+            return render(request, 'search.html', {'error_message': f"An error occurred: {e}"})
+        return update_favorites_helper(user, pid, sid, type)
+    return render(request, 'search.html')
 
-            # ExternalCoursePage view
-            else:
-                transfer = CourseTransfer.objects.get(internal_course=secondary_id,
-                                                      external_course=primary_id)
 
-            # Validate transfer and user before creating favorite
-            if not (user is None or transfer is None):
-                favorite = Favorites(user=user, transfer=transfer)
-                favorite.save()
-
-            # Go back to InternalCoursePage
-            if course_type == "internalcourse":
-                course_id = transfer.internal_course.pk
-                return redirect('internalCourse', pk=course_id)
-
-            # Go back to ExternalCoursePage
-            elif course_type == "externalcourse":
-                course_id = transfer.external_course.pk
-                return redirect('externalCourse', pk=course_id)
-
-            # This shouldn't happen, but go back to search
-            else:
-                return render(request, 'search.html')
-
-    # If not post request, go to search page
-    else:
-        return render(request, 'search.html')
-
-def delete_favorite2(request):
-    if request.method == "POST":
-        try:
-            user = request.user
-            primary_id = request.POST["primary"]
-            secondary_id = request.POST["secondary"]
-            course_type = request.POST["type"]
-        except Exception as e:
-            return render(request, request.path_info, {'error_message': f"An error occurred: {e}"})
-        else:
-            # ExternalCoursePage view
-            if course_type == "externalcourse":
-                transfer = CourseTransfer.objects.get(internal_course=secondary_id,
-                                                      external_course=primary_id)
-            # InternalCoursePage or Favorites view
-            else:
-                transfer = CourseTransfer.objects.get(internal_course=primary_id,
-                                                      external_course=secondary_id)
-
-            # Validate user and transfer objects before deleting
-            if not (user is None or transfer is None):
-                favorite = Favorites.objects.get(user=user, transfer=transfer)
-                favorite.delete()
-
-            # Go back to InternalCoursePage
-            if course_type == "internalcourse":
-                course_id = transfer.internal_course.pk
-                return redirect('internalCourse', pk=course_id)
-
-            # Go back to ExternalCoursePage
-            elif course_type == "externalcourse":
-                course_id = transfer.external_course.pk
-                return redirect('externalCourse', pk=course_id)
-
-            # Go back to Favorites view
-            else:
-                return redirect('favorites')
-
-    # If not post request, go to search page
-    else:
-        return render(request, 'search.html')
 
 
 def delete_favorite(request, favorite_id):
