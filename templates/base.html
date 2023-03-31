@@ -18,31 +18,45 @@
         margin-top: 15vh;
         margin-bottom: 5vh;
     }
+    #profile-dropdown:hover{
+        background-color: rgb(235, 235, 235);
+    }
 </style>
 {% endif %}
-<body class="min-vh-100 bg-dark d-flex flex-column align-items-center">
+<body class="bg-dark d-flex flex-column align-items-center">
     {% if user.is_authenticated%}
-    <nav class="navbar fixed-top w-100 bg-light d-flex align-items-center">
-        <ul class="d-flex flex-row align-items-center">
-            <a href="/" class="nav-link pt-2 mx-0">Home</a>
-            <a href="{% url 'request' %}" class="nav-link pt-2 mx-5">Request Form</a>
-            <a href="{% url 'submit_search' %}" class="nav-link pt-2 mx-5">Search</a>
-            <a href="#" class="nav-link pt-2 mx-0">Help</a>
-        </ul>
-        <button class="d-flex fkex-row align-items-center dropdown mx-2 btn btn-outline-dark" id="profile-dropdown" data-bs-toggle="dropdown">
-            <a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
-                <img width="40px" height="40px" href="#"
-                    src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"> {{ user.username }}
-            </a>
-        </button>
-        <div class="dropdown-menu dropdown-menu-end">
-            <a class="dropdown-item" href="#">Account Information</a>
-            <a class="dropdown-item" href="#">Pending Requests</a>
-            <a class="dropdown-item" href="{% url 'favorites' %}">Favorites</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'logout' %}">Log Out</a>
-        </div>
-    </nav>
+        <nav class="navbar fixed-top w-100 bg-light d-flex align-items-center">
+            <ul class="d-flex flex-row align-items-center">
+                {% if user.groups.all.0.name == 'users' %}
+                    <a href="/" class="nav-link pt-2 mx-0"> Home </a>
+                    <a href="{% url 'request' %}" class="nav-link pt-2 mx-5"> Request Form </a>
+                    <a href="#" class="nav-link pt-2 mx-0"> Help </a>
+                {% else %}
+                    <a href="/" class="nav-link pt-2 mx-0"> Home </a>
+                    <a href="#" class="nav-link pt-2 mx-5"> Resolve Transfer Requests </a>
+                    <a href="#" class="nav-link pt-2 mx-0"> Resolve Help Requests </a>
+                {% endif %}
+            </ul>   
+            <button class="d-flex fkex-row align-items-center dropdown mx-2 btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
+                <a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
+                    <img width="40px" height="40px" href="#"
+                        src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"> {{ user.username }}
+                </a>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                {% if user.groups.all.0.name == 'users' %}
+                    <a class="dropdown-item" href="{% url 'account_info' %}"> Account Information </a>
+                    <a class="dropdown-item" href="#"> Pending Requests </a>
+                    <a class="dropdown-item" href="{% url 'favorites' %}"> Favorites </a>
+                {% else %}
+                    <a class="dropdown-item" href="{% url 'account_info' %}"> Account Information </a>
+                    <a class="dropdown-item" href="#"> Resolved Requests </a>
+                    <a class="dropdown-item" href="{% url 'favorites' %}"> Favorites </a>
+                {% endif %}
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'logout' %}"> Log Out </a>
+            </div>
+        </nav>
     {% endif %}
 
     {% block content %}{% endblock %}

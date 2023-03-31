@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load socialaccount %}
+
+{% block title %} Account Information {% endblock %}
+
+{% block content %}
+
+<table class="table text-light h4 mt-5 w-auto">
+    <tbody>
+      <tr>
+        <th scope="row"> Username: </th>
+        <td> {{ user.username }} </td>
+      </tr>
+      <tr>
+        <th scope="row"> First Name: </th>
+        <td> {{ user.first_name }} </td>
+      </tr>
+      <tr>
+        <th scope="row"> Last Name: </th>
+        <td> {{ user.last_name }} </td>
+      </tr>
+      <tr>
+        <th scope="row"> Email Address: </th>
+        <td> {{ user.email }} </td>
+      </tr>
+      <tr>
+        <th scope="row"> Permissions: </th>
+        <td> {{ permissions }} </td>
+      </tr>
+    </tbody>
+</table>
+
+{% if permissions != "Admin" %}
+    <button onClick="" class="btn btn-light mt-5 ">
+        Request Permission Change
+    </button>
+{% else %}
+{% endif %}
+
+{% endblock %}
