@@ -17,7 +17,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
-from transferguideapp.views import set_group, submit_transfer_request 
+
+from transferguideapp.views import set_group, submit_transfer_request, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +28,24 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('request/', submit_transfer_request , name='request'),
     path('set_group/<int:user_id>', set_group , name='set_group'),
-]
+
+    path('search/', CourseSearch.as_view(), name='courseSearch'),
+    path('search/clear/', submit_search, name='submit_search'), # this is for error handling
+    path('internal/<int:pk>', InternalCoursePage.as_view(), name='internalcourse'),
+    path('external/<int:pk>', ExternalCoursePage.as_view(), name='externalcourse'),
+
+    path('internal/<int:pk>/update', UpdateInternal.as_view(), name='internalcourseUpdate'),
+    path('external/<int:pk>/update', UpdateExternal.as_view(), name='externalcourseUpdate'),
+    path('course/update/', UpdateCourses.as_view(), name='updateCourses'),
+    path('course/update/submit', submit_update, name='submit_update'),
+
+    path('favorites/', favorites, name='favorites'),
+    path('favorites/update/', update_favorites, name='update_favorites'),
+
+    path('internal/<int:pk>/request', CourseRequest.as_view(), name='courseRequest'),
+    path('course/request', make_request, name='make_request'),
+
+    path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),
+    path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),
+    ]
+

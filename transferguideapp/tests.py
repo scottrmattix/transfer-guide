@@ -1,5 +1,9 @@
 from django.test import TestCase
-from .models import CourseTransfer, ExternalCourse, InternalCourse, ExternalCollege
+from .models import CourseTransfer, ExternalCourse, InternalCourse, ExternalCollege, Favorites
+from django.contrib.auth.models import Group, User
+from .searchfilters import search, setCollege, filterMnemonic, filterNumber, filterName
+from django.test.client import RequestFactory, Client
+from django.contrib.sessions.middleware import SessionMiddleware
 
 # This test is just to verify that CI is working
 #class TestFail(TestCase):
@@ -27,8 +31,6 @@ class TestModelCreation(TestCase):
         self.assertEqual(str(course_transfer), str(CourseTransfer.objects.get(external_course = ExternalCourse.objects.get(course_number = "123", mnemonic = "CS"))))
         clean_data()
 
-
-
     def test_external_course_create(self):
         exter_college = ExternalCollege(college_name = "Piedmont Valley Community College")
         exter_college.save()
@@ -51,3 +53,31 @@ class TestModelCreation(TestCase):
         exter_college.save()
         self.assertEqual(str(exter_college), str(ExternalCollege.objects.get(college_name = "Piedmont Valley Community College")))
         clean_data()
+
+
+
+class SearchTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='12345')
+        login = self.client.login(username='testuser', password='12345')
+
+        for i in range(1,6):
+            college = ExternalCollege.objects.create(college_name=f"college{i}",
+                                                     domestic_college=True)
+            external = ExternalCourse.objects.create(college=college,
+                                                     mnemonic=f"mnemonic{i}",
+                                                     course_number=f"number{i}",
+                                                     course_name=f"name{i}")
+            internal = InternalCourse.objects.create(mnemonic=f"mnemonic{i}",
+                                                     course_number=f"number{i}",
+                                                     course_name=f"name{i}")
+            transfer = CourseTransfer.objects.create(internal_course=internal,
+                                                     external_course=external,
+                                                     accepted=True)
+            if i % 2 == 1:
+                favorite = Favorites.objects.create(user=self.user, transfer=transfer)
+        return
+
+    def test_same_user(self):
+        self.assertEqual(Favorites.objects.first().user, Favorites.objects.last().user)
