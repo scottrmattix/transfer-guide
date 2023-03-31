@@ -7,13 +7,20 @@ from django.views import generic
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
 from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites
 from .sis import request_data, unique_id
-import requests
-import json
-import re
 from django.db.models import Q
 from .searchfilters import search
 from .context import context_internal, context_external
 from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper
+
+def account_info(request):
+    user = request.user
+    permissions = "User"
+    if(user.groups.filter(name='admins').exists()):
+        permissions = "Admin"
+    if user.is_authenticated:
+        return render(request, 'account_info.html', {'user': user, 'permissions': permissions})
+    else:
+        return redirect('home')
 
 def set_group(request, user_id):
     if(request.method == 'POST'):
