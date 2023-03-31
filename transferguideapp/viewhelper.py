@@ -19,11 +19,11 @@ from django.db.models import Q
 def update_favorites_helper(user, pid, sid, type):
     if type == "internalcourse":
         q = Q(internal_course=pid, external_course=sid)
-        response = redirect('internalCourse', pk=pid)
+        response = redirect(type, pk=pid)
 
     elif type == "externalcourse":
         q = Q(internal_course=sid, external_course=pid)
-        response = redirect('externalCourse', pk=pid)
+        response = redirect(type, pk=pid)
 
     else:
         q = Q(internal_course=sid, external_course=pid)

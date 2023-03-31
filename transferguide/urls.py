@@ -30,8 +30,8 @@ urlpatterns = [
     path('set_group/<int:user_id>', set_group , name='set_group'),
 
     path('search/', CourseSearch.as_view(), name='courseSearch'),
-    path('search/internal/<int:pk>', InternalCoursePage.as_view(), name='internalCourse'),
-    path('search/external/<int:pk>', ExternalCoursePage.as_view(), name='externalCourse'),
+    path('search/internal/<int:pk>', InternalCoursePage.as_view(), name='internalcourse'),
+    path('search/external/<int:pk>', ExternalCoursePage.as_view(), name='externalcourse'),
     path('search/clear/', submit_search, name='submit_search'), # this is for error handling
 
     path('favorites/', favorites, name='favorites'),

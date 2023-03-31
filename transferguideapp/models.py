@@ -9,9 +9,6 @@ class ExternalCollege(models.Model):
     def __str__(self):
         return f"{self.college_name}"
 
-    def get_fields(self):
-        return [(field.name, field.value_to_string(self)) for field in ExternalCollege._meta.fields]
-
 #Model representing an external Course from an external university
 class ExternalCourse(models.Model):
     college = models.ForeignKey(ExternalCollege, on_delete=models.CASCADE)
@@ -20,9 +17,10 @@ class ExternalCourse(models.Model):
     course_name = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"{self.mnemonic} ({self.course_number}): {self.course_name} from {self.college.college_name}"
+        return f"{self.mnemonic} {self.course_number}:\t{self.course_name}"
 
     def get_model(self):
+        # this string matches the 'externalcourse' view name
         return self._meta.model_name
 
     def get_transfers(self):
@@ -39,6 +37,9 @@ class ExternalCourse(models.Model):
         userIDs = faves.values_list('user', flat=True).distinct()
         return User.objects.filter(id__in=userIDs)
 
+    def college_name(self):
+        return self.college.college_name
+
 #Model representing an internal UVA course
 class InternalCourse(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -48,9 +49,10 @@ class InternalCourse(models.Model):
     course_name = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"{self.mnemonic} ({self.course_number}): {self.course_name}"
+        return f"{self.mnemonic} {self.course_number}: {self.course_name}"
 
     def get_model(self):
+        # this string matches the 'internalcourse' view name
         return self._meta.model_name
 
     def get_transfers(self):
@@ -66,6 +68,9 @@ class InternalCourse(models.Model):
         faves = Favorites.objects.filter(transfer__in=transfers)
         userIDs = faves.values_list('user', flat=True).distinct()
         return User.objects.filter(id__in=userIDs)
+
+    def college_name(self):
+        return "University of Virginia"
 
 #Model representing a courses transfer
 class CourseTransfer(models.Model):

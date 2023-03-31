@@ -8,14 +8,14 @@ from django.db.models import Q
 
 def setCollege(request, inputCollege):
     aliases = ["", "UVA", "UNIVERSITY OF VIRGINIA"]
-    if inputCollege in aliases:
+    if inputCollege.upper() in aliases:
         courses = InternalCourse.objects
         q = Q()
     else:
         college = ExternalCollege.objects.filter(college_name=inputCollege).first()
         courses = ExternalCourse.objects
         q = Q(college=college)
-        if courses.count() > 0:
+        if college:
             request.session['user_college'] = college.college_name
     return q, courses
 

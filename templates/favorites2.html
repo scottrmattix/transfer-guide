@@ -18,32 +18,37 @@
     <content>
       <div class="container-fluid p-5" align="left">
         <h3>Favorites</h3>
-
-        <!--List the course equivalencies-->
         {% if favorites %}
-          <div class="list-group">
-            {% for f in favorites %}
-                <!--Define destination of post request (create or delete favorite)-->
+          <div class="card">
+            <div class="card-header d-flex">
+              <div class="col-3 text-center">College</div>
+              <div class="col-4 text-center">Course</div>
+              <div class="col-4 text-center">UVA Equivalent</div>
+              <div class="col-1 text-center"></div>
+            </div>
+            <ul class="list-group">
+              {% for f in favorites %}
                 <form action="{% url 'update_favorites' %}" method="post">
                   {% csrf_token %}
-                  <!--Hidden form fields for favorite creation/deletion-->
-                  <input type="hidden" id="external" name="primary" value="{{ f.transfer.external_course.pk }}">
-                  <input type="hidden" id="internal" name="secondary" value="{{ f.transfer.internal_course.pk }}">
-                  <input type="hidden" id="type" name="type" value="favorites">
-                  <div class="row">
-                    <!--Link to course equivalency-->
-                    <div class="col-md-5"><a href="{% url 'externalCourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action flex-column align-items-start">{{ f.transfer.external_course }}</a></div>
-                    <div class="col-md-5"><a href="{% url 'internalCourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action flex-column align-items-start">{{ f.transfer.internal_course }}</a></div>
-                    <!--Favoite / Unfavorite Button-->
-                    <div class="col-md"><button class="list-group-item list-group-item-light list-group-item-action flex-column align-items-center">Unfavorite</button></div>
-                  </div>
+                  <input type="hidden" id="primary1" name="primary" value="{{ f.transfer.external_course.pk }}">
+                  <input type="hidden" id="secondary1" name="secondary" value="{{ f.transfer.internal_course.pk }}">
+                  <input type="hidden" id="type1" name="type" value="favorites">
+
+                  <li class="list-group-item list-group-item-light d-flex">
+                    <div class="col-3 text-center"><a class="list-group-item list-group-item-light disabled h-100">{{ f.transfer.external_course.college_name }}</a></div>
+                    <div class="col-4 text-center"><a href="{% url 'externalcourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.external_course }}</a></div>
+                    <div class="col-4 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course }}</a></div>
+                    <div class="col-1 text-center"><button class="list-group-item list-group-item-light list-group-item-action h-100 align-items-center">╳</button></div>
+                  </li>
                 </form>
-            {% endfor %}
+              {% endfor %}
+            </ul>
           </div>
         {% else %}
-          <p>No Favorites Found.</p>
+          <p>No Accepted Course Equivalencies Found.</p>
         {% endif %}
       </div>
+
     </content>
 </body>
 </html>

@@ -51,8 +51,14 @@ class CourseSearch(generic.ListView):
         courses = search(self.request)
         return courses.order_by('mnemonic', 'course_number')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['test'] = "please work"
+        context['colleges'] = ExternalCollege.objects.values_list('college_name', flat=True).order_by('college_name')
+        return context
+
 # a session error arises when .../search/ is visited without calling submit_search beforehand
-# to bypass the issue, first visit .../search/error/.
+# to bypass the issue, first visit .../search/clear/.
 def submit_search(request):
     request.session["search"] = {"college": "", "mnemonic": "", "number": "", "name": ""}
     if request.method == "POST":
@@ -63,14 +69,11 @@ def submit_search(request):
             name = request.POST["name"]
         except Exception as e:
             return render(request, 'search.html', {'error_message': f"An error occurred: {e}"})
-        else:
-            request.session["search"]["college"] = college.upper()
-            request.session["search"]["mnemonic"] = mnemonic.upper()
-            request.session["search"]["number"] = number.upper()
-            request.session["search"]["name"] = name
-            return HttpResponseRedirect(reverse('courseSearch'))
-    else:
-        return render(request, 'search.html')
+        request.session["search"]["college"] = college
+        request.session["search"]["mnemonic"] = mnemonic.upper()
+        request.session["search"]["number"] = number.upper()
+        request.session["search"]["name"] = name
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 def handle_transfer_request(request):
     transfer_form = TransferRequestForm(request.POST)

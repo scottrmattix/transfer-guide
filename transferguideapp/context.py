@@ -38,8 +38,6 @@ def context_internal(context, request, course):
     context['equivalents'] = equivalent
     context['favorites'] = equivalent.filter(external_faves(request))
     context['exclusives'] = equivalent.filter(exclusive(request))
-    context['equiv_url'] = 'externalCourse'
-    context['college_name'] = "University of Virginia"
     context['foreign'] = ""
     return context
 
@@ -49,7 +47,5 @@ def context_external(context, request, course):
     context['equivalents'] = equivalent
     context['favorites'] = equivalent.filter(internal_faves(request))
     context['exclusives'] = equivalent
-    context['equiv_url'] = 'internalCourse'
-    context['college_name'] = course.college.college_name
     context['foreign'] = "" if course.college.domestic_college else "(Foreign)"
     return context
