@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Page</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {# Load the tag library #}
+    {% load bootstrap5 %}
+
+    {# Load CSS and JavaScript #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    {# Display django.contrib.messages as Bootstrap alerts #}
+    {% bootstrap_messages %}
+    <content>
+      <div class="container-fluid p-5" align="left">
+        <h3>Favorites</h3>
+        {% if favorites %}
+          <div class="card">
+            <div class="card-header d-flex">
+              <div class="col-3 text-center">College</div>
+              <div class="col-4 text-center">Course</div>
+              <div class="col-4 text-center">UVA Equivalent</div>
+              <div class="col-1 text-center"></div>
+            </div>
+            <ul class="list-group">
+              {% for f in favorites %}
+                <form action="{% url 'update_favorites' %}" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" id="primary1" name="primary" value="{{ f.transfer.external_course.pk }}">
+                  <input type="hidden" id="secondary1" name="secondary" value="{{ f.transfer.internal_course.pk }}">
+                  <input type="hidden" id="type1" name="type" value="favorites">
+
+                  <li class="list-group-item list-group-item-light d-flex">
+                    <div class="col-3 text-center"><a class="list-group-item list-group-item-light disabled h-100">{{ f.transfer.external_course.college_name }}</a></div>
+                    <div class="col-4 text-center"><a href="{% url 'externalcourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.external_course }}</a></div>
+                    <div class="col-4 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course }}</a></div>
+                    <div class="col-1 text-center"><button class="list-group-item list-group-item-light list-group-item-action h-100 align-items-center">╳</button></div>
+                  </li>
+                </form>
+              {% endfor %}
+            </ul>
+          </div>
+        {% else %}
+          <p>No Accepted Course Equivalencies Found.</p>
+        {% endif %}
+      </div>
+
+    </content>
+</body>
+</html>
+
+
+
