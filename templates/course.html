@@ -18,6 +18,8 @@
     <content>
       <div class="container-fluid p-5" align="left">
         {% if course %} <h6>{{ course.college_name }} | {{ course }}</h6>
+
+        <!-- List Course Attributes -->
         <h3>Course Attributes</h3>
         <ul>
           <li>College: {{ course.college_name }} {{ foreign }}</li>
@@ -25,6 +27,8 @@
           <li>Number: {{ course.course_number }}</li>
           <li>Title: {{ course.course_name }}</li>
         </ul>
+
+        <!-- Search Similar Course Button -->
         <form action="{% url 'submit_search' %}" method="post">
           {% csrf_token %}
           <input type="hidden" id="college" name="college" value="{{ course.college_name }}">
@@ -33,8 +37,13 @@
           <input type="hidden" id="name" name="name" value="">
           <button type="submit" class="btn btn-primary">Search Similar Courses</button>
         </form>
+
+        <!-- Edit Course Button -->
+        <a class="btn btn-primary" href="{% url course.get_model|add:'Update' course.pk %}" role="button">Edit Course</a>
+
         {% endif %}
       </div>
+
 
       <!--For Testing Purposes Only
       <p>Equivalents: {{ equivalents }}</p>
@@ -45,15 +54,18 @@
 
       <div class="container-fluid p-5" align="left">
 
+        <!-- Setup Course Equivalency Header (this probably needs to be redone) -->
         {% if course %} <h6>{{ course.college_name }} | {{ course }}</h6> {% endif %}
         <div style="float:left;"><h3>Course Equivalencies</h3></div>
         <div style="float:right;">
-          <!--Checkbox for specifying which colleges are visible-->
+
+          <!-- Checkbox for Row Visibility -->
           {% if course.get_model == "internalcourse" and request.session.user_college %}
           <input class="form-check-input" type="checkbox" align="right" id="toggle1" onclick="toggle();">
           <label class="form-check-label" for="toggle1">{{ request.session.user_college }} Specific</label>
           {% endif %}
-          <!--Javascript for hiding/unhiding elements (hidden by default) -->
+
+          <!--Javascript for Hiding / Un-hiding Elements  -->
           <script>
               function toggle() {
                 var x = document.getElementById("exclude");
@@ -63,12 +75,14 @@
             </script>
         </div>
 
-        <!--The following div is only here because it was the only way I could get the styling to reset-->
+        <!-- This is only here to cancel the "float" styling -->
         <div style="clear:both;" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-1 pb-1 mb-1 border-bottom"></div>
 
-        <!--List the course equivalencies-->
+        <!-- Course Equivalencies List-->
         {% if equivalents %}
           <div class="card">
+
+            <!-- Column Titles -->
             <div class="card-header d-flex">
               <div class="col-3">College</div>
               <div class="col-2">Mnemonic</div>
@@ -76,15 +90,21 @@
               <div class="col-4">Name</div>
               <div class="col-1">Action</div>
             </div>
+
+            <!-- Populate Rows of Table -->
             <ul class="list-group">
               {% for e in equivalents %}
                 <!--Define ID for javascript checkbox -->
-                <div {% if e not in exclusives %} id="exclude"{% endif %}> <!-- style="display: none;"-->
+                <div {% if e not in exclusives %} id="exclude"{% endif %}> <!-- style="display: none;" to auto-hide -->
                   <form action="{% url 'update_favorites' %}" method="post">
                     {% csrf_token %}
+
+                    <!-- Favorite Button Hidden Fields -->
                     <input type="hidden" id="secondary" name="secondary" value="{{ e.pk }}">
                     <input type="hidden" id="primary" name="primary" value="{{ course.pk }}">
                     <input type="hidden" id="type" name="type" value="{{ course.get_model }}">
+
+                    <!-- Table Cell Values -->
                     <a href="{% url e.get_model e.pk %}" class="list-group-item {% if e in favorites %}list-group-item-success{% endif %} list-group-item-action d-flex">
                       <div class="col-3">{{ e.college_name }}</div>
                       <div class="col-2">{{ e.mnemonic }}</div>
@@ -97,6 +117,8 @@
               {% endfor %}
             </ul>
           </div>
+
+        <!-- Message if Empty Equivalency List -->
         {% else %}
           <p>No Accepted Course Equivalencies Found.</p>
         {% endif %}

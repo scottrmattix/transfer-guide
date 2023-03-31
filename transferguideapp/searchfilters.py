@@ -12,7 +12,7 @@ def setCollege(request, inputCollege):
         courses = InternalCourse.objects
         q = Q()
     else:
-        college = ExternalCollege.objects.filter(college_name=inputCollege).first()
+        college = ExternalCollege.objects.filter(college_name__iexact=inputCollege).first()
         courses = ExternalCourse.objects
         q = Q(college=college)
         if college:

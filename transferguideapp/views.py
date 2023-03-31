@@ -10,9 +10,10 @@ from .sis import request_data, unique_id
 import requests
 import json
 import re
+from django.db.models import Q
 from .searchfilters import search
 from .context import context_internal, context_external
-from .viewhelper import update_favorites_helper
+from .viewhelper import update_favorites_helper, update_course_helper
 
 def set_group(request, user_id):
     if(request.method == 'POST'):
@@ -53,9 +54,64 @@ class CourseSearch(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['test'] = "please work"
         context['colleges'] = ExternalCollege.objects.values_list('college_name', flat=True).order_by('college_name')
         return context
+
+class UpdateInternal(generic.DetailView):
+    template_name = 'editCourse.html'
+    model = InternalCourse
+    context_object_name = 'course'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['colleges'] = ExternalCollege.objects.order_by('college_name')
+        context['collegeID'] = ""
+        context['college'] = "University of Virginia"
+        return context
+
+class UpdateExternal(generic.DetailView):
+    template_name = 'editCourse.html'
+    model = ExternalCourse
+    context_object_name = 'course'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        q = Q(id=self.object.college.id)
+        context['colleges'] = ExternalCollege.objects.filter(~q).order_by('college_name')
+        context['collegeID'] = self.object.college.id
+        context['college'] = self.object.college.college_name
+        return context
+
+
+class UpdateCourses(generic.ListView):
+    template_name = 'editCourse.html'
+    context_object_name = 'colleges'
+
+    def get_queryset(self):
+        return ExternalCollege.objects.order_by('college_name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['collegeID'] = ""
+        context['college'] = "University of Virginia"
+        return context
+
+def submit_update(request):
+    if request.method == "POST":
+        try:
+            collegeID = request.POST["collegeID"]
+            mnemonic = request.POST["mnemonic"]
+            number = request.POST["number"]
+            name = request.POST["name"]
+            courseID = request.POST["id"]
+        except Exception as e:
+            return render(request, 'editCourse.html', {'error_message': f"An error occurred: {e}"})
+        collegeID = int(collegeID) if collegeID else -1
+        mnemonic = mnemonic.upper()
+        number = number.upper()
+        courseID = int(courseID) if courseID else -1
+        return update_course_helper(collegeID, mnemonic, number, name, courseID)
+    return HttpResponseRedirect(reverse('updateCourses'))
 
 # a session error arises when .../search/ is visited without calling submit_search beforehand
 # to bypass the issue, first visit .../search/clear/.

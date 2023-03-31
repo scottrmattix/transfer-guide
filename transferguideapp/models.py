@@ -17,7 +17,7 @@ class ExternalCourse(models.Model):
     course_name = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"{self.mnemonic} {self.course_number}:\t{self.course_name}"
+        return f"{self.mnemonic} {self.course_number}: {self.course_name}"
 
     def get_model(self):
         # this string matches the 'externalcourse' view name

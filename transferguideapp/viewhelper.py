@@ -38,4 +38,22 @@ def update_favorites_helper(user, pid, sid, type):
 
     return response
 
+def update_course_helper(collegeID, mnemonic, number, name, courseID):
+    # Load External Course
+    try:
+        college = ExternalCollege.objects.get(id=collegeID)
+        courses = ExternalCourse.objects
+        vals = {'college': college, 'mnemonic': mnemonic, 'course_number': number,
+                'course_name': name}
+
+    # Load Internal Course
+    except ExternalCollege.DoesNotExist:
+        courses = InternalCourse.objects
+        vals = {'mnemonic': mnemonic, 'course_number': number, 'course_name': name}
+
+    # Update / Add Course
+    c, wasCreated = courses.filter(id=courseID).update_or_create(defaults=vals)
+
+    # Go to correct view
+    return redirect(c.get_model(), pk=c.id)
 
