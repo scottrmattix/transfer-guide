@@ -30,8 +30,12 @@
       </tr>
     </tbody>
 </table>
-<button onClick="" class="btn btn-light mt-5 ">
-    Request Permission Change
-</button>
+
+{% if permissions != "Admin" %}
+    <button onClick="" class="btn btn-light mt-5 ">
+        Request Permission Change
+    </button>
+{% else %}
+{% endif %}
 
 {% endblock %}
