@@ -8,7 +8,15 @@ from transferguideapp.forms import SisSearchForm, TransferRequestForm
 from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer 
 from .sis import request_data, unique_id 
 
-
+def account_info(request):
+    user = request.user
+    permissions = "User"
+    if(user.is_staff):
+        permissions = "Admin"
+    if user.is_authenticated:
+        return render(request, 'account_info.html', {'user': user, 'permissions': permissions})
+    else:
+        return redirect('home')
 
 def set_group(request, user_id):
     if(request.method == 'POST'):
