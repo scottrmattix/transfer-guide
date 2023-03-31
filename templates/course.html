@@ -41,6 +41,9 @@
         <!-- Edit Course Button -->
         <a class="btn btn-primary" href="{% url course.get_model|add:'Update' course.pk %}" role="button">Edit Course</a>
 
+        <!-- Make Request Button -->
+        <a class="btn btn-primary" href="{% url 'courseRequest' course.pk %}" role="button">Make Request</a>
+
         {% endif %}
       </div>
 

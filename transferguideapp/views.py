@@ -13,7 +13,7 @@ import re
 from django.db.models import Q
 from .searchfilters import search
 from .context import context_internal, context_external
-from .viewhelper import update_favorites_helper, update_course_helper
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper
 
 def set_group(request, user_id):
     if(request.method == 'POST'):
@@ -67,6 +67,7 @@ class UpdateInternal(generic.DetailView):
         context['colleges'] = ExternalCollege.objects.order_by('college_name')
         context['collegeID'] = ""
         context['college'] = "University of Virginia"
+        context['action'] = 'submit_update'
         return context
 
 class UpdateExternal(generic.DetailView):
@@ -80,6 +81,7 @@ class UpdateExternal(generic.DetailView):
         context['colleges'] = ExternalCollege.objects.filter(~q).order_by('college_name')
         context['collegeID'] = self.object.college.id
         context['college'] = self.object.college.college_name
+        context['action'] = 'submit_update'
         return context
 
 
@@ -94,6 +96,7 @@ class UpdateCourses(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['collegeID'] = ""
         context['college'] = "University of Virginia"
+        context['action'] = 'submit_update'
         return context
 
 def submit_update(request):
@@ -228,6 +231,39 @@ def update_favorites(request):
             return render(request, 'search.html', {'error_message': f"An error occurred: {e}"})
         return update_favorites_helper(user, pid, sid, type)
     return render(request, 'search.html')
+
+
+class CourseRequest(generic.DetailView):
+    model = InternalCourse
+    context_object_name = "course"
+    template_name = "requestForm.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        q = Q(id=self.request.session['user_college_id'])
+        context['colleges'] = ExternalCollege.objects.filter(~q).order_by(
+            'college_name')
+        context['collegeID'] = self.request.session['user_college_id']
+        context['college'] = self.request.session['user_college']
+        context['action'] = 'make_request'
+        return context
+
+def make_request(request):
+    if request.method == "POST":
+        try:
+            collegeID = request.POST["collegeID"]
+            mnemonic = request.POST["mnemonic"]
+            number = request.POST["number"]
+            name = request.POST["name"]
+            courseID = request.POST["id"]
+        except Exception as e:
+            return render(request, 'requestForm.html', {'error_message': f"An error occurred: {e}"})
+        collegeID = int(collegeID) if collegeID else -1
+        mnemonic = mnemonic.upper()
+        number = number.upper()
+        courseID = int(courseID) if courseID else -1
+        return request_course_helper(collegeID, mnemonic, number, name, courseID)
+    return HttpResponseRedirect(reverse('updateCourses'))
 
 
 

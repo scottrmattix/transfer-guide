@@ -17,6 +17,7 @@ def setCollege(request, inputCollege):
         q = Q(college=college)
         if college:
             request.session['user_college'] = college.college_name
+            request.session['user_college_id'] = college.id
     return q, courses
 
 def filterMnemonic(inputMnemonic):

@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Page</title>
+    <title>Request Form</title>
 </head>
 <body class="d-flex flex-column min-vh-100">
     {# Load the tag library #}
@@ -17,7 +17,7 @@
     {% bootstrap_messages %}
     <content>
       <div class="container-fluid p-5" align="left">
-        <h3>Course Edit / Add</h3>
+        <h3>Request Form</h3>
         {% if error_message %}<p class="text-danger"><strong>{{ error_message }}</strong></p>{% endif %}
         <form class="row gy-1 gx-15 align-items-center" action="{% url action %}" method="post">
           {% csrf_token %}
@@ -28,7 +28,6 @@
             <div class="input-group">
               <select class="form-select" id="collegeID" name="collegeID" aria-label=".form-select-sm example" aria-describedby="basic-addon2">
                 <option selected value="{{ collegeID }}">{{ college }}</option>
-                {% if course.get_model == "externalcourse" %} <option value="">University of Virginia</option>{% endif %}
                 {% for c in colleges %}
                   <option value="{{ c.pk }}">{{ c.college_name }}</option>
                 {% endfor %}
@@ -44,21 +43,21 @@
           <!-- Load / Input Course Mnemonic -->
           <div>
             <label for="mnemonic" class="form-label">Mnemonic:</label>
-            <input type="text" id="mnemonic" name="mnemonic" maxlength="4" class="form-control" value="{{ course.mnemonic }}" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
+            <input type="text" id="mnemonic" name="mnemonic" maxlength="4" class="form-control" value="" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
             <div class="form-text">Accepts SIS mnemonics only.</div>
           </div>
 
           <!-- Load / Input Course Number -->
           <div>
             <label for="number" class="form-label">Number:</label>
-            <input type="text" id="number" name="number" maxlength="4" class="form-control" value="{{ course.course_number }}" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
+            <input type="text" id="number" name="number" maxlength="4" class="form-control" value="" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
             <div class="form-text">Enter a full or partial course number.</div>
           </div>
 
           <!-- Load / Input Course Name -->
           <div>
             <label for="name" class="form-label">Title:</label>
-            <input type="text" id="name" name="name" maxlength="200" class="form-control" value="{{ course.course_name }}" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)">
+            <input type="text" id="name" name="name" maxlength="200" class="form-control" value="" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)">
             <div class="form-text">Try full names or key terms.</div>
           </div>
 
