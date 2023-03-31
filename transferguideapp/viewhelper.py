@@ -64,19 +64,21 @@ def request_course_helper(collegeID, mnemonic, number, name, courseID):
         courses = ExternalCourse.objects.filter(college=college,
                                                 mnemonic=mnemonic,
                                                 course_number=number)
-        vals = {'college': college,
-                'mnemonic': mnemonic,
-                'course_number': number,
-                'course_name': name}
+        external_vals = {'college': college,
+                         'mnemonic': mnemonic,
+                         'course_number': number,
+                         'course_name': name}
 
-        external, wasCreated = courses.update_or_create(defaults=vals)
+        external, wasCreated = courses.update_or_create(defaults=external_vals)
         internal = InternalCourse.objects.get(id=courseID)
+
+        transfer_vals = {'internal_course': internal,
+                         'external_course': external,
+                         'accepted': True}
 
         existing = CourseTransfer.objects.filter(internal_course=internal,
                                                  external_course=external)
-        transfer = existing.update_or_create(internal_course=internal,
-                                             external_course=external,
-                                             accepted=True)
+        transfer, wasCreated = existing.update_or_create(defaults=transfer_vals)
         return redirect("internalcourse", pk=courseID)
 
     except ExternalCollege.DoesNotExist:

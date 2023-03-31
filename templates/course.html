@@ -19,30 +19,32 @@
       <div class="container-fluid p-5" align="left">
         {% if course %} <h6>{{ course.college_name }} | {{ course }}</h6>
 
-        <!-- List Course Attributes -->
-        <h3>Course Attributes</h3>
-        <ul>
-          <li>College: {{ course.college_name }} {{ foreign }}</li>
-          <li>Mnemonic: {{ course.mnemonic }}</li>
-          <li>Number: {{ course.course_number }}</li>
-          <li>Title: {{ course.course_name }}</li>
-        </ul>
+          <!-- List Course Attributes -->
+          <h3>Course Attributes</h3>
+          <ul>
+            <li>College: {{ course.college_name }} {{ foreign }}</li>
+            <li>Mnemonic: {{ course.mnemonic }}</li>
+            <li>Number: {{ course.course_number }}</li>
+            <li>Title: {{ course.course_name }}</li>
+          </ul>
 
-        <!-- Search Similar Course Button -->
-        <form action="{% url 'submit_search' %}" method="post">
-          {% csrf_token %}
-          <input type="hidden" id="college" name="college" value="{{ course.college_name }}">
-          <input type="hidden" id="mnemonic" name="mnemonic" value="{{ course.mnemonic }}">
-          <input type="hidden" id="number" name="number" value="">
-          <input type="hidden" id="name" name="name" value="">
-          <button type="submit" class="btn btn-primary">Search Similar Courses</button>
-        </form>
+          <!-- Search Similar Course Button -->
+          <form action="{% url 'submit_search' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="college" name="college" value="{{ course.college_name }}">
+            <input type="hidden" id="mnemonic" name="mnemonic" value="{{ course.mnemonic }}">
+            <input type="hidden" id="number" name="number" value="">
+            <input type="hidden" id="name" name="name" value="">
+            <button type="submit" class="btn btn-primary">Search Similar Courses</button>
+          </form>
 
-        <!-- Edit Course Button -->
-        <a class="btn btn-primary" href="{% url course.get_model|add:'Update' course.pk %}" role="button">Edit Course</a>
+          <!-- Edit Course Button -->
+          <a class="btn btn-primary" href="{% url course.get_model|add:'Update' course.pk %}" role="button">Edit Course</a>
 
-        <!-- Make Request Button -->
-        <a class="btn btn-primary" href="{% url 'courseRequest' course.pk %}" role="button">Make Request</a>
+          <!-- Make Request Button -->
+          {% if course.get_model == "internalcourse" %}
+          <a class="btn btn-primary" href="{% url 'courseRequest' course.pk %}" role="button">Make Request</a>
+          {% endif %}
 
         {% endif %}
       </div>

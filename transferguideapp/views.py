@@ -119,6 +119,11 @@ def submit_update(request):
 # a session error arises when .../search/ is visited without calling submit_search beforehand
 # to bypass the issue, first visit .../search/clear/.
 def submit_search(request):
+    if not request.session["user_college_id"]:
+        userCollege = ExternalCollege.objects.first()
+        request.session["user_college_id"] = userCollege.id
+        request.session["user_college"] = userCollege.college_name
+
     request.session["search"] = {"college": "", "mnemonic": "", "number": "", "name": ""}
     if request.method == "POST":
         try:
