@@ -15,7 +15,7 @@ from .viewhelper import update_favorites_helper, update_course_helper, request_c
 def account_info(request):
     user = request.user
     permissions = "User"
-    if(user.is_staff):
+    if(user.groups.filter(name='admins').exists()):
         permissions = "Admin"
     if user.is_authenticated:
         return render(request, 'account_info.html', {'user': user, 'permissions': permissions})
