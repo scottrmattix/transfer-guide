@@ -13,7 +13,6 @@ import re
 from .searchfilters import search
 from .context import context_internal, context_external
 from django.db.models import Q
-from django.db import transaction
 
 # helper methods for views
 
@@ -74,21 +73,13 @@ def request_course_helper(collegeID, mnemonic, number, name, courseID):
                      'course_number': number,
                      'course_name': name}
 
-    #try:
-    with transaction.atomic():
-        external, wasCreated = courses.update_or_create(defaults=external_vals)
+    external, externalWasCreated = courses.update_or_create(defaults=external_vals)
     internal = InternalCourse.objects.get(id=courseID)
+    existing = CourseTransfer.objects.filter(internal_course=internal, external_course=external)
 
-    transfer_vals = {'internal_course': internal,
-                     'external_course': external,
-                     'accepted': True}
-
-    existing = CourseTransfer.objects.filter(internal_course=internal,
-                                             external_course=external)
-    with transaction.atomic():
-        transfer, wasCreated = existing.update_or_create(defaults=transfer_vals)
+    if not existing:
+        transfer = CourseTransfer.objects.create(internal_course=internal,
+                                                 external_course=external,
+                                                 accepted=True)
     return redirect("internalcourse", pk=courseID)
-
-    #except IntegrityError:
-    #    return redirect("courseRequest", pk=courseID)
 
