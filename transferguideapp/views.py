@@ -261,6 +261,7 @@ class CourseRequest(generic.DetailView):
         context['action'] = 'make_request'
         return context
 
+@transaction.atomic
 def make_request(request):
     if request.method == "POST":
         try:

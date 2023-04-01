@@ -74,20 +74,21 @@ def request_course_helper(collegeID, mnemonic, number, name, courseID):
                      'course_number': number,
                      'course_name': name}
 
-    try:
-        with transaction.atomic():
-            external, wasCreated = courses.update_or_create(defaults=external_vals)
-            internal = InternalCourse.objects.get(id=courseID)
+    #try:
+    with transaction.atomic():
+        external, wasCreated = courses.update_or_create(defaults=external_vals)
+    internal = InternalCourse.objects.get(id=courseID)
 
-            transfer_vals = {'internal_course': internal,
-                             'external_course': external,
-                             'accepted': True}
-            existing = CourseTransfer.objects.filter(internal_course=internal,
-                                                     external_course=external)
+    transfer_vals = {'internal_course': internal,
+                     'external_course': external,
+                     'accepted': True}
 
-            transfer, wasCreated = existing.update_or_create(defaults=transfer_vals)
-        return redirect("internalcourse", pk=courseID)
+    existing = CourseTransfer.objects.filter(internal_course=internal,
+                                             external_course=external)
+    with transaction.atomic():
+        transfer, wasCreated = existing.update_or_create(defaults=transfer_vals)
+    return redirect("internalcourse", pk=courseID)
 
-    except IntegrityError:
-        return redirect("formRequest", pk=courseID)
+    #except IntegrityError:
+    #    return redirect("courseRequest", pk=courseID)
 
