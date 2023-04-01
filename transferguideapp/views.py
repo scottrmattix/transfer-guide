@@ -11,6 +11,7 @@ from django.db.models import Q
 from .searchfilters import search
 from .context import context_internal, context_external
 from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper
+from django.db import transaction
 
 def account_info(request):
     user = request.user

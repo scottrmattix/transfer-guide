@@ -13,6 +13,7 @@ import re
 from .searchfilters import search
 from .context import context_internal, context_external
 from django.db.models import Q
+from django.db import transaction
 
 # helper methods for views
 
@@ -61,26 +62,32 @@ def update_course_helper(collegeID, mnemonic, number, name, courseID):
 def request_course_helper(collegeID, mnemonic, number, name, courseID):
     try:
         college = ExternalCollege.objects.get(id=collegeID)
-        courses = ExternalCourse.objects.filter(college=college,
-                                                mnemonic=mnemonic,
-                                                course_number=number)
-        external_vals = {'college': college,
-                         'mnemonic': mnemonic,
-                         'course_number': number,
-                         'course_name': name}
-
-        external, wasCreated = courses.update_or_create(defaults=external_vals)
-        internal = InternalCourse.objects.get(id=courseID)
-
-        transfer_vals = {'internal_course': internal,
-                         'external_course': external,
-                         'accepted': True}
-
-        existing = CourseTransfer.objects.filter(internal_course=internal,
-                                                 external_course=external)
-        transfer, wasCreated = existing.update_or_create(defaults=transfer_vals)
-        return redirect("internalcourse", pk=courseID)
 
     except ExternalCollege.DoesNotExist:
+        return redirect("formRequest", pk=courseID)
+
+    courses = ExternalCourse.objects.filter(college=college,
+                                            mnemonic=mnemonic,
+                                            course_number=number)
+    external_vals = {'college': college,
+                     'mnemonic': mnemonic,
+                     'course_number': number,
+                     'course_name': name}
+
+    try:
+        with transaction.atomic():
+            external, wasCreated = courses.update_or_create(defaults=external_vals)
+            internal = InternalCourse.objects.get(id=courseID)
+
+            transfer_vals = {'internal_course': internal,
+                             'external_course': external,
+                             'accepted': True}
+            existing = CourseTransfer.objects.filter(internal_course=internal,
+                                                     external_course=external)
+
+            transfer, wasCreated = existing.update_or_create(defaults=transfer_vals)
+        return redirect("internalcourse", pk=courseID)
+
+    except IntegrityError:
         return redirect("formRequest", pk=courseID)
 
