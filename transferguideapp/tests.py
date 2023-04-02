@@ -88,13 +88,22 @@ class FavoritesTests(TestCase):
     def setUp(self):
         
         self.user = User.objects.create_user(username='testuser', password='12345')
+        i=1
+        college = ExternalCollege.objects.create(college_name=f"college{i}",
+                                                     domestic_college=True)
 
-        # bogus CourseTransfer object used for testing
-        ec = ExternalCourse.objects.get(id=1)
+        external = ExternalCourse.objects.create(college=college,
+                                                     mnemonic=f"mnemonic{i}",
+                                                     course_number=f"number{i}",
+                                                     course_name=f"name{i}")
+        internal = InternalCourse.objects.create(mnemonic=f"mnemonic{i}",
+                                                     course_number=f"number{i}",
+                                                     course_name=f"name{i}")
         ic = InternalCourse.objects.get(id=1)
+        
         self.transfer = CourseTransfer.objects.create( 
-            external_course = ec.external_course_id,
-            internal_course = ic.internal_coruse_id,
+            external_course = external,
+            internal_course = internal,
             accepted = True 
         )
 
