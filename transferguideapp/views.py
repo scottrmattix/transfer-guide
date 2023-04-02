@@ -58,8 +58,11 @@ class CourseSearch(generic.ListView):
     context_object_name = 'course_list'
 
     def get_queryset(self):
-        courses = search(self.request)
-        return courses.order_by('mnemonic', 'course_number')
+        courses, query = search(self.request.session)
+        if query == Q():
+            return courses.none()
+        else:
+            return courses.filter(query).order_by('mnemonic', 'course_number')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
