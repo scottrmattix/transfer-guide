@@ -82,7 +82,7 @@ class SearchTests(TestCase):
     def test_same_user(self):
         self.assertEqual(Favorites.objects.first().user, Favorites.objects.last().user)
 
-        
+
 class FavoritesTests(TestCase):
 
     def setUp(self):
@@ -91,8 +91,8 @@ class FavoritesTests(TestCase):
 
         # bogus CourseTransfer object used for testing
         self.transfer = CourseTransfer.objects.create( 
-            ExternalCourse = ExternalCourse.objects.last(),
-            InternalCourse = InternalCourse.objects.last(),
+            external_course = ExternalCourse.objects.last(),
+            internal_course = InternalCourse.objects.last(),
             accepted = True 
         )
 
