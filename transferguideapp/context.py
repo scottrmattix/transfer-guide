@@ -1,51 +1,126 @@
 
 from .models import ExternalCollege, ExternalCourse, InternalCourse, CourseTransfer, Favorites
-from django.db.models import Q
+from django.db.models import Q, Count, Case, When, Value, CharField
 
 # Originally, all of this code was placed in the templates themselves, but
 # as the complexity grew, I decided to move everything to get_context_data().
 # However, views.py was getting cluttered, so I put everything in separate methods.
 
-# Definitions
-    # 'equivalents' - queryset of courses equivalent to a given course
-    # 'favorites' - queryset of courses equivalent to a given course AND favorited by the user
-    # 'exclusives' - queryset of courses equivalent to a given course AND from a specific college
-        # all InternalCourses are from UVA, so equal to 'equivalents'
-    # 'equiv_url' - url to the opposite course view (external for internal and vice versa)
-    # 'college_name' - course's college name (since InternalCourses don't have college field).
-    # 'foreign' - string to display on course view when the college is foreign
+########################################################################################
+# In order for us to reuse templates, the context dictionary entries of
+# InternalCoursePage and ExternalCoursePage must match
+########################################################################################
 
-# return query for external courses belonging to a specific college
-def exclusive(request):
-    college = ExternalCollege.objects.get(college_name=request.session['user_college'])
-    return Q(college=college)
+def context_course(context, course, request):
+    context['foreign'] = set_foreign(course)
+    context['checkbox'], collegeQ = handle_checkbox(course, request.session)
+    unspecific, specific = favorite_filters(course, request.user)
+    context['equivalents'] = create_annotations(course, specific, unspecific, collegeQ)
 
-# return query for internal courses favorited by user
-def internal_faves(request):
-    faves = Favorites.objects.filter(user=request.user)
-    intIDs = faves.values_list("transfer__internal_course", flat=True).distinct()
-    return Q(id__in=intIDs)
+########################################################################################
 
-# return query for external courses favorited by user
-def external_faves(request):
-    faves = Favorites.objects.filter(user=request.user)
-    extIDs = faves.values_list("transfer__external_course", flat=True).distinct()
-    return Q(id__in=extIDs)
+def handle_checkbox(course, session):
+    if "user_college_id" in session and course.get_model() == "internalcourse":
+        checkbox = True
+        collegeQ = Q(college__id=session["user_college_id"])
+    else:
+        checkbox = False
+        collegeQ = ~Q(id=-1)
+    return checkbox, collegeQ
 
-# define context for InternalCoursePage view
-def context_internal(context, request, course):
-    equivalent = course.get_equivalent()
-    context['equivalents'] = equivalent
-    context['favorites'] = equivalent.filter(external_faves(request))
-    context['exclusives'] = equivalent.filter(exclusive(request))
-    context['foreign'] = ""
-    return context
+def favorite_filters(course, user):
+    unspecific = Q(coursetransfer__favorites__user=user)
+    if course.get_model() == "internalcourse":
+        specific = unspecific & Q(coursetransfer__internal_course=course)
+    else:
+        specific = unspecific & Q(coursetransfer__external_course=course)
+    return unspecific, specific
 
-# define context for ExternalCoursePage view
-def context_external(context, request, course):
-    equivalent = course.get_equivalent()
-    context['equivalents'] = equivalent
-    context['favorites'] = equivalent.filter(internal_faves(request))
-    context['exclusives'] = equivalent
-    context['foreign'] = "" if course.college.domestic_college else "(Foreign)"
-    return context
+def set_foreign(course):
+    foreign = ""
+    if course.get_model() == "externalcourse":
+        if not course.college.domestic_college:
+            foreign = "(Foreign)"
+    return foreign
+
+def create_annotations(course, specific, unspecific, collegeQ):
+    return course.get_equivalent().annotate(
+        totallikes=Count('coursetransfer__favorites', filter=unspecific),
+
+        pagelikes=Count('coursetransfer__favorites', filter=specific),
+
+        visibility=Case(When(collegeQ, then=Value('include')),
+                        When(~collegeQ, then=Value('exclude')),
+                        output_field=CharField()),
+
+        color=Case(When(totallikes=0, then=Value('light')),
+                   When(Q(totallikes__gte=1, pagelikes=0), then=Value('warning')),
+                   When(Q(totallikes__gte=1, pagelikes__gte=1), then=Value('success')),
+                   output_field=CharField()),
+
+        action=Case(When(pagelikes=0, then=Value('Favorite')),
+                    When(pagelikes__gte=1, then=Value('Unfavorite')),
+                    output_field=CharField())
+    )
+
+########################################################################################
+# In order for us to reuse templates, the context dictionary entries of
+# CourseRequest, UpdateInternal, UpdateExternal, and UpdateCourses must match
+########################################################################################
+
+# define context for CourseRequest view
+def context_course_request(context, course, request):
+    if "user_college" in request.session:
+        collegeID = request.session["user_college_id"]
+        college = request.session["user_college"]
+        q = Q(id=collegeID)
+    else:
+        collegeID = ""
+        college = ""
+        q = Q()
+
+    context['colleges'] = ExternalCollege.objects.filter(~q).order_by('college_name')
+    context['collegeID'] = collegeID
+    context['college'] = college
+    context['action'] = 'make_request'
+    context['course'] = InternalCourse.objects.none()
+    context['courseID'] = course.id
+    context['title'] = "Course Transfer Request"
+
+# define context for UpdateInternal view
+def context_update_internal(context, course):
+    context['colleges'] = ExternalCollege.objects.order_by('college_name')
+    context['collegeID'] = ""
+    context['college'] = "University of Virginia"
+    context['action'] = 'submit_update'
+    context['course'] = course
+    context['courseID'] = course.id
+    context['title'] = "Edit UVA Course"
+
+# define context for UpdateExternal view
+def context_update_external(context, course):
+    q = Q(id=course.college.id)
+    context['colleges'] = ExternalCollege.objects.filter(~q).order_by('college_name')
+    context['collegeID'] = course.college.id
+    context['college'] = course.college.college_name
+    context['action'] = 'submit_update'
+    context['course'] = course
+    context['courseID'] = course.id
+    context['title'] = "Edit External Course"
+
+# define context for UpdateCourses view
+def context_update_course(context):
+    context['colleges'] = ExternalCollege.objects.order_by('college_name')
+    context['collegeID'] = ""
+    context['college'] = "University of Virginia"
+    context['action'] = 'submit_update'
+    context['course'] = InternalCourse.objects.none()
+    context['courseID'] = ""
+    context['title'] = "Add Course"
+
+########################################################################################
+
+
+
+
+

@@ -1,17 +1,5 @@
-from django.db import IntegrityError
-from django.urls import reverse
 from django.shortcuts import redirect, render, get_object_or_404
-from django.http import HttpResponseRedirect, Http404
-from django.contrib.auth.models import Group, User
-from django.views import generic
-from transferguideapp.forms import SisSearchForm, TransferRequestForm
 from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites
-from .sis import request_data, unique_id
-import requests
-import json
-import re
-from .searchfilters import search
-from .context import context_internal, context_external
 from django.db.models import Q
 
 # helper methods for views
@@ -38,6 +26,7 @@ def update_favorites_helper(user, pid, sid, type):
 
     return response
 
+
 def update_course_helper(collegeID, mnemonic, number, name, courseID):
     # Load External Course
     try:
@@ -59,27 +48,26 @@ def update_course_helper(collegeID, mnemonic, number, name, courseID):
 
 
 def request_course_helper(collegeID, mnemonic, number, name, courseID):
+    # Get College
     try:
         college = ExternalCollege.objects.get(id=collegeID)
 
+    # Return to Request Form if Invalid College
     except ExternalCollege.DoesNotExist:
-        return redirect("formRequest", pk=courseID)
+        return redirect("courseRequest", pk=courseID)
 
-    courses = ExternalCourse.objects.filter(college=college,
-                                            mnemonic=mnemonic,
-                                            course_number=number)
-    external_vals = {'college': college,
-                     'mnemonic': mnemonic,
-                     'course_number': number,
-                     'course_name': name}
+    # Update or Create External Course
+    existing_external = ExternalCourse.objects.filter(college=college, mnemonic=mnemonic, course_number=number)
+    external_vals = {'college': college, 'mnemonic': mnemonic, 'course_number': number, 'course_name': name}
+    external, externalWasCreated = existing_external.update_or_create(defaults=external_vals)
 
-    external, externalWasCreated = courses.update_or_create(defaults=external_vals)
+    # Get Internal Course
     internal = InternalCourse.objects.get(id=courseID)
-    existing = CourseTransfer.objects.filter(internal_course=internal, external_course=external)
 
-    if not existing:
-        transfer = CourseTransfer.objects.create(internal_course=internal,
-                                                 external_course=external,
-                                                 accepted=True)
+    # Update or Create CourseTransfer
+    transfer_vals = {'internal_course': internal, 'external_course': external, 'accepted': True}
+    existing_transfer = CourseTransfer.objects.filter(internal_course=internal, external_course=external)
+    transfer, transferWasCreated = existing_transfer.update_or_create(defaults=transfer_vals)
+
     return redirect("internalcourse", pk=courseID)
 
