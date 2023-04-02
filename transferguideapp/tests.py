@@ -247,7 +247,44 @@ class SearchTests(TestCase):
         return
 
 
+class FavoritesTests(TestCase):
 
+    def setUp(self):
+        
+        self.user = User.objects.create_user(username='testuser', password='12345')
+        i=1
+        college = ExternalCollege.objects.create(college_name=f"college{i}",
+                                                     domestic_college=True)
 
+        external = ExternalCourse.objects.create(college=college,
+                                                     mnemonic=f"mnemonic{i}",
+                                                     course_number=f"number{i}",
+                                                     course_name=f"name{i}")
+        internal = InternalCourse.objects.create(mnemonic=f"mnemonic{i}",
+                                                     course_number=f"number{i}",
+                                                     course_name=f"name{i}")
+        ic = InternalCourse.objects.get(id=1)
+        
+        self.transfer = CourseTransfer.objects.create( 
+            external_course = external,
+            internal_course = internal,
+            accepted = True 
+        )
 
+        self.favorite = Favorites.objects.create(
+            user = self.user,
+            transfer = self.transfer
+        )
 
+    def test_quantity(self):
+        count = Favorites.objects.filter(user=self.user).count()
+        self.assertEquals(count, 1)
+
+    def test_favorite_instance(self):
+        self.assertEqual(self.favorite.user, self.user)
+        self.assertEqual(self.favorite.transfer, self.transfer)
+        
+    def tearDown(self):
+        self.favorite.delete()
+        self.transfer.delete()
+        self.user.delete()
