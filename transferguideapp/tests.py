@@ -90,9 +90,11 @@ class FavoritesTests(TestCase):
         self.user = User.objects.create_user(username='testuser', password='12345')
 
         # bogus CourseTransfer object used for testing
+        ec = ExternalCourse.objects.last()
+        ic = InternalCourse.objects.last()
         self.transfer = CourseTransfer.objects.create( 
-            external_course = ExternalCourse.objects.last(),
-            internal_course = InternalCourse.objects.last(),
+            external_course = ec,
+            internal_course = ic,
             accepted = True 
         )
 
