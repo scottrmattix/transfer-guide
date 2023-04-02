@@ -197,6 +197,22 @@ class SearchTests(TestCase):
         self.assertEquals(college, collegeAfter)
         return
 
+    def test_set_user_college(self):
+        self.assertTrue("user_college" not in self.session)
+        self.assertTrue("user_college_id" not in self.session)
+
+        college = ExternalCollege.objects.none()
+        set_user_college(self.session, college)
+        self.assertTrue("user_college" not in self.session)
+        self.assertTrue("user_college_id" not in self.session)
+
+        name = "Virginia Polytechnic Institute"
+        college = ExternalCollege.objects.create(college_name=name, domestic_college=True)
+
+        set_user_college(self.session, college)
+        self.assertEquals(self.session["user_college_id"], 1)
+        self.assertEquals(self.session["user_college"], name)
+
     def test_filter_mnemonic(self):
         mnemonic = "MATH"
         full = filterMnemonic(mnemonic)
