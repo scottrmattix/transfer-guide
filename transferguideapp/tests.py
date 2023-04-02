@@ -1,7 +1,7 @@
 from django.test import TestCase
 from .models import CourseTransfer, ExternalCourse, InternalCourse, ExternalCollege, Favorites
 from django.contrib.auth.models import Group, User
-from .searchfilters import search, setCollege, filterMnemonic, filterNumber, filterName
+from .searchfilters import search, filterCollege, filterMnemonic, filterNumber, filterName
 from django.test.client import RequestFactory, Client
 from django.contrib.sessions.middleware import SessionMiddleware
 
