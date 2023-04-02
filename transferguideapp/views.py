@@ -9,7 +9,7 @@ from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTrans
 from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
-from .context import context_internal, context_external
+from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course
 from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper
 
 def account_info(request):
@@ -38,7 +38,8 @@ class InternalCoursePage(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return context_internal(context, self.request, self.object)
+        context_course(context, self.object, self.request)
+        return context
 
 
 class ExternalCoursePage(generic.DetailView):
@@ -48,7 +49,8 @@ class ExternalCoursePage(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return context_external(context, self.request, self.object)
+        context_course(context, self.object, self.request)
+        return context
 
 class CourseSearch(generic.ListView):
     template_name = 'search.html'
@@ -65,45 +67,48 @@ class CourseSearch(generic.ListView):
         return context
 
 class UpdateInternal(generic.DetailView):
-    template_name = 'editCourse.html'
+    template_name = 'generalForm.html'
     model = InternalCourse
-    context_object_name = 'course'
+    # context_object_name = 'course'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['colleges'] = ExternalCollege.objects.order_by('college_name')
-        context['collegeID'] = ""
-        context['college'] = "University of Virginia"
-        context['action'] = 'submit_update'
+        # context['colleges'] = ExternalCollege.objects.order_by('college_name')
+        # context['collegeID'] = ""
+        # context['college'] = "University of Virginia"
+        # context['action'] = 'submit_update'
+        context_update_internal(context, self.object)
         return context
 
 class UpdateExternal(generic.DetailView):
-    template_name = 'editCourse.html'
+    template_name = 'generalForm.html'
     model = ExternalCourse
-    context_object_name = 'course'
+    # context_object_name = 'course'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        q = Q(id=self.object.college.id)
-        context['colleges'] = ExternalCollege.objects.filter(~q).order_by('college_name')
-        context['collegeID'] = self.object.college.id
-        context['college'] = self.object.college.college_name
-        context['action'] = 'submit_update'
+        # q = Q(id=self.object.college.id)
+        # context['colleges'] = ExternalCollege.objects.filter(~q).order_by('college_name')
+        # context['collegeID'] = self.object.college.id
+        # context['college'] = self.object.college.college_name
+        # context['action'] = 'submit_update'
+        context_update_external(context, self.object)
         return context
 
 
 class UpdateCourses(generic.ListView):
-    template_name = 'editCourse.html'
-    context_object_name = 'colleges'
+    template_name = 'generalForm.html'
+    queryset = InternalCourse.objects.none()
 
-    def get_queryset(self):
-        return ExternalCollege.objects.order_by('college_name')
+    # def get_queryset(self):
+    #     return ExternalCollege.objects.order_by('college_name')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['collegeID'] = ""
-        context['college'] = "University of Virginia"
-        context['action'] = 'submit_update'
+        # context['collegeID'] = ""
+        # context['college'] = "University of Virginia"
+        # context['action'] = 'submit_update'
+        context_update_course(context)
         return context
 
 def submit_update(request):
@@ -115,7 +120,7 @@ def submit_update(request):
             name = request.POST["name"]
             courseID = request.POST["id"]
         except Exception as e:
-            return render(request, 'editCourse.html', {'error_message': f"An error occurred: {e}"})
+            return render(request, 'generalForm.html', {'error_message': f"An error occurred: {e}"})
         collegeID = int(collegeID) if collegeID else -1
         mnemonic = mnemonic.upper()
         number = number.upper()
@@ -247,17 +252,18 @@ def update_favorites(request):
 
 class CourseRequest(generic.DetailView):
     model = InternalCourse
-    context_object_name = "course"
-    template_name = "requestForm.html"
+    template_name = "generalForm.html"
+    # context_object_name = "course"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        q = Q(id=self.request.session['user_college_id'])
-        context['colleges'] = ExternalCollege.objects.filter(~q).order_by(
-            'college_name')
-        context['collegeID'] = self.request.session['user_college_id']
-        context['college'] = self.request.session['user_college']
-        context['action'] = 'make_request'
+        # q = Q(id=self.request.session['user_college_id'])
+        # context['colleges'] = ExternalCollege.objects.filter(~q).order_by(
+        #     'college_name')
+        # context['collegeID'] = self.request.session['user_college_id']
+        # context['college'] = self.request.session['user_college']
+        # context['action'] = 'make_request'
+        context_course_request(context, self.object, self.request)
         return context
 
 def make_request(request):
@@ -269,7 +275,7 @@ def make_request(request):
             name = request.POST["name"]
             courseID = request.POST["id"]
         except Exception as e:
-            return render(request, 'requestForm.html', {'error_message': f"An error occurred: {e}"})
+            return render(request, 'generalForm.html', {'error_message': f"An error occurred: {e}"})
         collegeID = int(collegeID) if collegeID else -1
         mnemonic = mnemonic.upper()
         number = number.upper()

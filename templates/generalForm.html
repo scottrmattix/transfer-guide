@@ -17,7 +17,7 @@
     {% bootstrap_messages %}
     <content>
       <div class="container-fluid p-5" align="left">
-        <h3>Course Edit / Add</h3>
+        <h3>{{ title }}</h3>
         {% if error_message %}<p class="text-danger"><strong>{{ error_message }}</strong></p>{% endif %}
         <form class="row gy-1 gx-15 align-items-center" action="{% url action %}" method="post">
           {% csrf_token %}
@@ -28,7 +28,7 @@
             <div class="input-group">
               <select class="form-select" id="collegeID" name="collegeID" aria-label=".form-select-sm example" aria-describedby="basic-addon2">
                 <option selected value="{{ collegeID }}">{{ college }}</option>
-                {% if course.get_model == "externalcourse" %} <option value="">University of Virginia</option>{% endif %}
+                {% if course.get_model == "externalcourse" %}<option value="">University of Virginia</option>{% endif %}
                 {% for c in colleges %}
                   <option value="{{ c.pk }}">{{ c.college_name }}</option>
                 {% endfor %}
@@ -64,7 +64,7 @@
 
           <!-- Load Course ID (hidden) -->
           <div>
-            <input type="hidden" id="id" name="id" maxlength="200" class="form-control" value="{{ course.id }}" >
+            <input type="hidden" id="id" name="id" maxlength="200" class="form-control" value="{{ courseID }}" >
           </div>
 
           <!-- Button for Form Submission -->

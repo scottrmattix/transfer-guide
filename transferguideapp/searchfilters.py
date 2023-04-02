@@ -6,19 +6,21 @@ from django.db.models import Q
 # less cluttered. Calling search() allows us to filter courses by college, mnemonic
 # number, and name.
 
-def setCollege(request, inputCollege):
+def set_user_college(request, college):
+    if college:
+        request.session["user_college_id"] = college.id
+        request.session["user_college"] = college.college_name
+
+def filterCollege(inputCollege):
+    college = ExternalCollege.objects.filter(college_name__iexact=inputCollege).first()
     aliases = ["", "UVA", "UNIVERSITY OF VIRGINIA"]
     if inputCollege.upper() in aliases:
         courses = InternalCourse.objects
         q = Q()
     else:
-        college = ExternalCollege.objects.filter(college_name__iexact=inputCollege).first()
         courses = ExternalCourse.objects
         q = Q(college=college)
-        if college:
-            request.session['user_college'] = college.college_name
-            request.session['user_college_id'] = college.id
-    return q, courses
+    return q, courses, college
 
 def filterMnemonic(inputMnemonic):
     return Q(mnemonic=inputMnemonic) if inputMnemonic else Q()
@@ -49,10 +51,12 @@ def search(request):
     inputNumber = request.session["search"]["number"]
     inputName = request.session["search"]["name"]
 
-    q1, courses = setCollege(request, inputCollege)
+    q1, courses, college = filterCollege(inputCollege)
     q2 = filterMnemonic(inputMnemonic)
     q3 = filterNumber(inputNumber)
     q4 = filterName(inputName)
+
+    set_user_college(request, college)
 
     # WARNING: this is not true comparison, just the string representation
     # this is only good to check if they're empty
