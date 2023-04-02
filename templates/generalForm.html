@@ -7,6 +7,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
     {# Load the tag library #}
+    {% extends "base.html" %}
     {% load bootstrap5 %}
 
     {# Load CSS and JavaScript #}
@@ -15,6 +16,8 @@
 
     {# Display django.contrib.messages as Bootstrap alerts #}
     {% bootstrap_messages %}
+
+    {% block content %}
     <content>
       <div class="container-fluid p-5" align="left">
         <h3>{{ title }}</h3>
@@ -75,9 +78,7 @@
         </form>
       </div>
     </content>
-
-
-
+    {% endblock %}
 
 <!-- Modal -->
 <div class="modal fade" id="addCollege" tabindex="-1" aria-labelledby="Label" aria-hidden="true">

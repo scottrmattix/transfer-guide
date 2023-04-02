@@ -7,6 +7,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
     {# Load the tag library #}
+    {% extends "base.html" %}
     {% load bootstrap5 %}
 
     {# Load CSS and JavaScript #}
@@ -15,6 +16,8 @@
 
     {# Display django.contrib.messages as Bootstrap alerts #}
     {% bootstrap_messages %}
+
+    {% block content %}
     <content>
       <div class="container-fluid p-5" align="left">
         {% if course %} <h6>{{ course.college_name }} | {{ course }}</h6>
@@ -127,6 +130,7 @@
         {% endif %}
       </div>
     </content>
+    {% endblock %}
 </body>
 </html>
 
