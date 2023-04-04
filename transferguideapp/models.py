@@ -19,7 +19,7 @@ class ExternalCourse(models.Model):
 
     # Feel free to change this for testing purposes
     def __str__(self):
-        return f"{self.college} {self.mnemonic} {self.course_number}: {self.course_name}"
+        return f"{(self.college[0:5])}... {self.mnemonic} {self.course_number}: {self.course_name}"
 
     # WARNING: this method is written such that the return value matches a URL defined in urls.py, and it is used in multiple places to differentiate InternalCourse and ExternalCourse objects. Do not change.
     def get_model(self):
