@@ -19,7 +19,13 @@ class ExternalCourse(models.Model):
 
     # Feel free to change this for testing purposes
     def __str__(self):
-        return f"({self.college.college_name[0:5]})... {self.mnemonic} {self.course_number}: {self.course_name}"
+        collegename = self.college.college_name
+        acronym = collegename[0]
+        for i in range(len(collegename)):
+            if collegename[i] in [" ","-","_"]:
+                acronym += collegename[i+1]
+
+        return f"({acronym.upper()}) {self.mnemonic} {self.course_number}: {self.course_name}"
 
     # WARNING: this method is written such that the return value matches a URL defined in urls.py, and it is used in multiple places to differentiate InternalCourse and ExternalCourse objects. Do not change.
     def get_model(self):
@@ -56,7 +62,7 @@ class InternalCourse(models.Model):
 
     # Feel free to change this for testing purposes
     def __str__(self):
-        return f"{self.mnemonic} {self.course_number}: {self.course_name}"
+        return f"({self.id}) {self.mnemonic} {self.course_number}: {self.course_name}"
 
     # WARNING: this method is written such that the return value matches a URL defined in urls.py, and it is used in multiple places to differentiate InternalCourse and ExternalCourse objects. Do not change.
     def get_model(self):
