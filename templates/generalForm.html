@@ -19,6 +19,38 @@
 
     {% block content %}
     <content>
+
+      <div class="modal fade" id="addCollege" tabindex="-1" aria-labelledby="Label" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add College</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <form method = "POST" action ="{% url 'add_external_college' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                  <div class="form-group mb-2">
+                    <label for="college">Name</label>
+                    <input type="text" class="form-control" name = 'college' id="college" placeholder="University of Virginia">
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name = "domestic" id="domestic">
+                    <label class="form-check-label" for="domestic">Domestic</label>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+
+
+
       <div class="container-fluid p-5" align="left">
         <h3>{{ title }}</h3>
         {% if error_message %}<p class="text-danger"><strong>{{ error_message }}</strong></p>{% endif %}
@@ -42,7 +74,7 @@
             </div>
             <div class="form-text">Defaults to UVA.</div>
           </div>
-
+          
 
           <!-- Load / Input Course Mnemonic -->
           <div>
@@ -79,35 +111,6 @@
       </div>
     </content>
     {% endblock %}
-
-<!-- Modal -->
-<div class="modal fade" id="addCollege" tabindex="-1" aria-labelledby="Label" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add College</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <form>
-        <div class="modal-body">
-          <div class="form-group mb-2">
-            <label for="college">Name</label>
-            <input type="text" class="form-control" id="college" placeholder="University of Virginia">
-          </div>
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="domestic">
-            <label class="form-check-label" for="domestic">Domestic</label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary">Save</button>
-        </div>
-      </form>
-
-    </div>
-  </div>
-</div>
 
 </body>
 </html>

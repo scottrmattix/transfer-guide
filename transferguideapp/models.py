@@ -1,14 +1,45 @@
 from django.db import models
 from django.contrib.auth.models import User
+import re
+from string import capwords
+
+# method to make course_title strings match those of SIS
+# ex: "The intro stars and The galaxies" -> "The Intro Stars and the Galaxies"
+# ex: "University Of Texas" -> "University of Texas"
+def course_title_format(s):
+    pattern = re.compile(r'\b(?:and|or|in|to|the|of)\b', re.IGNORECASE)
+    
+    words = s.split() #split by space
+    title_words = []
+    if words[0].lower() == "the": 
+        title_words.append("The") #dont change first word for courses starting with The (they exist for some reason)
+        words = words[1:]
+
+    for word in words: 
+        title_word = capwords(word) #capwords capitalizes first letter of word()
+        if pattern.match(word): 
+            title_word = title_word.lower() #if and,or,in, etc lowercase it
+        title_words.append(title_word)
+    return ' '.join(title_words)
+
 
 # Model representing an external University that may or may not be accepted
 class ExternalCollege(models.Model):
     college_name = models.CharField(max_length=60)
     domestic_college = models.BooleanField(default=True)
 
+    # overridding the save() method to normalize the formatting of strings
+    # college
+    def save(self, *args, **kwargs):
+        self.college_name = course_title_format(self.college_name)
+        self.domestic_college = self.domestic_college
+
+        super().save(*args, **kwargs)
+        
     # Feel free to change this for testing purposes
     def __str__(self):
         return f"{self.college_name}"
+    
 
 # Model representing an external Course from an external university
 class ExternalCourse(models.Model):
@@ -19,7 +50,25 @@ class ExternalCourse(models.Model):
 
     # Feel free to change this for testing purposes
     def __str__(self):
-        return f"({self.college.college_name[0:5]})... {self.mnemonic} {self.course_number}: {self.course_name}"
+        collegename = self.college.college_name
+        acronym = collegename[0]
+        for i in range(len(collegename)):
+            if collegename[i] in [" ","-","_"]:
+                acronym += collegename[i+1]
+
+        return f"({acronym.upper()}) {self.mnemonic} {self.course_number}: {self.course_name}"
+
+    # overridding the save() method to normalize the formatting of strings (mnemonic & course_name)
+    # mnemonic will now always save as fully uppercase and course_name will be titled (python's .title())
+    # ex: mth -> MTH ; discrete math -> Discrete Math
+    def save(self, *args, **kwargs):
+        self.college = self.college #probably redundant
+        self.mnemonic = self.mnemonic.upper()
+        self.course_number = self.course_number
+        self.course_name = course_title_format(self.course_name)
+
+        super().save(*args, **kwargs) 
+
 
     # WARNING: this method is written such that the return value matches a URL defined in urls.py, and it is used in multiple places to differentiate InternalCourse and ExternalCourse objects. Do not change.
     def get_model(self):
@@ -56,7 +105,7 @@ class InternalCourse(models.Model):
 
     # Feel free to change this for testing purposes
     def __str__(self):
-        return f"{self.mnemonic} {self.course_number}: {self.course_name}"
+        return f"({self.id}) {self.mnemonic} {self.course_number}: {self.course_name}"
 
     # WARNING: this method is written such that the return value matches a URL defined in urls.py, and it is used in multiple places to differentiate InternalCourse and ExternalCourse objects. Do not change.
     def get_model(self):
