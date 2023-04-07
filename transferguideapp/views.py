@@ -297,8 +297,8 @@ def delete_favorite(request, favorite_id):
     favorite.delete()
     return redirect('favorites')
 
-class ViewRequests(generic.ListView):
-    template_name = 'viewRequests.html'
+class HandleRequests(generic.ListView):
+    template_name = 'handleRequests.html'
     queryset = TransferRequest.objects.none()
 
     def get_context_data(self, **kwargs):
@@ -308,27 +308,25 @@ class ViewRequests(generic.ListView):
 
 
 def accept_request(request):
-    print("accept test")
     if request.method == "POST":
         try:
             requestID = request.POST["requestID"]
         except Exception as e:
-            return render(request, 'viewRequests.html', {'error_message': f"An error occurred: {e}"})
+            return render(request, 'handleRequests.html', {'error_message': f"An error occurred: {e}"})
         redirect, error = accept_request_helper(requestID)
         if error:
             messages.error(request, error)
         return redirect
-    return HttpResponseRedirect(reverse('viewRequests'))
+    return HttpResponseRedirect(reverse('handleRequests'))
 
 def reject_request(request):
-    print("reject test")
     if request.method == "POST":
         try:
             requestID = request.POST["requestID"]
         except Exception as e:
-            return render(request, 'viewRequests.html', {'error_message': f"An error occurred: {e}"})
+            return render(request, 'handleRequests.html', {'error_message': f"An error occurred: {e}"})
         redirect, error = reject_request_helper(requestID)
         if error:
             messages.error(request, error)
         return redirect
-    return HttpResponseRedirect(reverse('viewRequests'))
+    return HttpResponseRedirect(reverse('handleRequests'))

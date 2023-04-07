@@ -110,12 +110,12 @@ def accept_request_helper(requestID):
     request.transfer.accepted = True
     request.transfer.save()
     TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.accepted)
-    return redirect("viewRequests"), None
+    return redirect("handleRequests"), None
 
 def reject_request_helper(requestID):
     request = TransferRequest.objects.get(id=requestID)
     request.transfer.accepted = False
     request.transfer.save()
     TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.rejected)
-    return redirect("viewRequests"), None
+    return redirect("handleRequests"), None
 
