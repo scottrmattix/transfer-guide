@@ -78,6 +78,15 @@
             </div>
           {% endif %}
 
+          <!-- Input User Comment (Transfer Request) -->
+          {% if comment %}
+            <div class="form-outline">
+              <label for="url" class="form-label">Explanation</label>
+              <textarea id="comment" name="comment" maxlength="200" class="form-control"></textarea>
+              <div class="form-text">Provide your reasoning for making this request.</div>
+            </div>
+          {% endif %}
+
           <!-- Load Course ID (hidden) -->
           <div>
             <input type="hidden" id="id" name="id" maxlength="200" class="form-control" value="{{ courseID }}" >

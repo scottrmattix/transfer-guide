@@ -87,6 +87,7 @@ def context_course_request(context, course, request):
     context['courseID'] = course.id
     context['title'] = "Course Transfer Request"
     context['link'] = True
+    context['comment'] = True
 
 # define context for UpdateInternal view
 def context_update_internal(context, course):
@@ -98,6 +99,7 @@ def context_update_internal(context, course):
     context['courseID'] = course.id
     context['title'] = "Edit UVA Course"
     context['link'] = False
+    context['comment'] = False
 
 # define context for UpdateExternal view
 def context_update_external(context, course):
@@ -110,6 +112,7 @@ def context_update_external(context, course):
     context['courseID'] = course.id
     context['title'] = "Edit External Course"
     context['link'] = False
+    context['comment'] = False
 
 # define context for UpdateCourses view
 def context_update_course(context):
@@ -121,6 +124,7 @@ def context_update_course(context):
     context['courseID'] = ""
     context['title'] = "Add Course"
     context['link'] = False
+    context['comment'] = False
 
 ########################################################################################
 # Context for ViewRequests view
@@ -128,7 +132,14 @@ def context_update_course(context):
 
 
 def context_view_requests(context, user):
-    requests = TransferRequest.objects.all().annotate(
+    if user.groups.filter(name='admins').exists():
+        context["isAdmin"] = True
+        user_specific = Q()
+    else:
+        context["isAdmin"] = False
+        user_specific = Q(user=user)
+
+    requests = TransferRequest.objects.filter(user_specific).annotate(
         color=Case(When(Q(condition=TransferRequest.pending), then=Value('light')),
                    When(Q(condition=TransferRequest.accepted), then=Value('success')),
                    When(Q(condition=TransferRequest.rejected), then=Value('danger')),
@@ -137,9 +148,9 @@ def context_view_requests(context, user):
                  When(Q(condition=TransferRequest.accepted), then=Value('outline-success')),
                  When(Q(condition=TransferRequest.rejected), then=Value('outline-danger')),
                  output_field=CharField()),
-        action=Case(When(Q(condition=TransferRequest.pending), then=Value(True)),
-                    When(~Q(condition=TransferRequest.pending), then=Value(False)),
-                    output_field=BooleanField()),
+        visibility=Case(When(Q(response__exact=""), then=Value("none")),
+                        When(~Q(response__exact=""), then=Value("block")),
+                        output_field=CharField()),
     )
     context["all"] = requests
     context["pending"] = requests.filter(condition=TransferRequest.pending)

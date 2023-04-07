@@ -132,6 +132,8 @@ class TransferRequest(TimeStampMixin):
     transfer = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
     condition = models.CharField(max_length=50, choices=REQUEST_CHOICES, default=pending)
     url = models.URLField(max_length=200, default="")
+    comment = models.CharField(max_length=200, default="")
+    response = models.CharField(max_length=200, default="")
 
     def __str__(self):
         return f"{self.condition} | {self.user} | {self.transfer}"

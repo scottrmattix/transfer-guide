@@ -63,12 +63,17 @@ def update_course_helper(collegeID, mnemonic, number, name, courseID):
     return redirect(c.get_model(), pk=c.id), None
 
 
-def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url):
+def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url, comment):
     # Check valid url
     protocol = r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"
     noProtocol = r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"
     if not (re.fullmatch(protocol, url) or re.fullmatch(noProtocol, url)):
         error = "Provided course link is invalid."
+        return redirect("courseRequest", pk=courseID), error
+
+    # check valid comment
+    if not comment:
+        error = "Inadequate explanation provided."
         return redirect("courseRequest", pk=courseID), error
 
     # Get Internal Course
@@ -96,26 +101,26 @@ def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url
     # Get or Create TransferRequest
     try:
         request = TransferRequest.objects.get(user=user, transfer=transfer)
-        error = "You have already made a request for these two courses."
+        error = "You have already made a transfer request for these two courses."
         return redirect("courseRequest", pk=courseID), error
     except TransferRequest.DoesNotExist:
-        request = TransferRequest.objects.create(user=user, transfer=transfer, condition=TransferRequest.pending, url=url)
+        request = TransferRequest.objects.create(user=user, transfer=transfer, condition=TransferRequest.pending, url=url, comment=comment)
 
     # Return back to InternalCourse view without error
     return redirect("internalcourse", pk=courseID), None
 
 
-def accept_request_helper(requestID):
+def accept_request_helper(requestID, adminResponse):
     request = TransferRequest.objects.get(id=requestID)
     request.transfer.accepted = True
     request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.accepted)
+    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.accepted, response=adminResponse)
     return redirect("handleRequests"), None
 
-def reject_request_helper(requestID):
+def reject_request_helper(requestID, adminResponse):
     request = TransferRequest.objects.get(id=requestID)
     request.transfer.accepted = False
     request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.rejected)
+    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.rejected, respones=adminResponse)
     return redirect("handleRequests"), None
 

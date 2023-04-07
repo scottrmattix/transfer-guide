@@ -279,13 +279,14 @@ def make_request(request):
             name = request.POST["name"]
             courseID = request.POST["id"]
             url = request.POST["url"]
+            comment = request.POST["comment"]
         except Exception as e:
             return render(request, 'generalForm.html', {'error_message': f"An error occurred: {e}"})
         collegeID = int(collegeID) if collegeID else -1
         mnemonic = mnemonic.upper()
         number = number.upper()
         courseID = int(courseID) if courseID else -1
-        redirect, error = request_course_helper(user, collegeID, mnemonic, number, name, courseID, url)
+        redirect, error = request_course_helper(user, collegeID, mnemonic, number, name, courseID, url, comment)
         if error:
             messages.error(request, error)
         return redirect
@@ -311,9 +312,10 @@ def accept_request(request):
     if request.method == "POST":
         try:
             requestID = request.POST["requestID"]
+            adminResponse = request.POST["adminResponse"]
         except Exception as e:
             return render(request, 'handleRequests.html', {'error_message': f"An error occurred: {e}"})
-        redirect, error = accept_request_helper(requestID)
+        redirect, error = accept_request_helper(requestID, adminResponse)
         if error:
             messages.error(request, error)
         return redirect
@@ -323,9 +325,10 @@ def reject_request(request):
     if request.method == "POST":
         try:
             requestID = request.POST["requestID"]
+            adminResponse = request.POST["adminResponse"]
         except Exception as e:
             return render(request, 'handleRequests.html', {'error_message': f"An error occurred: {e}"})
-        redirect, error = reject_request_helper(requestID)
+        redirect, error = reject_request_helper(requestID, adminResponse)
         if error:
             messages.error(request, error)
         return redirect
