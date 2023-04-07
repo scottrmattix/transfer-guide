@@ -152,8 +152,16 @@ def context_view_requests(context, user):
         rejected_cnt=Count('pk', filter=Q(condition=TransferRequest.rejected)),
         total_cnt=Count('pk'),
     )
-    context["pending_pct"] = 100 * myRequests["pending_cnt"] / myRequests["total_cnt"]
-    context["accepted_pct"] = 100 * myRequests["accepted_cnt"] / myRequests["total_cnt"]
-    context["rejected_pct"] = 100 * myRequests["rejected_cnt"] / myRequests["total_cnt"]
+
+    total = myRequests["total_cnt"]
+    if total != 0:
+        context["pending_pct"] = 100 * myRequests["pending_cnt"] / total
+        context["accepted_pct"] = 100 * myRequests["accepted_cnt"] / total
+        context["rejected_pct"] = 100 * myRequests["rejected_cnt"] / total
+    else:
+        context["pending_pct"] = 0
+        context["accepted_pct"] = 0
+        context["rejected_pct"] = 0
+
 
 
