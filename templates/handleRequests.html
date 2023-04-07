@@ -56,6 +56,16 @@
       <div class="container-fluid p-5" align="left">
         <h3>Requests</h3>
 
+        <!-- Progress Bar -->
+        <div class="progress">
+          <!-- Accepted -->
+          <div class="progress-bar bg-success" role="progressbar" style="width: {{ accepted_pct }}%" aria-valuenow="{{ accepted_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+          <!-- Pending  -->
+          <div class="progress-bar bg-info" role="progressbar" style="width: {{ pending_pct }}%" aria-valuenow="{{ pending_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+          <!-- Rejected  -->
+          <div class="progress-bar bg-danger" role="progressbar" style="width: {{ rejected_pct }}%" aria-valuenow="{{ rejected_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+
         <!-- Define Tabs -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">

@@ -127,7 +127,7 @@ def context_update_course(context):
 ########################################################################################
 
 
-def context_view_requests(context):
+def context_view_requests(context, user):
     requests = TransferRequest.objects.all().annotate(
         color=Case(When(Q(condition=TransferRequest.pending), then=Value('light')),
                    When(Q(condition=TransferRequest.accepted), then=Value('success')),
@@ -145,5 +145,15 @@ def context_view_requests(context):
     context["pending"] = requests.filter(condition=TransferRequest.pending)
     context["accepted"] = requests.filter(condition=TransferRequest.accepted)
     context["rejected"] = requests.filter(condition=TransferRequest.rejected)
+
+    myRequests = TransferRequest.objects.filter(user=user).aggregate(
+        pending_cnt=Count('pk', filter=Q(condition=TransferRequest.pending)),
+        accepted_cnt=Count('pk', filter=Q(condition=TransferRequest.accepted)),
+        rejected_cnt=Count('pk', filter=Q(condition=TransferRequest.rejected)),
+        total_cnt=Count('pk'),
+    )
+    context["pending_pct"] = 100 * myRequests["pending_cnt"] / myRequests["total_cnt"]
+    context["accepted_pct"] = 100 * myRequests["accepted_cnt"] / myRequests["total_cnt"]
+    context["rejected_pct"] = 100 * myRequests["rejected_cnt"] / myRequests["total_cnt"]
 
 
