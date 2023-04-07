@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Course Page</title>
+    <title>Favorites Page</title>
 </head>
 <body class="d-flex flex-column min-vh-100">
     {# Load the tag library #}
@@ -33,9 +33,9 @@
               {% for f in favorites %}
                 <form action="{% url 'update_favorites' %}" method="post">
                   {% csrf_token %}
-                  <input type="hidden" id="primary1" name="primary" value="{{ f.transfer.external_course.pk }}">
-                  <input type="hidden" id="secondary1" name="secondary" value="{{ f.transfer.internal_course.pk }}">
-                  <input type="hidden" id="type1" name="type" value="favorites">
+                  <input type="hidden" id="primary" name="primary" value="{{ f.transfer.external_course.pk }}">
+                  <input type="hidden" id="secondary" name="secondary" value="{{ f.transfer.internal_course.pk }}">
+                  <input type="hidden" id="type" name="type" value="favorites">
 
                   <li class="list-group-item list-group-item-light d-flex">
                     <div class="col-3 text-center"><a class="list-group-item list-group-item-light disabled h-100">{{ f.transfer.external_course.college_name }}</a></div>

@@ -1,6 +1,6 @@
 
-from .models import ExternalCollege, ExternalCourse, InternalCourse, CourseTransfer, Favorites
-from django.db.models import Q, Count, Case, When, Value, CharField
+from .models import ExternalCollege, ExternalCourse, InternalCourse, CourseTransfer, Favorites, TransferRequest
+from django.db.models import Q, Count, Case, When, Value, CharField, BooleanField
 
 # Originally, all of this code was placed in the templates themselves, but
 # as the complexity grew, I decided to move everything to get_context_data().
@@ -86,16 +86,20 @@ def context_course_request(context, course, request):
     context['course'] = InternalCourse.objects.none()
     context['courseID'] = course.id
     context['title'] = "Course Transfer Request"
+    context['link'] = True
+    context['comment'] = True
 
 # define context for UpdateInternal view
 def context_update_internal(context, course):
-    context['colleges'] = ExternalCollege.objects.order_by('college_name')
+    context['colleges'] = ExternalCollege.objects.none()
     context['collegeID'] = ""
     context['college'] = "University of Virginia"
     context['action'] = 'submit_update'
     context['course'] = course
     context['courseID'] = course.id
     context['title'] = "Edit UVA Course"
+    context['link'] = False
+    context['comment'] = False
 
 # define context for UpdateExternal view
 def context_update_external(context, course):
@@ -107,6 +111,8 @@ def context_update_external(context, course):
     context['course'] = course
     context['courseID'] = course.id
     context['title'] = "Edit External Course"
+    context['link'] = False
+    context['comment'] = False
 
 # define context for UpdateCourses view
 def context_update_course(context):
@@ -117,10 +123,56 @@ def context_update_course(context):
     context['course'] = InternalCourse.objects.none()
     context['courseID'] = ""
     context['title'] = "Add Course"
+    context['link'] = False
+    context['comment'] = False
 
+########################################################################################
+# Context for ViewRequests view
 ########################################################################################
 
 
+def context_view_requests(context, user):
+    if user.groups.filter(name='admins').exists():
+        context["isAdmin"] = True
+        user_specific = Q()
+    else:
+        context["isAdmin"] = False
+        user_specific = Q(user=user)
+
+    requests = TransferRequest.objects.filter(user_specific).annotate(
+        color=Case(When(Q(condition=TransferRequest.pending), then=Value('light')),
+                   When(Q(condition=TransferRequest.accepted), then=Value('success')),
+                   When(Q(condition=TransferRequest.rejected), then=Value('danger')),
+                   output_field=CharField()),
+        btn=Case(When(Q(condition=TransferRequest.pending), then=Value('outline-dark')),
+                 When(Q(condition=TransferRequest.accepted), then=Value('outline-success')),
+                 When(Q(condition=TransferRequest.rejected), then=Value('outline-danger')),
+                 output_field=CharField()),
+        visibility=Case(When(Q(response__exact=""), then=Value("none")),
+                        When(~Q(response__exact=""), then=Value("block")),
+                        output_field=CharField()),
+    )
+    context["all"] = requests
+    context["pending"] = requests.filter(condition=TransferRequest.pending)
+    context["accepted"] = requests.filter(condition=TransferRequest.accepted)
+    context["rejected"] = requests.filter(condition=TransferRequest.rejected)
+
+    myRequests = TransferRequest.objects.filter(user=user).aggregate(
+        pending_cnt=Count('pk', filter=Q(condition=TransferRequest.pending)),
+        accepted_cnt=Count('pk', filter=Q(condition=TransferRequest.accepted)),
+        rejected_cnt=Count('pk', filter=Q(condition=TransferRequest.rejected)),
+        total_cnt=Count('pk'),
+    )
+
+    total = myRequests["total_cnt"]
+    if total != 0:
+        context["pending_pct"] = 100 * myRequests["pending_cnt"] / total
+        context["accepted_pct"] = 100 * myRequests["accepted_cnt"] / total
+        context["rejected_pct"] = 100 * myRequests["rejected_cnt"] / total
+    else:
+        context["pending_pct"] = 0
+        context["accepted_pct"] = 0
+        context["rejected_pct"] = 0
 
 
 

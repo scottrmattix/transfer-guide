@@ -34,6 +34,7 @@
                     <a href="/" class="nav-link left pt-2 mx-0"> Home </a>
                     <a href="{% url 'request' %}" class="nav-link pt-2 mx-5"> Request Form </a>
                     <a href="{% url 'submit_search' %}" class="nav-link pt-2 mx-5"> Search </a>
+                    <a href="{% url 'handleRequests' %}" class="nav-link pt-2 mx-5"> View Requests </a>
                     <a href="#" class="nav-link pt-2 mx-0"> Help </a>
                 {% else %}
                     <a href="/" class="nav-link pt-2 mx-0"> Home </a>
@@ -41,6 +42,7 @@
                     <a href="#" class="nav-link pt-2 mx-0"> Resolve Help Requests </a>
                     <a href="{% url 'submit_search' %}" class="nav-link pt-2 mx-5"> Search </a>
                     <a href="{% url 'updateCourses' %}" class="nav-link pt-2 mx-5"> Add Course </a>
+                    <a href="{% url 'handleRequests' %}" class="nav-link pt-2 mx-5"> View Requests </a>
                 {% endif %}
             </ul>
             <button class="d-flex fkex-row align-items-center dropdown mx-2 btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
