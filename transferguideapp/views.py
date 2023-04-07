@@ -1,7 +1,9 @@
+import re
+from string import capwords
 from django.db import IntegrityError
 from django.urls import reverse
 from django.shortcuts import redirect, render, get_object_or_404
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.contrib.auth.models import Group, User
 from django.views import generic
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
@@ -10,8 +12,39 @@ from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
 from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
-from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, accept_request_helper, reject_request_helper
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, accept_request_helper, reject_request_helper  
 from django.contrib import messages
+
+# sorry for the spaghetti; using this to properly get() names from db
+def course_title_format(s):
+    pattern = re.compile(r'\b(?:and|or|in|to|the|of)\b', re.IGNORECASE)
+    
+    words = s.split() #split by space
+    title_words = []
+    if words[0].lower() == "the": 
+        title_words.append("The") #dont change first word for courses starting with The (they exist for some reason)
+        words = words[1:]
+
+    for word in words: 
+        title_word = capwords(word) #capwords capitalizes first letter of word()
+        if pattern.match(word): 
+            title_word = title_word.lower() #if and,or,in, etc lowercase it
+        title_words.append(title_word)
+    return ' '.join(title_words)
+
+
+def add_external_college(request):
+
+    if(request.method == 'POST'):
+        college_name = request.POST['college']
+        domestic_college = True
+        if request.POST.get('domestic') == 'off':
+            domestic_college = False
+        normalized_name = course_title_format(college_name)    
+        if not ExternalCollege.objects.filter(college_name=normalized_name, domestic_college=domestic_college).exists():
+            ExternalCollege(college_name=college_name, domestic_college=domestic_college).save()
+        return HttpResponseRedirect('/course/update')
+
 
 def account_info(request):
     user = request.user

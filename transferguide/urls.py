@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
-from transferguideapp.views import set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request
+from transferguideapp.views import add_external_college, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,6 +39,7 @@ urlpatterns = [
     path('external/<int:pk>/update', UpdateExternal.as_view(), name='externalcourseUpdate'),
     path('course/update/', UpdateCourses.as_view(), name='updateCourses'),
     path('course/update/submit', submit_update, name='submit_update'),
+    path('course/update/add_external_college', add_external_college, name ='add_external_college'),
 
     path('favorites/', favorites, name='favorites'),
     path('favorites/update/', update_favorites, name='update_favorites'),
