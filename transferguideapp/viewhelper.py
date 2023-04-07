@@ -80,7 +80,11 @@ def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url
     internal = InternalCourse.objects.get(id=courseID)
 
     # Get College
-    college = ExternalCollege.objects.get(id=collegeID)
+    try:
+        college = ExternalCollege.objects.get(id=collegeID)
+    except ExternalCollege.DoesNotExist:
+        error = "Invalid External College."
+        return redirect("courseRequest", pk=courseID), error
 
     # Get or Create External Course
     try:
