@@ -100,11 +100,39 @@ class CourseTransfer(models.Model):
         userIDs = faves.values_list('user', flat=True).distinct()
         return User.objects.filter(id__in=userIDs)
 
+class TimeStampMixin(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
 # Model representing a User-CourseTransfer relation
-class Favorites(models.Model):
+class Favorites(TimeStampMixin):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_items', default=None)
     transfer = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
 
     # Feel free to change this for testing purposes
     def __str__(self):
         return f"{self.transfer.internal_course.mnemonic} {self.transfer.internal_course.course_number}: {self.transfer.internal_course.course_name} = {self.transfer.external_course.college} {self.transfer.external_course.mnemonic} {self.transfer.external_course.course_number}: {self.transfer.external_course.course_name} "
+
+
+class TransferRequest(TimeStampMixin):
+    pending = "pending"
+    accepted = "accepted"
+    rejected = "rejected"
+
+    REQUEST_CHOICES = [
+        (pending, "pending"),
+        (accepted, "accepted"),
+        (rejected, "rejected"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    transfer = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
+    condition = models.CharField(max_length=50, choices=REQUEST_CHOICES, default=pending)
+    url = models.URLField(max_length=200, default="")
+
+    def __str__(self):
+        return f"{self.condition} | {self.user} | {self.transfer}"
+

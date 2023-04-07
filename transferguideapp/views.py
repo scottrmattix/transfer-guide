@@ -5,12 +5,13 @@ from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.models import Group, User
 from django.views import generic
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
-from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites
+from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites, TransferRequest
 from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
-from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course
-from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper
+from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, accept_request_helper, reject_request_helper
+from django.contrib import messages
 
 def account_info(request):
     user = request.user
@@ -128,17 +129,16 @@ def submit_update(request):
         mnemonic = mnemonic.upper()
         number = number.upper()
         courseID = int(courseID) if courseID else -1
-        return update_course_helper(collegeID, mnemonic, number, name, courseID)
-    return HttpResponseRedirect(reverse('updateCourses'))
+
+        redirect, error = update_course_helper(collegeID, mnemonic, number, name, courseID)
+        if error:
+            messages.error(request, error)
+        return redirect
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 # a session error arises when .../search/ is visited without calling submit_search beforehand
 # to bypass the issue, first visit .../search/clear/.
 def submit_search(request):
-    # if "user_college_id" not in request.session:
-    #     userCollege = ExternalCollege.objects.first()
-    #     request.session["user_college_id"] = userCollege.id
-    #     request.session["user_college"] = userCollege.college_name
-
     request.session["search"] = {"college": "", "mnemonic": "", "number": "", "name": ""}
     if request.method == "POST":
         try:
@@ -272,24 +272,63 @@ class CourseRequest(generic.DetailView):
 def make_request(request):
     if request.method == "POST":
         try:
+            user = request.user
             collegeID = request.POST["collegeID"]
             mnemonic = request.POST["mnemonic"]
             number = request.POST["number"]
             name = request.POST["name"]
             courseID = request.POST["id"]
+            url = request.POST["url"]
         except Exception as e:
             return render(request, 'generalForm.html', {'error_message': f"An error occurred: {e}"})
         collegeID = int(collegeID) if collegeID else -1
         mnemonic = mnemonic.upper()
         number = number.upper()
         courseID = int(courseID) if courseID else -1
-        return request_course_helper(collegeID, mnemonic, number, name, courseID)
-    return HttpResponseRedirect(reverse('updateCourses'))
-
-
+        redirect, error = request_course_helper(user, collegeID, mnemonic, number, name, courseID, url)
+        if error:
+            messages.error(request, error)
+        return redirect
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 
 def delete_favorite(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
     favorite.delete()
     return redirect('favorites')
+
+class ViewRequests(generic.ListView):
+    template_name = 'viewRequests.html'
+    queryset = TransferRequest.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context_view_requests(context)
+        return context
+
+
+def accept_request(request):
+    print("accept test")
+    if request.method == "POST":
+        try:
+            requestID = request.POST["requestID"]
+        except Exception as e:
+            return render(request, 'viewRequests.html', {'error_message': f"An error occurred: {e}"})
+        redirect, error = accept_request_helper(requestID)
+        if error:
+            messages.error(request, error)
+        return redirect
+    return HttpResponseRedirect(reverse('viewRequests'))
+
+def reject_request(request):
+    print("reject test")
+    if request.method == "POST":
+        try:
+            requestID = request.POST["requestID"]
+        except Exception as e:
+            return render(request, 'viewRequests.html', {'error_message': f"An error occurred: {e}"})
+        redirect, error = reject_request_helper(requestID)
+        if error:
+            messages.error(request, error)
+        return redirect
+    return HttpResponseRedirect(reverse('viewRequests'))

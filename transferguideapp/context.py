@@ -1,6 +1,6 @@
 
-from .models import ExternalCollege, ExternalCourse, InternalCourse, CourseTransfer, Favorites
-from django.db.models import Q, Count, Case, When, Value, CharField
+from .models import ExternalCollege, ExternalCourse, InternalCourse, CourseTransfer, Favorites, TransferRequest
+from django.db.models import Q, Count, Case, When, Value, CharField, BooleanField
 
 # Originally, all of this code was placed in the templates themselves, but
 # as the complexity grew, I decided to move everything to get_context_data().
@@ -86,16 +86,18 @@ def context_course_request(context, course, request):
     context['course'] = InternalCourse.objects.none()
     context['courseID'] = course.id
     context['title'] = "Course Transfer Request"
+    context['link'] = True
 
 # define context for UpdateInternal view
 def context_update_internal(context, course):
-    context['colleges'] = ExternalCollege.objects.order_by('college_name')
+    context['colleges'] = ExternalCollege.objects.none()
     context['collegeID'] = ""
     context['college'] = "University of Virginia"
     context['action'] = 'submit_update'
     context['course'] = course
     context['courseID'] = course.id
     context['title'] = "Edit UVA Course"
+    context['link'] = False
 
 # define context for UpdateExternal view
 def context_update_external(context, course):
@@ -107,6 +109,7 @@ def context_update_external(context, course):
     context['course'] = course
     context['courseID'] = course.id
     context['title'] = "Edit External Course"
+    context['link'] = False
 
 # define context for UpdateCourses view
 def context_update_course(context):
@@ -117,10 +120,30 @@ def context_update_course(context):
     context['course'] = InternalCourse.objects.none()
     context['courseID'] = ""
     context['title'] = "Add Course"
+    context['link'] = False
 
+########################################################################################
+# Context for ViewRequests view
 ########################################################################################
 
 
-
+def context_view_requests(context):
+    requests = TransferRequest.objects.all().annotate(
+        color=Case(When(Q(condition=TransferRequest.pending), then=Value('light')),
+                   When(Q(condition=TransferRequest.accepted), then=Value('success')),
+                   When(Q(condition=TransferRequest.rejected), then=Value('danger')),
+                   output_field=CharField()),
+        btn=Case(When(Q(condition=TransferRequest.pending), then=Value('outline-dark')),
+                 When(Q(condition=TransferRequest.accepted), then=Value('outline-success')),
+                 When(Q(condition=TransferRequest.rejected), then=Value('outline-danger')),
+                 output_field=CharField()),
+        action=Case(When(Q(condition=TransferRequest.pending), then=Value(True)),
+                    When(~Q(condition=TransferRequest.pending), then=Value(False)),
+                    output_field=BooleanField()),
+    )
+    context["all"] = requests
+    context["pending"] = requests.filter(condition=TransferRequest.pending)
+    context["accepted"] = requests.filter(condition=TransferRequest.accepted)
+    context["rejected"] = requests.filter(condition=TransferRequest.rejected)
 
 
