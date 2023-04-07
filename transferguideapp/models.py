@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import re
 from string import capwords
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 # method to make course_title strings match those of SIS
 # ex: "The intro stars and The galaxies" -> "The Intro Stars and the Galaxies"
@@ -157,3 +158,39 @@ class Favorites(models.Model):
     # Feel free to change this for testing purposes
     def __str__(self):
         return f"{self.transfer.internal_course.mnemonic} {self.transfer.internal_course.course_number}: {self.transfer.internal_course.course_name} = {self.transfer.external_course.college} {self.transfer.external_course.mnemonic} {self.transfer.external_course.course_number}: {self.transfer.external_course.course_name} "
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    NOTIFICATION_CHOICES = [
+            ('transfer','transfer'),
+    ]
+    notification = models.CharField(blank=True, choices=NOTIFICATION_CHOICES, max_length=10)
+    subject = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None) 
+    def __str__(self):
+        return f"User: {self.user} Type: {self.notification}"
+
+class TimeStampMixin(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+class TransferRequest(TimeStampMixin):
+    pending = "pending"
+    accepted = "accepted"
+    rejected = "rejected"
+
+    REQUEST_CHOICES = [
+        (pending, "pending"),
+        (accepted, "accepted"),
+        (rejected, "rejected"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    transfer = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
+    condition = models.CharField(max_length=50, choices=REQUEST_CHOICES, default=pending)
+    url = models.URLField(max_length=200, default="")
+
+    def __str__(self):
+        return f"{self.condition} | {self.user} | {self.transfer}"

@@ -1,5 +1,17 @@
 from allauth.socialaccount.models import providers
 from allauth.socialaccount.providers.google.provider import GoogleProvider
+from django.dispatch import receiver
+from .models import Notification, CourseTransfer, TransferRequest
+
+def hook_save(sender, **kwargs):
+    instance = kwargs['instance']
+    if instance.__class__ == TransferRequest:
+        if instance.condition != "pending":
+            #This will also send a notifcation when 
+            Notification.objects.update_or_create(user = instance.user, notification='transfer', subject=instance.transfer)
+
+    
+
 
 
 def populate_models(sender, **kwargs):
