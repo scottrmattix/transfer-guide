@@ -34,14 +34,14 @@
             <div class="modal-body">
               <div>
                 <div class="form-text">User Explanation: </div>
-                <input type="text" id="comment" name="comment" readonly class="form-control-plaintext" value="" data-bs-toggle="tooltip" data-bs-placement="top" title=""/>
+                <input type="text" id="comment" name="comment" readonly class="form-control-plaintext" value="" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title=""/>
               </div>
               {% if isAdmin %}
                 <form method="post">
                   {% csrf_token %}
                   <div class="form-outline">
                     <div class="form-text">Comment (Optional):</div>
-                    <textarea id="adminResponse" name="adminResponse" maxlength="200" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top" title=""></textarea>
+                    <textarea id="adminResponse" name="adminResponse" maxlength="200" class="form-control"></textarea>
                   </div>
                   <input type="hidden" name="requestID" id="requestID" value=""/>
                   <input type="hidden" name="tab" id="tab" value=""/>
@@ -52,9 +52,8 @@
                 </form>
               {% else %}
                 <div id="style" class="form-text">
-                    <input type="text" id="updated" name="updated" readonly class="form-control-plaintext" value=""/>
                     <div class="form-text">Admin Comment: </div>
-                    <input type="text" id="userResponse" name="userResponse" readonly class="form-control-plaintext" value="" data-bs-toggle="tooltip" data-bs-placement="top" title=""/>
+                    <input type="text" id="userResponse" name="userResponse" readonly class="form-control-plaintext" value="" data-bs-html="true" data-bs-toggle="tooltip" data-bs-placement="right" title=""/>
                 </div>
               {% endif %}
             </div>
@@ -66,12 +65,11 @@
       <!-- Script for passing request ID to modal -->
       <script type="text/javascript">
           $(document).on("click", ".open-ActionModal", function () {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {return new bootstrap.Tooltip(tooltipTriggerEl)})
-
             var requestID = $(this).data('id');
             var comment = $(this).data('comment');
-            var response = $(this).data('response');
+            var userResponse = $(this).data('response');
+            var adminResponse = $(this).data('response');
+            userResponse = userResponse === "" ? "(None)" : userResponse;
             var style = $(this).data('style');
             var tab = $(this).data('tab');
             var created = $(this).data('created');
@@ -79,13 +77,15 @@
 
             $(".modal-body #requestID").val( requestID );
             $(".modal-body #comment").val( comment );
-            $(".modal-body #userResponse").val( response );
-            $(".modal-body #adminResponse").val( response );
+            $(".modal-body #userResponse").val( userResponse );
+            $(".modal-body #adminResponse").val( adminResponse );
             $(".modal-body #style").css("display", style);
             $(".modal-body #tab").val( tab );
-            $(".modal-body #comment").prop('title', "Requested " + created + " ago.");
-            $(".modal-body #userResponse").prop('title', "Resolved " + updated + " ago.");
-            $(".modal-body #adminResponse").prop('title', "Resolved " + updated + " ago.");
+            $(".modal-body #comment").prop('title', "Requested <em><b>" + created + "</b></em> ago.");
+            $(".modal-body #userResponse").prop('title', "Resolved <em><b>" + updated + "</b></em> ago.");
+
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {return new bootstrap.Tooltip(tooltipTriggerEl)})
           });
       </script>
 
@@ -125,7 +125,7 @@
         <div class="card">
           <div class="card-header d-flex">
             <div class="col-3 text-center">College</div>
-            <div class="col-4 text-center">Course</div>
+            <div class="col-4 text-center">Course Link</div>
             <div class="col-4 text-center">UVA Equivalent</div>
             <div class="col-1 text-center"></div>
           </div>

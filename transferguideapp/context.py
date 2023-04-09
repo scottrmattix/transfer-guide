@@ -164,16 +164,16 @@ def context_view_requests(context, user, session):
                  When(Q(condition=TransferRequest.rejected), then=Value('outline-danger')),
                  output_field=CharField()),
 
-        visibility=Case(When(Q(response__exact=""), then=Value("none")),
-                        When(~Q(response__exact=""), then=Value("block")),
+        visibility=Case(When(Q(condition=TransferRequest.pending), then=Value("none")),
+                        When(~Q(condition=TransferRequest.pending), then=Value("block")),
                         output_field=CharField()),
     )
 
     # filter which transfer requests are under each tab
-    context["all"] = requests
-    context["pending"] = requests.filter(condition=TransferRequest.pending)
-    context["accepted"] = requests.filter(condition=TransferRequest.accepted)
-    context["rejected"] = requests.filter(condition=TransferRequest.rejected)
+    context["all"] = requests.order_by('-created_at')
+    context["pending"] = requests.filter(condition=TransferRequest.pending).order_by('-created_at')
+    context["accepted"] = requests.filter(condition=TransferRequest.accepted).order_by('-updated_at')
+    context["rejected"] = requests.filter(condition=TransferRequest.rejected).order_by('-updated_at')
 
     # count how many of user's transfer requests are under each tab
     myRequests = TransferRequest.objects.filter(user=user).aggregate(

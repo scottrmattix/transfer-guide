@@ -256,7 +256,7 @@ def submit_transfer_request(request):
 
 
 def favorites(request):
-    f = Favorites.objects.filter(user=request.user)
+    f = Favorites.objects.filter(user=request.user).order_by('-created_at')
     # f is the entire query set, to access individual fields do:
     # f[0].in_course.course_name, f[0].ex_course.course_id, etc
 
@@ -344,6 +344,7 @@ class HandleRequests(generic.ListView):
 
 
 def accept_request(request):
+    request.session["request_tab"] = "pending"
     if request.method == "POST":
         try:
             requestID = request.POST["requestID"]
@@ -359,6 +360,7 @@ def accept_request(request):
     return HttpResponseRedirect(reverse('handleRequests'))
 
 def reject_request(request):
+    request.session["request_tab"] = "pending"
     if request.method == "POST":
         try:
             requestID = request.POST["requestID"]
