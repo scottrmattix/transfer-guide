@@ -3,6 +3,7 @@ from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTrans
 from django.db.models import Q
 from django.contrib import messages
 import re
+from django.utils import timezone
 # helper methods for views
 
 def update_favorites_helper(user, pid, sid, type):
@@ -118,13 +119,13 @@ def accept_request_helper(requestID, adminResponse):
     request = TransferRequest.objects.get(id=requestID)
     request.transfer.accepted = True
     request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.accepted, response=adminResponse)
+    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.accepted, response=adminResponse, updated_at=timezone.now())
     return redirect("handleRequests"), None
 
 def reject_request_helper(requestID, adminResponse):
     request = TransferRequest.objects.get(id=requestID)
     request.transfer.accepted = False
     request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.rejected, response=adminResponse)
+    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.rejected, response=adminResponse, updated_at=timezone.now())
     return redirect("handleRequests"), None
 

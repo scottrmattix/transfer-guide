@@ -1,6 +1,7 @@
 
 from .models import ExternalCollege, ExternalCourse, InternalCourse, CourseTransfer, Favorites, TransferRequest
-from django.db.models import Q, Count, Case, When, Value, CharField, BooleanField
+from django.db.models import Q, F, Func, Count, Case, When, Value, CharField, BooleanField
+from django.db.models.functions import Concat
 
 # Originally, all of this code was placed in the templates themselves, but
 # as the complexity grew, I decided to move everything to get_context_data().
@@ -27,10 +28,6 @@ def context_course(context, course, request):
         totallikes=Count('coursetransfer__favorites', filter=unspecific),
 
         pagelikes=Count('coursetransfer__favorites', filter=specific),
-
-        visibility=Case(When(collegeQ, then=Value('include')),
-                        When(~collegeQ, then=Value('exclude')),
-                        output_field=CharField()),
 
         color=Case(When(totallikes=0, then=Value('light')),
                    When(Q(totallikes__gte=1, pagelikes=0), then=Value('warning')),
@@ -166,6 +163,7 @@ def context_view_requests(context, user, session):
                  When(Q(condition=TransferRequest.accepted), then=Value('outline-success')),
                  When(Q(condition=TransferRequest.rejected), then=Value('outline-danger')),
                  output_field=CharField()),
+
         visibility=Case(When(Q(response__exact=""), then=Value("none")),
                         When(~Q(response__exact=""), then=Value("block")),
                         output_field=CharField()),
@@ -195,6 +193,9 @@ def context_view_requests(context, user, session):
         context["pending_pct"] = 0
         context["accepted_pct"] = 0
         context["rejected_pct"] = 0
+
+########################################################################################
+
 
 
 

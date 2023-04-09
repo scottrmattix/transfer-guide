@@ -34,14 +34,14 @@
             <div class="modal-body">
               <div>
                 <div class="form-text">User Explanation: </div>
-                <input type="text" id="comment" name="comment" readonly class="form-control-plaintext" value=""/>
+                <input type="text" id="comment" name="comment" readonly class="form-control-plaintext" value="" data-bs-toggle="tooltip" data-bs-placement="top" title=""/>
               </div>
               {% if isAdmin %}
                 <form method="post">
                   {% csrf_token %}
                   <div class="form-outline">
                     <div class="form-text">Comment (Optional):</div>
-                    <textarea id="adminResponse" name="adminResponse" maxlength="200" class="form-control"></textarea>
+                    <textarea id="adminResponse" name="adminResponse" maxlength="200" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top" title=""></textarea>
                   </div>
                   <input type="hidden" name="requestID" id="requestID" value=""/>
                   <input type="hidden" name="tab" id="tab" value=""/>
@@ -52,8 +52,9 @@
                 </form>
               {% else %}
                 <div id="style" class="form-text">
+                    <input type="text" id="updated" name="updated" readonly class="form-control-plaintext" value=""/>
                     <div class="form-text">Admin Comment: </div>
-                    <input type="text" id="userResponse" name="userResponse" readonly class="form-control-plaintext" value=""/>
+                    <input type="text" id="userResponse" name="userResponse" readonly class="form-control-plaintext" value="" data-bs-toggle="tooltip" data-bs-placement="top" title=""/>
                 </div>
               {% endif %}
             </div>
@@ -65,17 +66,26 @@
       <!-- Script for passing request ID to modal -->
       <script type="text/javascript">
           $(document).on("click", ".open-ActionModal", function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {return new bootstrap.Tooltip(tooltipTriggerEl)})
+
             var requestID = $(this).data('id');
             var comment = $(this).data('comment');
             var response = $(this).data('response');
             var style = $(this).data('style');
             var tab = $(this).data('tab');
+            var created = $(this).data('created');
+            var updated = $(this).data('updated');
+
             $(".modal-body #requestID").val( requestID );
             $(".modal-body #comment").val( comment );
             $(".modal-body #userResponse").val( response );
             $(".modal-body #adminResponse").val( response );
             $(".modal-body #style").css("display", style);
             $(".modal-body #tab").val( tab );
+            $(".modal-body #comment").prop('title', "Requested " + created + " ago.");
+            $(".modal-body #userResponse").prop('title', "Resolved " + updated + " ago.");
+            $(".modal-body #adminResponse").prop('title', "Resolved " + updated + " ago.");
           });
       </script>
 
@@ -131,7 +141,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="pending" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="pending" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -149,7 +159,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="accepted" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="accepted" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -167,7 +177,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="rejected" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="rejected" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -185,7 +195,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="all" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="all" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
