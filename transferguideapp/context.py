@@ -13,38 +13,17 @@ from django.db.models import Q, Count, Case, When, Value, CharField, BooleanFiel
 
 def context_course(context, course, request):
     context['foreign'] = set_foreign(course)
-    context['checkbox'], collegeQ = handle_checkbox(course, request.session)
+    context['tab'], collegeQ = handle_tab(course, request.session)
+
+    if "course_tab" not in request.session:
+        request.session["course_tab"] = "all"
+    context["all_tab"] = "show active" if (request.session["course_tab"] == "all") else ""
+    context["specific_tab"] = "show active" if (request.session["course_tab"] == "specific") else ""
+
+
     unspecific, specific = favorite_filters(course, request.user)
-    context['equivalents'] = create_annotations(course, specific, unspecific, collegeQ)
 
-########################################################################################
-
-def handle_checkbox(course, session):
-    if "user_college_id" in session and course.get_model() == "internalcourse":
-        checkbox = True
-        collegeQ = Q(college__id=session["user_college_id"])
-    else:
-        checkbox = False
-        collegeQ = ~Q(id=-1)
-    return checkbox, collegeQ
-
-def favorite_filters(course, user):
-    unspecific = Q(coursetransfer__favorites__user=user)
-    if course.get_model() == "internalcourse":
-        specific = unspecific & Q(coursetransfer__internal_course=course)
-    else:
-        specific = unspecific & Q(coursetransfer__external_course=course)
-    return unspecific, specific
-
-def set_foreign(course):
-    foreign = ""
-    if course.get_model() == "externalcourse":
-        if not course.college.domestic_college:
-            foreign = "(Foreign)"
-    return foreign
-
-def create_annotations(course, specific, unspecific, collegeQ):
-    return course.get_equivalent().annotate(
+    equivalents = course.get_equivalent().annotate(
         totallikes=Count('coursetransfer__favorites', filter=unspecific),
 
         pagelikes=Count('coursetransfer__favorites', filter=specific),
@@ -62,6 +41,35 @@ def create_annotations(course, specific, unspecific, collegeQ):
                     When(pagelikes__gte=1, then=Value('Unfavorite')),
                     output_field=CharField())
     )
+
+    context["equivalents"] = equivalents
+    context["equivalents_specific"] = equivalents.filter(collegeQ)
+
+########################################################################################
+
+def handle_tab(course, session):
+    if "user_college_id" in session and course.get_model() == "internalcourse":
+        tab = True
+        collegeQ = Q(college__id=session["user_college_id"])
+    else:
+        tab = False
+        collegeQ = ~Q(id=-1)
+    return tab, collegeQ
+
+def favorite_filters(course, user):
+    unspecific = Q(coursetransfer__favorites__user=user)
+    if course.get_model() == "internalcourse":
+        specific = unspecific & Q(coursetransfer__internal_course=course)
+    else:
+        specific = unspecific & Q(coursetransfer__external_course=course)
+    return unspecific, specific
+
+def set_foreign(course):
+    foreign = ""
+    if course.get_model() == "externalcourse":
+        if not course.college.domestic_college:
+            foreign = "(Foreign)"
+    return foreign
 
 ########################################################################################
 # In order for us to reuse templates, the context dictionary entries of
@@ -131,7 +139,8 @@ def context_update_course(context):
 ########################################################################################
 
 
-def context_view_requests(context, user):
+def context_view_requests(context, user, session):
+    # control which elements are visible for admins vs. common users
     if user.groups.filter(name='admins').exists():
         context["isAdmin"] = True
         user_specific = Q()
@@ -139,6 +148,15 @@ def context_view_requests(context, user):
         context["isAdmin"] = False
         user_specific = Q(user=user)
 
+    # set which tab is active
+    if "request_tab" not in session:
+        session["request_tab"] = "pending"
+    context["pending_tab"] = "show active" if (session["request_tab"] == "pending") else ""
+    context["accepted_tab"] = "show active" if (session["request_tab"] == "accepted") else ""
+    context["rejected_tab"] = "show active" if (session["request_tab"] == "rejected") else ""
+    context["all_tab"] = "show active" if (session["request_tab"] == "all") else ""
+
+    # annotate transfer requests with relevant attributes
     requests = TransferRequest.objects.filter(user_specific).annotate(
         color=Case(When(Q(condition=TransferRequest.pending), then=Value('light')),
                    When(Q(condition=TransferRequest.accepted), then=Value('success')),
@@ -152,11 +170,14 @@ def context_view_requests(context, user):
                         When(~Q(response__exact=""), then=Value("block")),
                         output_field=CharField()),
     )
+
+    # filter which transfer requests are under each tab
     context["all"] = requests
     context["pending"] = requests.filter(condition=TransferRequest.pending)
     context["accepted"] = requests.filter(condition=TransferRequest.accepted)
     context["rejected"] = requests.filter(condition=TransferRequest.rejected)
 
+    # count how many of user's transfer requests are under each tab
     myRequests = TransferRequest.objects.filter(user=user).aggregate(
         pending_cnt=Count('pk', filter=Q(condition=TransferRequest.pending)),
         accepted_cnt=Count('pk', filter=Q(condition=TransferRequest.accepted)),
@@ -164,6 +185,7 @@ def context_view_requests(context, user):
         total_cnt=Count('pk'),
     )
 
+    # set percentage of user's transfer requests for each condition
     total = myRequests["total_cnt"]
     if total != 0:
         context["pending_pct"] = 100 * myRequests["pending_cnt"] / total

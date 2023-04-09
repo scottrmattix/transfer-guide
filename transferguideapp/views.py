@@ -12,22 +12,22 @@ from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
 from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
-from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, accept_request_helper, reject_request_helper  
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, accept_request_helper, reject_request_helper
 from django.contrib import messages
 
 # sorry for the spaghetti; using this to properly get() names from db
 def course_title_format(s):
     pattern = re.compile(r'\b(?:and|or|in|to|the|of)\b', re.IGNORECASE)
-    
+
     words = s.split() #split by space
     title_words = []
-    if words[0].lower() == "the": 
+    if words[0].lower() == "the":
         title_words.append("The") #dont change first word for courses starting with The (they exist for some reason)
         words = words[1:]
 
-    for word in words: 
+    for word in words:
         title_word = capwords(word) #capwords capitalizes first letter of word()
-        if pattern.match(word): 
+        if pattern.match(word):
             title_word = title_word.lower() #if and,or,in, etc lowercase it
         title_words.append(title_word)
     return ' '.join(title_words)
@@ -40,7 +40,7 @@ def add_external_college(request):
         domestic_college = True
         if request.POST.get('domestic') == 'off':
             domestic_college = False
-        normalized_name = course_title_format(college_name)    
+        normalized_name = course_title_format(college_name)
         if not ExternalCollege.objects.filter(college_name=normalized_name, domestic_college=domestic_college).exists():
             ExternalCollege(college_name=college_name, domestic_college=domestic_college).save()
         return HttpResponseRedirect('/course/update')
@@ -280,8 +280,10 @@ def update_favorites(request):
             pid = request.POST["primary"]
             sid = request.POST["secondary"]
             type = request.POST["type"]
+            tab = request.POST["active-tab"]
         except Exception as e:
             return render(request, 'search.html', {'error_message': f"An error occurred: {e}"})
+        request.session["course_tab"] = tab
         return update_favorites_helper(user, pid, sid, type)
     return render(request, 'search.html')
 
@@ -337,7 +339,7 @@ class HandleRequests(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context_view_requests(context, self.request.user)
+        context_view_requests(context, self.request.user, self.request.session)
         return context
 
 
@@ -346,8 +348,10 @@ def accept_request(request):
         try:
             requestID = request.POST["requestID"]
             adminResponse = request.POST["adminResponse"]
+            tab = request.POST["tab"]
         except Exception as e:
             return render(request, 'handleRequests.html', {'error_message': f"An error occurred: {e}"})
+        request.session["request_tab"] = tab
         redirect, error = accept_request_helper(requestID, adminResponse)
         if error:
             messages.error(request, error)
@@ -359,8 +363,10 @@ def reject_request(request):
         try:
             requestID = request.POST["requestID"]
             adminResponse = request.POST["adminResponse"]
+            tab = request.POST["tab"]
         except Exception as e:
             return render(request, 'handleRequests.html', {'error_message': f"An error occurred: {e}"})
+        request.session["request_tab"] = tab
         redirect, error = reject_request_helper(requestID, adminResponse)
         if error:
             messages.error(request, error)

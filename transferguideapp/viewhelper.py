@@ -125,6 +125,6 @@ def reject_request_helper(requestID, adminResponse):
     request = TransferRequest.objects.get(id=requestID)
     request.transfer.accepted = False
     request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.rejected, respones=adminResponse)
+    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.rejected, response=adminResponse)
     return redirect("handleRequests"), None
 

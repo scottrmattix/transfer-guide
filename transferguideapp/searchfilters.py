@@ -23,8 +23,11 @@ def search(session):
 
 def set_user_college(session, college):
     if college:
-        session["user_college_id"] = college.id
-        session["user_college"] = college.college_name
+        if session["user_college_id"] != college.id:
+            session["user_college_id"] = college.id
+            session["user_college"] = college.college_name
+            if "course_tab" in session:
+                session["course_tab"] = "all"
 
 
 def filterCollege(inputCollege):
