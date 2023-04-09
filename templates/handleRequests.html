@@ -34,7 +34,7 @@
             <div class="modal-body">
               <div>
                 <div class="form-text">User Explanation: </div>
-                <input type="text" id="comment" name="comment" readonly class="form-control-plaintext" value=""/>
+                <input type="text" id="comment" name="comment" readonly class="form-control-plaintext" value="" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title=""/>
               </div>
               {% if isAdmin %}
                 <form method="post">
@@ -44,6 +44,7 @@
                     <textarea id="adminResponse" name="adminResponse" maxlength="200" class="form-control"></textarea>
                   </div>
                   <input type="hidden" name="requestID" id="requestID" value=""/>
+                  <input type="hidden" name="tab" id="tab" value=""/>
                   <div class="text-center p-2">
                     <button class="btn btn-success" formaction="{% url 'accept_request' %}"> Accept </button>
                     <button class="btn btn-danger" formaction="{% url 'reject_request' %}"> Reject </button>
@@ -52,7 +53,7 @@
               {% else %}
                 <div id="style" class="form-text">
                     <div class="form-text">Admin Comment: </div>
-                    <input type="text" id="userResponse" name="userResponse" readonly class="form-control-plaintext" value=""/>
+                    <input type="text" id="userResponse" name="userResponse" readonly class="form-control-plaintext" value="" data-bs-html="true" data-bs-toggle="tooltip" data-bs-placement="right" title=""/>
                 </div>
               {% endif %}
             </div>
@@ -65,14 +66,26 @@
       <script type="text/javascript">
           $(document).on("click", ".open-ActionModal", function () {
             var requestID = $(this).data('id');
-            var comment = $(this).data('comment')
-            var response = $(this).data('response')
-            var style = $(this).data('style')
+            var comment = $(this).data('comment');
+            var userResponse = $(this).data('response');
+            var adminResponse = $(this).data('response');
+            userResponse = userResponse === "" ? "(None)" : userResponse;
+            var style = $(this).data('style');
+            var tab = $(this).data('tab');
+            var created = $(this).data('created');
+            var updated = $(this).data('updated');
+
             $(".modal-body #requestID").val( requestID );
             $(".modal-body #comment").val( comment );
-            $(".modal-body #userResponse").val( response );
-            $(".modal-body #adminResponse").val( response );
+            $(".modal-body #userResponse").val( userResponse );
+            $(".modal-body #adminResponse").val( adminResponse );
             $(".modal-body #style").css("display", style);
+            $(".modal-body #tab").val( tab );
+            $(".modal-body #comment").prop('title', "Requested <em><b>" + created + "</b></em> ago.");
+            $(".modal-body #userResponse").prop('title', "Resolved <em><b>" + updated + "</b></em> ago.");
+
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {return new bootstrap.Tooltip(tooltipTriggerEl)})
           });
       </script>
 
@@ -95,16 +108,16 @@
         <!-- Define Tabs -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending</button>
+            <button class="nav-link {{ pending_tab }}" id="pending-tab" name="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="accepted-tab" data-bs-toggle="tab" data-bs-target="#accepted" type="button" role="tab" aria-controls="accepted" aria-selected="false">Accepted</button>
+            <button class="nav-link {{ accepted_tab }}" id="accepted-tab" name="accepted-tab" data-bs-toggle="tab" data-bs-target="#accepted" type="button" role="tab" aria-controls="accepted" aria-selected="false">Accepted</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab" aria-controls="rejected" aria-selected="false">Rejected</button>
+            <button class="nav-link {{ rejected_tab }}" id="rejected-tab" name="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab" aria-controls="rejected" aria-selected="false">Rejected</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="false">All</button>
+            <button class="nav-link {{ all_tab }}" id="all-tab" name="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="false">All</button>
           </li>
         </ul>
 
@@ -112,7 +125,7 @@
         <div class="card">
           <div class="card-header d-flex">
             <div class="col-3 text-center">College</div>
-            <div class="col-4 text-center">Course</div>
+            <div class="col-4 text-center">Course Link</div>
             <div class="col-4 text-center">UVA Equivalent</div>
             <div class="col-1 text-center"></div>
           </div>
@@ -120,7 +133,7 @@
           <!-- Tab Content -->
           <div class="tab-content" id="myTabContent">
             <!-- Pending Requests -->
-            <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+            <div class="tab-pane fade {{ pending_tab }}" id="pending" role="tabpanel" aria-labelledby="pending-tab">
               <ul class="list-group">
                 {% if pending %}
                   {% for r in pending %}
@@ -128,7 +141,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="pending" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -138,7 +151,7 @@
             </div>
 
             <!-- Accepted Requests -->
-            <div class="tab-pane fade" id="accepted" role="tabpanel" aria-labelledby="pending-tab">
+            <div class="tab-pane fade {{ accepted_tab }}" id="accepted" role="tabpanel" aria-labelledby="pending-tab">
               <ul class="list-group">
                 {% if accepted %}
                   {% for r in accepted %}
@@ -146,7 +159,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="accepted" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -156,7 +169,7 @@
             </div>
 
             <!-- Rejected Requests -->
-            <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="pending-tab">
+            <div class="tab-pane fade {{ rejected_tab }}" id="rejected" role="tabpanel" aria-labelledby="pending-tab">
               <ul class="list-group">
                 {% if rejected %}
                   {% for r in rejected %}
@@ -164,7 +177,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="rejected" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -174,7 +187,7 @@
             </div>
 
             <!-- All Requests -->
-            <div class="tab-pane fade" id="all" role="tabpanel" aria-labelledby="pending-tab">
+            <div class="tab-pane fade {{ all_tab }}" id="all" role="tabpanel" aria-labelledby="pending-tab">
               <ul class="list-group">
                 {% if all %}
                   {% for r in all %}
@@ -182,7 +195,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="all" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
