@@ -32,6 +32,29 @@ def course_title_format(s):
         title_words.append(title_word)
     return ' '.join(title_words)
 
+def favorite_request(request, favorite_id, icpk, ecpk):
+    internal_course = get_object_or_404(InternalCourse, pk=icpk)
+    external_course = get_object_or_404(ExternalCourse, pk=ecpk)
+    ct = CourseTransfer(external_course=external_course, internal_course=internal_course, accepted = False)
+    ct.save()
+
+    #TODO dont add duplicate TRs
+    # exists = TransferRequest.objects.filter(user=request.user, transfer=ct)
+    # if len(exists) == 0:
+    #     tr = TransferRequest(user=request.user, transfer = ct)
+    #     tr.save()
+    #     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
+    #     favorite.delete()
+
+    tr = TransferRequest(user=request.user, transfer = ct)
+    tr.save()
+    favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
+    favorite.delete()
+
+    return redirect('/handle/request')
+
+
+
 
 def add_external_college(request):
 
