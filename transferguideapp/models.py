@@ -102,10 +102,11 @@ class InternalCourse(models.Model):
     #needs to support text characters for courses like 1000T
     course_number = models.CharField(max_length=30)
     course_name = models.CharField(max_length=200)
+    credits = models.CharField(max_length = 30, default=-1)
 
     # Feel free to change this for testing purposes
     def __str__(self):
-        return f"({self.id}) {self.mnemonic} {self.course_number}: {self.course_name}"
+        return f"({self.id}) [{self.credits}] {self.mnemonic} {self.course_number}: {self.course_name}"
 
     # WARNING: this method is written such that the return value matches a URL defined in urls.py, and it is used in multiple places to differentiate InternalCourse and ExternalCourse objects. Do not change.
     def get_model(self):
