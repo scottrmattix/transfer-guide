@@ -17,6 +17,9 @@
     {# Display django.contrib.messages as Bootstrap alerts #}
     {% bootstrap_messages %}
 
+    {% block title %}
+      testing
+    {% endblock %}
     {% block content %}
     <content>
 
@@ -54,10 +57,7 @@
       <div class="container-fluid p-5" align="left">
         <h3>{{ title }}</h3>
 
-        {% for message in messages %}
-          <div class="alert alert-danger">
-            <a class="close link-danger text-decoration-none" href="" data-bs-dismiss="alert"> ╳ </a>{{ message }}</div>
-        {% endfor %}
+        {% include "messages.html" with messages=messages%}
 
         <form class="row gy-1 gx-15 align-items-center" action="{% url action %}" method="post">
           {% csrf_token %}
@@ -78,7 +78,7 @@
             </div>
             <div class="form-text">Defaults to UVA.</div>
           </div>
-          
+
 
           <!-- Load / Input Course Mnemonic -->
           <div>

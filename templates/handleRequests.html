@@ -93,6 +93,8 @@
       <div class="container-fluid p-5" align="left">
         <h3>Requests</h3>
 
+        {% include "messages.html" with messages=messages%}
+
         {% if not isAdmin %}
           <!-- Progress Bar -->
           <div class="progress m-2">

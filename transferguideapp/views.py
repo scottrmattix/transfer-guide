@@ -163,9 +163,9 @@ def submit_update(request):
         number = number.upper()
         courseID = int(courseID) if courseID else -1
 
-        redirect, error = update_course_helper(collegeID, mnemonic, number, name, courseID)
-        if error:
-            messages.error(request, error)
+        redirect, type, message = update_course_helper(collegeID, mnemonic, number, name, courseID)
+        if message:
+            messages.add_message(request, type, message)
         return redirect
     return HttpResponseRedirect(reverse('courseSearch'))
 

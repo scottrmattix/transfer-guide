@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.contrib import messages
 import re
 from django.utils import timezone
+from django.urls import reverse
 # helper methods for views
 
 def update_favorites_helper(user, pid, sid, type):
@@ -48,20 +49,29 @@ def update_course_helper(collegeID, mnemonic, number, name, courseID):
         errorURL = "internalcourseUpdate"
 
     # Check if new/edited course is a duplicate
-    if courses.filter(check):
-        error = "ERROR: another course already exists with this Mnemonic and Number at this college."
+    existing = courses.filter(check).first()
+    if existing:
+        existingURL = reverse(existing.get_model(), kwargs={'pk': existing.id})
+        message = f"A <a href='{existingURL}' class='alert-link'>course</a> with this mnemonic and number already exists at this college."
         # Go back to UpdateCourses view with error
         if courseID == -1:
-            return redirect("updateCourses"), error
+            return redirect("updateCourses"), messages.ERROR, message
         # Go back to Update Internal/External view with error
         else:
-            return redirect(errorURL, pk=courseID), error
+            return redirect(errorURL, pk=courseID), messages.ERROR, message
 
     # Update / Add Course
     c, wasCreated = courses.filter(id=courseID).update_or_create(defaults=vals)
 
+    if wasCreated:
+        if not c.mnemonic or c.course_number or c.course_name:
+            c.delete()
+            message = "No fields may be left empty"
+            return redirect("updateCourses"), messages.ERROR, message
+
     # Go to Internal/External Course view without error
-    return redirect(c.get_model(), pk=c.id), None
+    message = "Course successfully created."
+    return redirect(c.get_model(), pk=c.id), messages.SUCCESS, message
 
 
 def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url, comment):

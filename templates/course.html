@@ -22,6 +22,8 @@
       <div class="container-fluid p-5" align="left">
         {% if course %} <h6>{{ course.college_name }} | {{ course }}</h6>
 
+        {% include "messages.html" with messages=messages%}
+
           <!-- List Course Attributes -->
           <h3>Course Attributes</h3>
           <ul>
