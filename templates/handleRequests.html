@@ -33,7 +33,7 @@
 
             <div class="modal-body">
               <div>
-                <div class="form-text">User Explanation: </div>
+                <div class="form-text"><a id="name" href="" class="link-primary text-decoration-none">Test</a>'s Explanation:</div>
                 <input type="text" id="comment" name="comment" readonly class="form-control-plaintext" value="" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title=""/>
               </div>
               {% if isAdmin %}
@@ -47,6 +47,7 @@
                   <input type="hidden" name="tab" id="tab" value=""/>
                   <div class="text-center p-2">
                     <button class="btn btn-success" formaction="{% url 'accept_request' %}"> Accept </button>
+                    <button class="btn btn-dark btn-sm" formaction="{% url 'delete_request' %}"> Delete </button>
                     <button class="btn btn-danger" formaction="{% url 'reject_request' %}"> Reject </button>
                   </div>
                 </form>
@@ -74,6 +75,10 @@
             var tab = $(this).data('tab');
             var created = $(this).data('created');
             var updated = $(this).data('updated');
+            var username = $(this).data('username');
+            var userURL = "profile/" + username;
+            var name = $(this).data('name');
+            name = name.trim() === "" ? username : name;
 
             $(".modal-body #requestID").val( requestID );
             $(".modal-body #comment").val( comment );
@@ -83,6 +88,8 @@
             $(".modal-body #tab").val( tab );
             $(".modal-body #comment").prop('title', "Requested <em><b>" + created + "</b></em> ago.");
             $(".modal-body #userResponse").prop('title', "Resolved <em><b>" + updated + "</b></em> ago.");
+            $(".modal-body #name").attr('href', userURL);
+            $(".modal-body #name").text(name);
 
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {return new bootstrap.Tooltip(tooltipTriggerEl)})
@@ -143,7 +150,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="pending" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="pending" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user_last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -161,7 +168,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="accepted" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="accepted" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user_last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -179,7 +186,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="rejected" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="rejected" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user_last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -197,7 +204,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="all" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="all" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user_last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
