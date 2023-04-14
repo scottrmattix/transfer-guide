@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 import sys
-from django_heroku import dj_database_url
-import dotenv
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -85,14 +83,14 @@ WSGI_APPLICATION = 'transferguide.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-"""
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 
 DATABASES = {
     'default': {
@@ -106,6 +104,7 @@ DATABASES = {
 }
 
 
+#DATABASES = {}
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -158,11 +157,28 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#Optional, use to access posgres with HEROKU=0 and appropiate DATABASE_URL, having this
+#uncommented wont break anything on production
+"""
+import dotenv
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
+"""
 #Error prevention
 try:
     if 'HEROKU' in os.environ:
         import django_heroku
+#       from django_heroku import dj_database_url
         django_heroku.settings(locals())
+#       DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+#  else:
+#     DATABASES = {
+#            'default': {
+#              'ENGINE': 'django.db.backends.sqlite3',
+#              'NAME': BASE_DIR / 'db.sqlite3',
+#           }
+#       }
 except ImportError:
     found = False
 
@@ -191,14 +207,6 @@ SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-"""
-dotenv_file = os.path.join(BASE_DIR, ".env")
-if os.path.isfile(dotenv_file):
-    dotenv.load_dotenv(dotenv_file)
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
-
-"""
 if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 

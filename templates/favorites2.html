@@ -27,10 +27,12 @@
         {% if favorites %}
           <div class="card">
             <div class="card-header d-flex">
-              <div class="col-3 text-center">College</div>
-              <div class="col-4 text-center">Course</div>
-              <div class="col-4 text-center">UVA Equivalent</div>
-              <div class="col-1 text-center"></div>
+              <div class="col-2 text-center">College</div>
+              <div class="col-3 text-center">Course</div>
+              <div class="col-3 text-center">UVA Equivalent</div>
+              <div class="col-1 text-center">Credits</div>
+              <div class="col-1 text-center">Delete</div>
+              <div class="col-2 text-center">Request Transfer</div>
             </div>
             <ul class="list-group">
               {% for f in favorites %}
@@ -41,10 +43,13 @@
                   <input type="hidden" id="type" name="type" value="favorites">
 
                   <li class="list-group-item list-group-item-light d-flex">
-                    <div class="col-3 text-center"><a class="list-group-item list-group-item-light disabled h-100">{{ f.transfer.external_course.college_name }}</a></div>
-                    <div class="col-4 text-center"><a href="{% url 'externalcourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.external_course }}</a></div>
-                    <div class="col-4 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course }}</a></div>
-                    <div class="col-1 text-center"><button class="list-group-item list-group-item-light list-group-item-action h-100 align-items-center">╳</button></div>
+                    <div class="col-2 text-center"><a class="list-group-item list-group-item-light disabled h-100">{{ f.transfer.external_course.college_name }}</a></div>
+                    <div class="col-3 text-center"><a href="{% url 'externalcourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.external_course }}</a></div>
+                    <div class="col-3 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course }}</a></div>
+                    <div class="col-1 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course.credits }}</a></div>
+                    <div class="col-1 text-center"><a href="{% url 'delete_favorite' f.id %}" class="list-group-item list-group-item-light list-group-item-action h-100">X</a></div>
+                    <div class="col-2 text-center"><a href="{% url 'favorite_request' f.id %}" class="list-group-item list-group-item-light list-group-item-action h-100">✓</a></div>
+                    <!-- <div class="col-1 text-center"><button class="list-group-item list-group-item-light list-group-item-action h-100 align-items-center">╳</button></div> -->
                   </li>
                 </form>
               {% endfor %}

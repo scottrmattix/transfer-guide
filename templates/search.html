@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Submit Comment</title>
+    <title>Search</title>
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body>
     {# Load the tag library #}
     {% extends "base.html" %}
     {% load bootstrap5 %}
@@ -17,12 +17,11 @@
     {% bootstrap_messages %}
 
     {% block content %}
-    <content>
+    <content class>
+      {% include "messages.html" with messages=messages%}
+
       <div class="container-fluid px-5 py-2" align="left">
         <h3>Course Search</h3>
-
-        {% include "messages.html" with messages=messages%}
-
         <!--Form for entering a course search-->
         <form class="row gy-1 gx-15 align-items-center" action="{% url 'submit_search' %}" method="post">
           {% csrf_token %}

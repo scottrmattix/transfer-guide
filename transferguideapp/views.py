@@ -1,5 +1,3 @@
-import re
-from string import capwords
 from django.db import IntegrityError
 from django.urls import reverse
 from django.shortcuts import redirect, render, get_object_or_404
@@ -14,23 +12,16 @@ from .searchfilters import search
 from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
 from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper
 from django.contrib import messages
+from helpermethods import course_title_format
 
-# sorry for the spaghetti; using this to properly get() names from db
-def course_title_format(s):
-    pattern = re.compile(r'\b(?:and|or|in|to|the|of)\b', re.IGNORECASE)
+def favorite_request(request, favorite_id):
+    favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
 
-    words = s.split() #split by space
-    title_words = []
-    if words[0].lower() == "the":
-        title_words.append("The") #dont change first word for courses starting with The (they exist for some reason)
-        words = words[1:]
+    tr, created = TransferRequest.objects.get_or_create(user=request.user, transfer = favorite.transfer)
+    if created:
+        tr.save()
 
-    for word in words:
-        title_word = capwords(word) #capwords capitalizes first letter of word()
-        if pattern.match(word):
-            title_word = title_word.lower() #if and,or,in, etc lowercase it
-        title_words.append(title_word)
-    return ' '.join(title_words)
+    return redirect('/handle/request')
 
 
 def add_external_college(request):
