@@ -563,3 +563,5 @@ def auto_accept(request):
         handle_request_helper(r.id, response, accepted=True)
     return HttpResponseRedirect(reverse('handleRequests'))
 
+def handle_notifications(request):
+    pass
