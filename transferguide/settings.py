@@ -86,24 +86,24 @@ WSGI_APPLICATION = 'transferguide.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd91okdepde0qki',
-        'USER': 'rtvsisurfamdhr',
-        'PASSWORD': '39772c6d00d368f0c4f6fa5779b24f28570b0c5a7bc00010b9b1f7010b62d509',
-        'HOST': 'ec2-54-227-248-71.compute-1.amazonaws.com',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'd91okdepde0qki',
+#         'USER': 'rtvsisurfamdhr',
+#         'PASSWORD': '39772c6d00d368f0c4f6fa5779b24f28570b0c5a7bc00010b9b1f7010b62d509',
+#         'HOST': 'ec2-54-227-248-71.compute-1.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
