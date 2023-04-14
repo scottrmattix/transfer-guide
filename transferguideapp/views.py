@@ -321,9 +321,10 @@ def make_request(request):
         mnemonic = mnemonic.upper()
         number = number.upper()
         courseID = int(courseID) if courseID else -1
-        redirect, error = request_course_helper(user, collegeID, mnemonic, number, name, courseID, url, comment)
-        if error:
-            messages.error(request, error)
+
+        redirect, type, message = request_course_helper(user, collegeID, mnemonic, number, name, courseID, url, comment)
+        if message:
+            messages.add_message(request, type, message)
         return redirect
     return HttpResponseRedirect(reverse('courseSearch'))
 

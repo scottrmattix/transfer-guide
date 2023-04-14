@@ -114,7 +114,7 @@
           {% if comment %}
             <div class="form-outline">
               <label for="url" class="form-label">Explanation</label>
-              <textarea id="comment" name="comment" maxlength="200" class="form-control"></textarea>
+              <textarea id="comment" name="comment" maxlength="200" class="form-control" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)"></textarea>
               <div class="form-text">Provide your reasoning for making this request.</div>
             </div>
           {% endif %}
