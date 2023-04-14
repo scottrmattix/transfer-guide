@@ -32,17 +32,16 @@
             <ul class="d-flex flex-row align-items-center">
                 {% if user.groups.all.0.name == 'users' %}
                     <a href="/" class="nav-link left pt-2 mx-0"> Home </a>
-                    <a href="{% url 'request' %}" class="nav-link pt-2 mx-5"> Request Form </a>
-                    <a href="{% url 'submit_search' %}" class="nav-link pt-2 mx-5"> Search </a>
-                    <a href="{% url 'accept_request' %}" class="nav-link pt-2 mx-5"> View Requests </a>
-                    <a href="#" class="nav-link pt-2 mx-0"> Help </a>
+                    <a href="{% url 'request' %}" class="nav-link pt-2 ms-5"> Request Form </a>
+                    <a href="{% url 'accept_request' %}" class="nav-link pt-2 ms-5"> View Requests </a>
+                    <a href="#" class="nav-link pt-2 ms-5"> Help </a>
                 {% else %}
                     <a href="/" class="nav-link pt-2 mx-0"> Home </a>
-                    <a href="#" class="nav-link pt-2 mx-5"> Resolve Transfer Requests </a>
-                    <a href="#" class="nav-link pt-2 mx-0"> Resolve Help Requests </a>
-                    <a href="{% url 'submit_search' %}" class="nav-link pt-2 mx-5"> Search </a>
-                    <a href="{% url 'updateCourses' %}" class="nav-link pt-2 mx-5"> Add Course </a>
-                    <a href="{% url 'accept_request' %}" class="nav-link pt-2 mx-5"> View Requests </a>
+                    <a href="#" class="nav-link pt-2 ms-5"> Resolve Transfer Requests </a>
+                    <a href="#" class="nav-link pt-2 ms-5"> Resolve Help Requests </a>
+                    <a href="{% url 'submit_search' %}" class="nav-link pt-2 ms-5"> Search </a>
+                    <a href="{% url 'updateCourses' %}" class="nav-link pt-2 ms-5"> Add Course </a>
+                    <a href="{% url 'accept_request' %}" class="nav-link pt-2 ms-5"> View Requests </a>
                 {% endif %}
             </ul>
             <button class="d-flex fkex-row align-items-center dropdown mx-2 btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
