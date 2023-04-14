@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Submit Comment</title>
+    <title>Search</title>
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body>
     {# Load the tag library #}
     {% extends "base.html" %}
     {% load bootstrap5 %}
@@ -17,12 +17,11 @@
     {% bootstrap_messages %}
 
     {% block content %}
-    <content>
+    <content class="text-light">
+      {% include "messages.html" with messages=messages%}
+
       <div class="container-fluid px-5 py-2" align="left">
         <h3>Course Search</h3>
-
-        {% include "messages.html" with messages=messages%}
-
         <!--Form for entering a course search-->
         <form class="row gy-1 gx-15 align-items-center" action="{% url 'submit_search' %}" method="post">
           {% csrf_token %}
@@ -35,22 +34,22 @@
                 <option value="{{ c }}">
               {% endfor %}
             </datalist>
-            <div class="form-text">Defaults to UVA.</div>
+            <div class="form-text text-light">Defaults to UVA.</div>
           </div>
           <div class="col-auto">
             <label for="mnemonic" class="form-label">Mnemonic:</label>
             <input type="text" id="mnemonic" name="mnemonic" maxlength="4" class="form-control" value="{{request.session.search.mnemonic}}" placeholder="MATH"  onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
-            <div class="form-text">Accepts SIS mnemonics only.</div>
+            <div class="form-text text-light">Accepts SIS mnemonics only.</div>
           </div>
           <div class="col-auto">
             <label for="number" class="form-label">Number:</label>
             <input type="text" id="number" name="number" maxlength="4" class="form-control" value="{{request.session.search.number}}" placeholder="1320" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
-            <div class="form-text">Enter a full or partial course number.</div>
+            <div class="form-text text-light">Enter a full or partial course number.</div>
           </div>
           <div class="col-auto">
             <label for="name" class="form-label">Title:</label>
             <input type="text" id="name" name="name" maxlength="200" class="form-control" value="{{request.session.search.name}}" placeholder="Calculus II" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)">
-            <div class="form-text">Try full names or key terms.</div>
+            <div class="form-text text-light">Try full names or key terms.</div>
           </div>
           <div class="col-auto">
             <button type="submit" class="btn btn-primary">Search</button>
