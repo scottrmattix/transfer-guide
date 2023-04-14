@@ -160,6 +160,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#Optional, use to access posgres with HEROKU=0 and appropiate DATABASE_URL, having this
+#uncommented wont break anything on production
+"""
+import dotenv
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
+"""
 #Error prevention
 try:
     if 'HEROKU' in os.environ:
@@ -202,13 +210,6 @@ SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-"""
-dotenv_file = os.path.join(BASE_DIR, ".env")
-if os.path.isfile(dotenv_file):
-    dotenv.load_dotenv(dotenv_file)
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
-"""
 
 if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
