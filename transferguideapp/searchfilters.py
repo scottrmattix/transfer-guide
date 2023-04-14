@@ -23,9 +23,15 @@ def search(session):
 
 def set_user_college(session, college):
     if college:
-        session["user_college_id"] = college.id
-        session["user_college"] = college.college_name
-
+        if "user_college_id" in session:
+            if session["user_college_id"] != college.id:
+                session["user_college_id"] = college.id
+                session["user_college"] = college.college_name
+                session["course_tab"] = "all"
+        else:
+            session["user_college_id"] = college.id
+            session["user_college"] = college.college_name
+            session["course_tab"] = "all"
 
 def filterCollege(inputCollege):
     college = ExternalCollege.objects.filter(college_name__iexact=inputCollege).first()

@@ -15,6 +15,7 @@ import os
 import sys
 from django_heroku import dj_database_url
 import dotenv
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -122,6 +123,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# Message Tags
+# https://docs.djangoproject.com/en/4.1/ref/contrib/messages/#message-tags
+
+MESSAGE_TAGS = {
+    # these were changed to match the Bootstrap color names (the others already do)
+    messages.DEBUG: 'light',
+    messages.ERROR: 'danger',
+}
 
 
 # Internationalization

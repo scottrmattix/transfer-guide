@@ -17,6 +17,9 @@
     {# Display django.contrib.messages as Bootstrap alerts #}
     {% bootstrap_messages %}
 
+    {% block title %}
+      testing
+    {% endblock %}
     {% block content %}
     <content>
 
@@ -53,7 +56,9 @@
 
       <div class="container-fluid p-5" align="left">
         <h3>{{ title }}</h3>
-        {% if error_message %}<p class="text-danger"><strong>{{ error_message }}</strong></p>{% endif %}
+
+        {% include "messages.html" with messages=messages%}
+
         <form class="row gy-1 gx-15 align-items-center" action="{% url action %}" method="post">
           {% csrf_token %}
 
@@ -63,7 +68,6 @@
             <div class="input-group">
               <select class="form-select" id="collegeID" name="collegeID" aria-label=".form-select-sm example" aria-describedby="basic-addon2">
                 <option selected value="{{ collegeID }}">{{ college }}</option>
-                {% if course.get_model == "externalcourse" %}<option value="">University of Virginia</option>{% endif %}
                 {% for c in colleges %}
                   <option value="{{ c.pk }}">{{ c.college_name }}</option>
                 {% endfor %}
@@ -74,7 +78,7 @@
             </div>
             <div class="form-text">Defaults to UVA.</div>
           </div>
-          
+
 
           <!-- Load / Input Course Mnemonic -->
           <div>
@@ -96,6 +100,24 @@
             <input type="text" id="name" name="name" maxlength="200" class="form-control" value="{{ course.course_name }}" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)">
             <div class="form-text">Try full names or key terms.</div>
           </div>
+
+          <!-- Input Course Link (Transfer Request) -->
+          {% if link %}
+            <div class="form-outline">
+              <label for="url" class="form-label">Course Link</label>
+              <input type="url" id="url" name="url" maxlength="200" class="form-control" placeholder="www.example.com"/>
+              <div class="form-text">Provide a link to the course homepage.</div>
+            </div>
+          {% endif %}
+
+          <!-- Input User Comment (Transfer Request) -->
+          {% if comment %}
+            <div class="form-outline">
+              <label for="url" class="form-label">Explanation</label>
+              <textarea id="comment" name="comment" maxlength="200" class="form-control" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)"></textarea>
+              <div class="form-text">Provide your reasoning for making this request.</div>
+            </div>
+          {% endif %}
 
           <!-- Load Course ID (hidden) -->
           <div>

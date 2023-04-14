@@ -1,5 +1,3 @@
-import re
-from string import capwords
 from django.db import IntegrityError
 from django.urls import reverse
 from django.shortcuts import redirect, render, get_object_or_404
@@ -7,29 +5,26 @@ from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.contrib.auth.models import Group, User
 from django.views import generic
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
-from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites
+from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites, TransferRequest
 from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
-from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course
-from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper    
+from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper
+from django.contrib import messages
+from helpermethods import course_title_format
 
-# sorry for the spaghetti; using this to properly get() names from db
-def course_title_format(s):
-    pattern = re.compile(r'\b(?:and|or|in|to|the|of)\b', re.IGNORECASE)
-    
-    words = s.split() #split by space
-    title_words = []
-    if words[0].lower() == "the": 
-        title_words.append("The") #dont change first word for courses starting with The (they exist for some reason)
-        words = words[1:]
+def favorite_request(request, favorite_id):
+    favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
 
-    for word in words: 
-        title_word = capwords(word) #capwords capitalizes first letter of word()
-        if pattern.match(word): 
-            title_word = title_word.lower() #if and,or,in, etc lowercase it
-        title_words.append(title_word)
-    return ' '.join(title_words)
+    # check if this TR already exists:
+    if not TransferRequest.objects.filter(user = request.user, transfer = favorite.transfer).exists():
+        tr = TransferRequest(user=request.user, transfer = favorite.transfer)
+        tr.save()
+
+    favorite.delete()
+
+    return redirect('/handle/request')
 
 
 def add_external_college(request):
@@ -39,7 +34,7 @@ def add_external_college(request):
         domestic_college = True
         if request.POST.get('domestic') == 'off':
             domestic_college = False
-        normalized_name = course_title_format(college_name)    
+        normalized_name = course_title_format(college_name)
         if not ExternalCollege.objects.filter(college_name=normalized_name, domestic_college=domestic_college).exists():
             ExternalCollege(college_name=college_name, domestic_college=domestic_college).save()
         return HttpResponseRedirect('/course/update')
@@ -156,22 +151,23 @@ def submit_update(request):
             name = request.POST["name"]
             courseID = request.POST["id"]
         except Exception as e:
-            return render(request, 'generalForm.html', {'error_message': f"An error occurred: {e}"})
-        collegeID = int(collegeID) if collegeID else -1
-        mnemonic = mnemonic.upper()
-        number = number.upper()
-        courseID = int(courseID) if courseID else -1
-        return update_course_helper(collegeID, mnemonic, number, name, courseID)
-    return HttpResponseRedirect(reverse('updateCourses'))
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            collegeID = int(collegeID) if collegeID else -1
+            mnemonic = mnemonic.upper()
+            number = number.upper()
+            courseID = int(courseID) if courseID else -1
+
+            redirect, type, message = update_course_helper(collegeID, mnemonic, number, name, courseID)
+            if message:
+                messages.add_message(request, type, message)
+            return redirect
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 # a session error arises when .../search/ is visited without calling submit_search beforehand
 # to bypass the issue, first visit .../search/clear/.
 def submit_search(request):
-    # if "user_college_id" not in request.session:
-    #     userCollege = ExternalCollege.objects.first()
-    #     request.session["user_college_id"] = userCollege.id
-    #     request.session["user_college"] = userCollege.college_name
-
     request.session["search"] = {"college": "", "mnemonic": "", "number": "", "name": ""}
     if request.method == "POST":
         try:
@@ -180,11 +176,13 @@ def submit_search(request):
             number = request.POST["number"]
             name = request.POST["name"]
         except Exception as e:
-            return render(request, 'search.html', {'error_message': f"An error occurred: {e}"})
-        request.session["search"]["college"] = college
-        request.session["search"]["mnemonic"] = mnemonic.upper()
-        request.session["search"]["number"] = number.upper()
-        request.session["search"]["name"] = name
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            request.session["search"]["college"] = college
+            request.session["search"]["mnemonic"] = mnemonic.upper()
+            request.session["search"]["number"] = number.upper()
+            request.session["search"]["name"] = name
     return HttpResponseRedirect(reverse('courseSearch'))
 
 def handle_transfer_request(request):
@@ -256,7 +254,7 @@ def submit_transfer_request(request):
 
 
 def favorites(request):
-    f = Favorites.objects.filter(user=request.user)
+    f = Favorites.objects.filter(user=request.user).order_by('-created_at')
     # f is the entire query set, to access individual fields do:
     # f[0].in_course.course_name, f[0].ex_course.course_id, etc
 
@@ -280,10 +278,14 @@ def update_favorites(request):
             pid = request.POST["primary"]
             sid = request.POST["secondary"]
             type = request.POST["type"]
+            tab = request.POST["active-tab"]
         except Exception as e:
-            return render(request, 'search.html', {'error_message': f"An error occurred: {e}"})
-        return update_favorites_helper(user, pid, sid, type)
-    return render(request, 'search.html')
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            request.session["course_tab"] = tab
+            return update_favorites_helper(user, pid, sid, type)
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 
 class CourseRequest(generic.DetailView):
@@ -305,24 +307,74 @@ class CourseRequest(generic.DetailView):
 def make_request(request):
     if request.method == "POST":
         try:
+            user = request.user
             collegeID = request.POST["collegeID"]
             mnemonic = request.POST["mnemonic"]
             number = request.POST["number"]
             name = request.POST["name"]
             courseID = request.POST["id"]
+            url = request.POST["url"]
+            comment = request.POST["comment"]
         except Exception as e:
-            return render(request, 'generalForm.html', {'error_message': f"An error occurred: {e}"})
-        collegeID = int(collegeID) if collegeID else -1
-        mnemonic = mnemonic.upper()
-        number = number.upper()
-        courseID = int(courseID) if courseID else -1
-        return request_course_helper(collegeID, mnemonic, number, name, courseID)
-    return HttpResponseRedirect(reverse('updateCourses'))
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            collegeID = int(collegeID) if collegeID else -1
+            mnemonic = mnemonic.upper()
+            number = number.upper()
+            courseID = int(courseID) if courseID else -1
 
-
+            redirect, type, message = request_course_helper(user, collegeID, mnemonic, number,
+                                                            name, courseID, url, comment)
+            if message:
+                messages.add_message(request, type, message)
+            return redirect
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 
 def delete_favorite(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
     favorite.delete()
     return redirect('favorites')
+
+class HandleRequests(generic.ListView):
+    template_name = 'handleRequests.html'
+    queryset = TransferRequest.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context_view_requests(context, self.request.user, self.request.session)
+        return context
+
+
+def accept_request(request):
+    request.session["request_tab"] = "pending"
+    if request.method == "POST":
+        try:
+            requestID = request.POST["requestID"]
+            adminResponse = request.POST["adminResponse"]
+            tab = request.POST["tab"]
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            request.session["request_tab"] = tab
+            redirect = handle_request_helper(requestID, adminResponse, accepted=True)
+            return redirect
+    return HttpResponseRedirect(reverse('handleRequests'))
+
+def reject_request(request):
+    request.session["request_tab"] = "pending"
+    if request.method == "POST":
+        try:
+            requestID = request.POST["requestID"]
+            adminResponse = request.POST["adminResponse"]
+            tab = request.POST["tab"]
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            request.session["request_tab"] = tab
+            redirect = handle_request_helper(requestID, adminResponse, accepted=False)
+            return redirect
+    return HttpResponseRedirect(reverse('handleRequests'))
