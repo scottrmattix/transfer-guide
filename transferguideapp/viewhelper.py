@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.contrib import messages
 import re
 from django.utils import timezone
+from django.urls import reverse
 # helper methods for views
 
 def update_favorites_helper(user, pid, sid, type):
@@ -47,35 +48,53 @@ def update_course_helper(collegeID, mnemonic, number, name, courseID):
         check = Q(mnemonic=mnemonic, course_number=number) & ~Q(id=courseID)
         errorURL = "internalcourseUpdate"
 
+
+    # Check that no empty strings were supplied
+    if not (mnemonic and number and name):
+        message = "No fields may be left empty"
+        if courseID == -1:
+            return redirect("updateCourses"), messages.ERROR, message
+        else:
+            return redirect(errorURL, pk=courseID), messages.ERROR, message
+
+
     # Check if new/edited course is a duplicate
-    if courses.filter(check):
-        error = "ERROR: another course already exists with this Mnemonic and Number at this college."
+    existing = courses.filter(check).first()
+    if existing:
+        existingURL = reverse(existing.get_model(), kwargs={'pk': existing.id})
+        message = f"A <a href='{existingURL}' class='alert-link'>course</a> with this mnemonic and number already exists at this college."
         # Go back to UpdateCourses view with error
         if courseID == -1:
-            return redirect("updateCourses"), error
+            return redirect("updateCourses"), messages.ERROR, message
         # Go back to Update Internal/External view with error
         else:
-            return redirect(errorURL, pk=courseID), error
+            return redirect(errorURL, pk=courseID), messages.ERROR, message
 
     # Update / Add Course
     c, wasCreated = courses.filter(id=courseID).update_or_create(defaults=vals)
 
-    # Go to Internal/External Course view without error
-    return redirect(c.get_model(), pk=c.id), None
+    if wasCreated:
+        # Go to new Internal/External Course view without error
+        message = "Course successfully created."
+    else:
+        # Go to edited Internal/External Course view without error
+        message = "Course successfully updated."
+    return redirect(c.get_model(), pk=c.id), messages.SUCCESS, message
 
 
 def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url, comment):
+    # check that no empty strings were provided
+    if not (mnemonic and number and name and url and comment):
+        message = "No fields may be left empty"
+        return redirect("courseRequest", pk=courseID), messages.ERROR, message
+
     # Check valid url
     protocol = r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"
     noProtocol = r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"
     if not (re.fullmatch(protocol, url) or re.fullmatch(noProtocol, url)):
-        error = "Provided course link is invalid."
-        return redirect("courseRequest", pk=courseID), error
+        message = "Provided course link is invalid."
+        return redirect("courseRequest", pk=courseID), messages.ERROR, message
 
-    # check valid comment
-    if not comment:
-        error = "Inadequate explanation provided."
-        return redirect("courseRequest", pk=courseID), error
 
     # Get Internal Course
     internal = InternalCourse.objects.get(id=courseID)
@@ -84,8 +103,8 @@ def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url
     try:
         college = ExternalCollege.objects.get(id=collegeID)
     except ExternalCollege.DoesNotExist:
-        error = "Invalid External College."
-        return redirect("courseRequest", pk=courseID), error
+        message = "The provided college could not be found."
+        return redirect("courseRequest", pk=courseID), messages.ERROR, message
 
     # Get or Create External Course
     try:
@@ -97,8 +116,9 @@ def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url
     try:
         transfer = CourseTransfer.objects.get(internal_course=internal, external_course=external)
         if transfer.accepted:
-            error = "This course equivalency has already been accepted."
-            return redirect("courseRequest", pk=courseID), error
+            externalURL = reverse("externalcourse", kwargs={'pk': transfer.external_course.id})
+            message = f"This <a href='{externalURL}' class='alert-link'>course equivalency</a> has already been accepted."
+            return redirect("courseRequest", pk=courseID), messages.ERROR, message
 
     except CourseTransfer.DoesNotExist:
         transfer = CourseTransfer.objects.create(internal_course=internal, external_course=external, accepted=False)
@@ -106,26 +126,23 @@ def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url
     # Get or Create TransferRequest
     try:
         request = TransferRequest.objects.get(user=user, transfer=transfer)
-        error = "You have already made a transfer request for these two courses."
-        return redirect("courseRequest", pk=courseID), error
+        requestsURL = reverse("handleRequests")
+        message = f"You have already made a <a href='{requestsURL}' class='alert-link'>transfer request</a> for these two courses."
+        return redirect("courseRequest", pk=courseID), messages.ERROR, message
     except TransferRequest.DoesNotExist:
         request = TransferRequest.objects.create(user=user, transfer=transfer, condition=TransferRequest.pending, url=url, comment=comment)
 
     # Return back to InternalCourse view without error
-    return redirect("internalcourse", pk=courseID), None
+    requestsURL = reverse("handleRequests")
+    message = f"Your <a href='{requestsURL}' class='alert-link'>transfer request</a> is now pending."
+    return redirect("internalcourse", pk=courseID), messages.SUCCESS, message
 
 
-def accept_request_helper(requestID, adminResponse):
+def handle_request_helper(requestID, adminResponse, accepted):
+    condition = TransferRequest.accepted if accepted else TransferRequest.rejected
     request = TransferRequest.objects.get(id=requestID)
-    request.transfer.accepted = True
+    request.transfer.accepted = accepted
     request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.accepted, response=adminResponse, updated_at=timezone.now())
-    return redirect("handleRequests"), None
-
-def reject_request_helper(requestID, adminResponse):
-    request = TransferRequest.objects.get(id=requestID)
-    request.transfer.accepted = False
-    request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.rejected, response=adminResponse, updated_at=timezone.now())
-    return redirect("handleRequests"), None
+    TransferRequest.objects.filter(transfer=request.transfer).update(condition=condition, response=adminResponse, updated_at=timezone.now())
+    return redirect("handleRequests")
 

@@ -12,7 +12,7 @@ from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
 from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
-from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, accept_request_helper, reject_request_helper
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper
 from django.contrib import messages
 
 # sorry for the spaghetti; using this to properly get() names from db
@@ -180,16 +180,18 @@ def submit_update(request):
             name = request.POST["name"]
             courseID = request.POST["id"]
         except Exception as e:
-            return render(request, 'generalForm.html', {'error_message': f"An error occurred: {e}"})
-        collegeID = int(collegeID) if collegeID else -1
-        mnemonic = mnemonic.upper()
-        number = number.upper()
-        courseID = int(courseID) if courseID else -1
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            collegeID = int(collegeID) if collegeID else -1
+            mnemonic = mnemonic.upper()
+            number = number.upper()
+            courseID = int(courseID) if courseID else -1
 
-        redirect, error = update_course_helper(collegeID, mnemonic, number, name, courseID)
-        if error:
-            messages.error(request, error)
-        return redirect
+            redirect, type, message = update_course_helper(collegeID, mnemonic, number, name, courseID)
+            if message:
+                messages.add_message(request, type, message)
+            return redirect
     return HttpResponseRedirect(reverse('courseSearch'))
 
 # a session error arises when .../search/ is visited without calling submit_search beforehand
@@ -203,11 +205,13 @@ def submit_search(request):
             number = request.POST["number"]
             name = request.POST["name"]
         except Exception as e:
-            return render(request, 'search.html', {'error_message': f"An error occurred: {e}"})
-        request.session["search"]["college"] = college
-        request.session["search"]["mnemonic"] = mnemonic.upper()
-        request.session["search"]["number"] = number.upper()
-        request.session["search"]["name"] = name
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            request.session["search"]["college"] = college
+            request.session["search"]["mnemonic"] = mnemonic.upper()
+            request.session["search"]["number"] = number.upper()
+            request.session["search"]["name"] = name
     return HttpResponseRedirect(reverse('courseSearch'))
 
 def handle_transfer_request(request):
@@ -305,10 +309,12 @@ def update_favorites(request):
             type = request.POST["type"]
             tab = request.POST["active-tab"]
         except Exception as e:
-            return render(request, 'search.html', {'error_message': f"An error occurred: {e}"})
-        request.session["course_tab"] = tab
-        return update_favorites_helper(user, pid, sid, type)
-    return render(request, 'search.html')
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            request.session["course_tab"] = tab
+            return update_favorites_helper(user, pid, sid, type)
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 
 class CourseRequest(generic.DetailView):
@@ -339,15 +345,19 @@ def make_request(request):
             url = request.POST["url"]
             comment = request.POST["comment"]
         except Exception as e:
-            return render(request, 'generalForm.html', {'error_message': f"An error occurred: {e}"})
-        collegeID = int(collegeID) if collegeID else -1
-        mnemonic = mnemonic.upper()
-        number = number.upper()
-        courseID = int(courseID) if courseID else -1
-        redirect, error = request_course_helper(user, collegeID, mnemonic, number, name, courseID, url, comment)
-        if error:
-            messages.error(request, error)
-        return redirect
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            collegeID = int(collegeID) if collegeID else -1
+            mnemonic = mnemonic.upper()
+            number = number.upper()
+            courseID = int(courseID) if courseID else -1
+
+            redirect, type, message = request_course_helper(user, collegeID, mnemonic, number,
+                                                            name, courseID, url, comment)
+            if message:
+                messages.add_message(request, type, message)
+            return redirect
     return HttpResponseRedirect(reverse('courseSearch'))
 
 
@@ -374,12 +384,12 @@ def accept_request(request):
             adminResponse = request.POST["adminResponse"]
             tab = request.POST["tab"]
         except Exception as e:
-            return render(request, 'handleRequests.html', {'error_message': f"An error occurred: {e}"})
-        request.session["request_tab"] = tab
-        redirect, error = accept_request_helper(requestID, adminResponse)
-        if error:
-            messages.error(request, error)
-        return redirect
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            request.session["request_tab"] = tab
+            redirect = handle_request_helper(requestID, adminResponse, accepted=True)
+            return redirect
     return HttpResponseRedirect(reverse('handleRequests'))
 
 def reject_request(request):
@@ -390,10 +400,10 @@ def reject_request(request):
             adminResponse = request.POST["adminResponse"]
             tab = request.POST["tab"]
         except Exception as e:
-            return render(request, 'handleRequests.html', {'error_message': f"An error occurred: {e}"})
-        request.session["request_tab"] = tab
-        redirect, error = reject_request_helper(requestID, adminResponse)
-        if error:
-            messages.error(request, error)
-        return redirect
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            request.session["request_tab"] = tab
+            redirect = handle_request_helper(requestID, adminResponse, accepted=False)
+            return redirect
     return HttpResponseRedirect(reverse('handleRequests'))

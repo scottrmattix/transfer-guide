@@ -21,6 +21,9 @@
     <content>
       <div class="container-fluid p-5" align="left">
         <h3>Favorites</h3>
+
+        {% include "messages.html" with messages=messages%}
+
         {% if favorites %}
           <div class="card">
             <div class="card-header d-flex">

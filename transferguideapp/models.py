@@ -9,6 +9,10 @@ from string import capwords
 def course_title_format(s):
     pattern = re.compile(r'\b(?:and|or|in|to|the|of)\b', re.IGNORECASE)
 
+    s = s.strip()
+    if not s:
+        return s
+
     words = s.split() #split by space
     title_words = []
     if words[0].lower() == "the":
