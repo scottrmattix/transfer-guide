@@ -150,16 +150,6 @@ class Favorites(TimeStampMixin):
         return f"{self.transfer.internal_course.mnemonic} {self.transfer.internal_course.course_number}: {self.transfer.internal_course.course_name} = {self.transfer.external_course.college} {self.transfer.external_course.mnemonic} {self.transfer.external_course.course_number}: {self.transfer.external_course.course_name} "
 
 
-class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
-    NOTIFICATION_CHOICES = [
-            ('transfer','transfer'),
-    ]
-    notification = models.CharField(blank=True, choices=NOTIFICATION_CHOICES, max_length=10)
-    subject = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
-    def __str__(self):
-        return f"User: {self.user} Type: {self.notification}"
-
 class TransferRequest(TimeStampMixin):
     pending = "pending"
     accepted = "accepted"
