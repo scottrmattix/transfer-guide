@@ -52,5 +52,5 @@ urlpatterns = [
 
     path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),
     path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),
-    path('favorites/<int:favorite_id>/<int:icpk>/<int:ecpk>', favorite_request, name='favorite_request'),
+    path('favorites/<int:favorite_id>/', favorite_request, name='favorite_request'),
     ]
