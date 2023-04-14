@@ -48,7 +48,7 @@
                     <div class="col-3 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course }}</a></div>
                     <div class="col-1 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course.credits }}</a></div>
                     <div class="col-1 text-center"><a href="{% url 'delete_favorite' f.id %}" class="list-group-item list-group-item-light list-group-item-action h-100">X</a></div>
-                    <div class="col-2 text-center"><a href="{% url 'favorite_request' f.id f.transfer.internal_course.pk f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">✓</a></div>
+                    <div class="col-2 text-center"><a href="{% url 'favorite_request' f.id %}" class="list-group-item list-group-item-light list-group-item-action h-100">✓</a></div>
                     <!-- <div class="col-1 text-center"><button class="list-group-item list-group-item-light list-group-item-action h-100 align-items-center">╳</button></div> -->
                   </li>
                 </form>

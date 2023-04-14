@@ -1,5 +1,3 @@
-import re
-from string import capwords
 from django.db import IntegrityError
 from django.urls import reverse
 from django.shortcuts import redirect, render, get_object_or_404
@@ -14,46 +12,18 @@ from .searchfilters import search
 from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
 from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper
 from django.contrib import messages
+from helpermethods import course_title_format
 
-# sorry for the spaghetti; using this to properly get() names from db
-def course_title_format(s):
-    pattern = re.compile(r'\b(?:and|or|in|to|the|of)\b', re.IGNORECASE)
-
-    words = s.split() #split by space
-    title_words = []
-    if words[0].lower() == "the":
-        title_words.append("The") #dont change first word for courses starting with The (they exist for some reason)
-        words = words[1:]
-
-    for word in words:
-        title_word = capwords(word) #capwords capitalizes first letter of word()
-        if pattern.match(word):
-            title_word = title_word.lower() #if and,or,in, etc lowercase it
-        title_words.append(title_word)
-    return ' '.join(title_words)
-
-def favorite_request(request, favorite_id, icpk, ecpk):
-    internal_course = get_object_or_404(InternalCourse, pk=icpk)
-    external_course = get_object_or_404(ExternalCourse, pk=ecpk)
-    ct = CourseTransfer(external_course=external_course, internal_course=internal_course, accepted = False)
-    ct.save()
-
-    #TODO dont add duplicate TRs
-    # exists = TransferRequest.objects.filter(user=request.user, transfer=ct)
-    # if len(exists) == 0:
-    #     tr = TransferRequest(user=request.user, transfer = ct)
-    #     tr.save()
-    #     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
-    #     favorite.delete()
-
-    tr = TransferRequest(user=request.user, transfer = ct)
-    tr.save()
+def favorite_request(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
+
+    tr = TransferRequest(user=request.user, transfer = favorite.transfer)
+    if not TransferRequest.objects.filter(user = tr.user, transfer = favorite.transfer).exists():
+        tr.save()
+
     favorite.delete()
 
     return redirect('/handle/request')
-
-
 
 
 def add_external_college(request):
