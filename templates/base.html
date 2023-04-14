@@ -1,7 +1,7 @@
 {% load socialaccount %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -18,15 +18,19 @@
         margin-top: 15vh;
         margin-bottom: 5vh;
     }
-    #profile-dropdown:hover{
+    #profile-dropdown:hover, #profile-dropdown:focus{
         background-color: rgb(235, 235, 235);
+        color: black;
+    }
+    .pt-2{
+        color:black;
     }
     .pt-2:hover{
         color:rgba(0, 0, 0, 0.606)
     }
 </style>
 {% endif %}
-<body class="bg-dark d-flex flex-column align-items-center">
+<body class="d-flex flex-column align-items-center">
     {% if user.is_authenticated%}
         <nav class="navbar fixed-top w-100 bg-light d-flex align-items-center">
             <ul class="d-flex flex-row align-items-center">
