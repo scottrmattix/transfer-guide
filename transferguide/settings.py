@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 import sys
-from django_heroku import dj_database_url
-import dotenv
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -95,6 +93,7 @@ DATABASES = {
 }
 """
 
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -105,6 +104,9 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+"""
+
+DATABASES = {}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -162,7 +164,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 try:
     if 'HEROKU' in os.environ:
         import django_heroku
+        from django_heroku import dj_database_url
         django_heroku.settings(locals())
+        DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+    else:
+        DATABASES = {
+         'default': {
+             'ENGINE': 'django.db.backends.sqlite3',
+             'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 except ImportError:
     found = False
 
@@ -197,8 +208,8 @@ if os.path.isfile(dotenv_file):
     dotenv.load_dotenv(dotenv_file)
 DATABASES = {}
 DATABASES['default'] = dj_database_url.config(conn_max_age=600)
-
 """
+
 if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 
