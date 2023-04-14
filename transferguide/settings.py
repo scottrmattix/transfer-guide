@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 import sys
+from django_heroku import dj_database_url
+import dotenv
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -84,14 +86,12 @@ WSGI_APPLICATION = 'transferguide.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
-"""
-DATABASES = {
- 'default': {
-     'ENGINE': 'django.db.backends.sqlite3',
-     'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-"""
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 """
 DATABASES = {
@@ -107,7 +107,6 @@ DATABASES = {
 """
 
 DATABASES = {}
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -209,7 +208,6 @@ SITE_ID = 1
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
 
 if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}

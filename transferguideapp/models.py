@@ -140,15 +140,6 @@ class TimeStampMixin(models.Model):
     class Meta:
         abstract = True
 
-# Model representing a User-CourseTransfer relation
-class Favorites(TimeStampMixin):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_items', default=None)
-    transfer = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
-
-    # Feel free to change this for testing purposes
-    def __str__(self):
-        return f"{self.transfer.internal_course.mnemonic} {self.transfer.internal_course.course_number}: {self.transfer.internal_course.course_name} = {self.transfer.external_course.college} {self.transfer.external_course.mnemonic} {self.transfer.external_course.course_number}: {self.transfer.external_course.course_name} "
-
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
@@ -159,6 +150,16 @@ class Notification(models.Model):
     subject = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
     def __str__(self):
         return f"User: {self.user} Type: {self.notification}"
+
+# Model representing a User-CourseTransfer relation
+class Favorites(TimeStampMixin):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_items', default=None)
+    transfer = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
+
+    # Feel free to change this for testing purposes
+    def __str__(self):
+        return f"{self.transfer.internal_course.mnemonic} {self.transfer.internal_course.course_number}: {self.transfer.internal_course.course_name} = {self.transfer.external_course.college} {self.transfer.external_course.mnemonic} {self.transfer.external_course.course_number}: {self.transfer.external_course.course_name} "
+
 
 class TransferRequest(TimeStampMixin):
     pending = "pending"

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import InternalCourse, ExternalCourse, ExternalCollege, CourseTransfer, Notification, TransferRequest
+from .models import InternalCourse, ExternalCourse, ExternalCollege, CourseTransfer, TransferRequest, Notification
 
 admin.site.register(InternalCourse)
 admin.site.register(ExternalCourse)
