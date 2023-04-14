@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django.db.models.signals import post_migrate, pre_save
+from django.db.models.signals import post_migrate
 
 
 class TransferguideappConfig(AppConfig):
@@ -7,6 +7,5 @@ class TransferguideappConfig(AppConfig):
     name = 'transferguideapp'
 
     def ready(self):
-        from .signals import populate_models, hook_save
+        from .signals import populate_models
         post_migrate.connect(populate_models, sender=self)
-        pre_save.connect(hook_save )
