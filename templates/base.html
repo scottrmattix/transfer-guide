@@ -48,6 +48,18 @@
             <button class="d-flex fkex-row align-items-center dropdown mx-2 btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
                 <a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
                     <img width="40px" height="40px" href="#"
+                        src="https://www.pinclipart.com/picdir/middle/185-1850576_png-file-white-bell-notification-icon-transparent-clipart.png"> {{ user.notification_set.all.count }}
+                </a>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+							{% for note in user.notification_set.all %}
+							<a class="dropdown-item"> Type: {{ note.notification }} </br> Subject: {{ note.subject }}</a>
+							{% endfor %}
+            </div>
+
+            <button class="d-flex fkex-row align-items-center dropdown mx-2 btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
+                <a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
+                    <img width="40px" height="40px" href="#"
                         src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"> {{ user.username }}
                 </a>
             </button>
