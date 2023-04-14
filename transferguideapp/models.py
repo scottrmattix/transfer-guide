@@ -140,6 +140,17 @@ class TimeStampMixin(models.Model):
     class Meta:
         abstract = True
 
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    NOTIFICATION_CHOICES = [
+            ('transfer','transfer'),
+    ]
+    notification = models.CharField(blank=True, choices=NOTIFICATION_CHOICES, max_length=10)
+    subject = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
+    def __str__(self):
+        return f"User: {self.user} Type: {self.notification}"
+
 # Model representing a User-CourseTransfer relation
 class Favorites(TimeStampMixin):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_items', default=None)
