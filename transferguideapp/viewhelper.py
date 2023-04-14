@@ -138,17 +138,11 @@ def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url
     return redirect("internalcourse", pk=courseID), messages.SUCCESS, message
 
 
-def accept_request_helper(requestID, adminResponse):
+def handle_request_helper(requestID, adminResponse, accepted):
+    condition = TransferRequest.accepted if accepted else TransferRequest.rejected
     request = TransferRequest.objects.get(id=requestID)
-    request.transfer.accepted = True
+    request.transfer.accepted = accepted
     request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.accepted, response=adminResponse, updated_at=timezone.now())
-    return redirect("handleRequests"), None
-
-def reject_request_helper(requestID, adminResponse):
-    request = TransferRequest.objects.get(id=requestID)
-    request.transfer.accepted = False
-    request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=TransferRequest.rejected, response=adminResponse, updated_at=timezone.now())
-    return redirect("handleRequests"), None
+    TransferRequest.objects.filter(transfer=request.transfer).update(condition=condition, response=adminResponse, updated_at=timezone.now())
+    return redirect("handleRequests")
 

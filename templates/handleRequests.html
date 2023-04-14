@@ -41,7 +41,7 @@
                   {% csrf_token %}
                   <div class="form-outline">
                     <div class="form-text">Comment (Optional):</div>
-                    <textarea id="adminResponse" name="adminResponse" maxlength="200" class="form-control"></textarea>
+                    <textarea id="adminResponse" name="adminResponse" maxlength="200" class="form-control" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)"></textarea>
                   </div>
                   <input type="hidden" name="requestID" id="requestID" value=""/>
                   <input type="hidden" name="tab" id="tab" value=""/>
