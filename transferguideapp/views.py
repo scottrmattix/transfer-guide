@@ -17,8 +17,9 @@ from helpermethods import course_title_format
 def favorite_request(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
 
-    tr = TransferRequest(user=request.user, transfer = favorite.transfer)
-    if not TransferRequest.objects.filter(user = tr.user, transfer = favorite.transfer).exists():
+    # check if this TR already exists:
+    if not TransferRequest.objects.filter(user = request.user, transfer = favorite.transfer).exists():
+        tr = TransferRequest(user=request.user, transfer = favorite.transfer)
         tr.save()
 
     favorite.delete()
