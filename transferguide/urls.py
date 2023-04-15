@@ -17,8 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
-from transferguideapp.views import favorite_request, add_external_college, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, add_to_cart, cart_TR
 
+from transferguideapp.views import favorite_request, add_external_college, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, , add_to_cart, cart_TR
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,6 +33,7 @@ urlpatterns = [
 
     path('search/', CourseSearch.as_view(), name='courseSearch'),
     path('search/clear/', submit_search, name='submit_search'), # this is for error handling
+    path('search/lookup/', sis_lookup, name="sis_lookup"),
 
     path('internal/<int:pk>', InternalCoursePage.as_view(), name='internalcourse'),
     path('external/<int:pk>', ExternalCoursePage.as_view(), name='externalcourse'),
@@ -55,9 +56,11 @@ urlpatterns = [
 
     path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),
     path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),
+
     path('favorites/<int:favorite_id>/', favorite_request, name='favorite_request'),
     path('add_to_cart/', add_to_cart, name='add_to_cart'),
-    path('add_to_cart/submit', cart_TR, name='cart_TR')
-
+    path('add_to_cart/submit', cart_TR, name='cart_TR'),
+    path('add_to_cart/', add_to_cart, name='add_to_cart'),
+    path('add_to_cart/submit', cart_TR, name='cart_TR'),
 
     ]

@@ -37,10 +37,10 @@ def filterCollege(inputCollege):
     college = ExternalCollege.objects.filter(college_name__iexact=inputCollege).first()
     aliases = ["", "UVA", "UNIVERSITY OF VIRGINIA"]
     if inputCollege.upper() in aliases:
-        courses = InternalCourse.objects
+        courses = InternalCourse.objects.all()
         q = Q()
     else:
-        courses = ExternalCourse.objects
+        courses = ExternalCourse.objects.filter(coursetransfer__accepted=True)
         q = Q(college=college)
     return q, courses, college
 

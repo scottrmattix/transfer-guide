@@ -5,6 +5,7 @@ from django.contrib import messages
 import re
 from django.utils import timezone
 from django.urls import reverse
+from .sis import request_data, unique_id
 # helper methods for views
 
 def update_favorites_helper(user, pid, sid, type):
@@ -148,4 +149,42 @@ def handle_request_helper(requestID, adminResponse, accepted):
     for tr in trs:
         tr.save()
     return redirect("handleRequests")
+
+
+def sis_lookup_helper(sisMnemonic, sisNumber):
+    if not (sisMnemonic and sisNumber):
+        message = f"No fields may be left empty"
+        return redirect("courseSearch"), messages.ERROR, message
+
+
+
+    existing = InternalCourse.objects.filter(mnemonic=sisMnemonic,
+                                             course_number=sisNumber).first()
+    if existing:
+        existingURL = reverse(existing.get_model(), kwargs={'pk': existing.id})
+        message = f"A <a href='{existingURL}' class='alert-link'>course</a> with this mnemonic and number already exists at this college."
+        return redirect("courseSearch"), messages.INFO, message
+    else:
+        query = {'subject': sisMnemonic, 'catalog_nbr': sisNumber}
+        try:
+            r = unique_id(request_data(query))[0]
+            print(r)
+            c = InternalCourse(
+                    id=r['crse_id'],
+                    mnemonic=r['subject'],
+                    course_number=r['catalog_nbr'],
+                    course_name=r['descr'],
+                    credits=r['units'],
+                )
+        except IndexError:
+            message = f"Your course could not be found."
+            return redirect("courseSearch"), messages.INFO, message
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            return redirect("courseSearch"), messages.WARNING, message
+        else:
+            c.save()
+            courseURL = reverse(c.get_model(), kwargs={'pk': c.id})
+            message = f"Your <a href='{courseURL}' class='alert-link'>course</a> was successfully added to the database."
+            return redirect("courseSearch"), messages.SUCCESS, message
 
