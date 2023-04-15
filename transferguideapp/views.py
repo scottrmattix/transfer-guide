@@ -56,6 +56,19 @@ def set_group(request, user_id):
         user.save()
     return redirect('home')
 
+class ProfilePage(generic.DetailView):
+    template_name = "profilePage.html"
+    model = User
+    slug_field = "username"
+    slug_url_kwarg = "username"
+    context_object_name = "profile"
+
+    def get(self, request, *args, **kwargs):
+        if request.user == self.get_object() or request.user.groups.filter(name='admins').exists():
+            return super(ProfilePage, self).get(request, *args, **kwargs)
+        else:
+            return render(request, 'index.html')
+
 class InternalCoursePage(generic.DetailView):
     template_name = 'course.html'
     model = InternalCourse
@@ -160,7 +173,7 @@ def submit_update(request):
             if message:
                 messages.add_message(request, type, message)
             return redirect
-    return HttpResponseRedirect(reverse('courseSearch'))
+    return render(request, 'index.html')
 
 # a session error arises when .../search/ is visited without calling submit_search beforehand
 # to bypass the issue, first visit .../search/clear/.
@@ -282,7 +295,7 @@ def update_favorites(request):
         else:
             request.session["course_tab"] = tab
             return update_favorites_helper(user, pid, sid, type)
-    return HttpResponseRedirect(reverse('courseSearch'))
+    return render(request, 'index.html')
 
 
 class CourseRequest(generic.DetailView):
@@ -326,7 +339,7 @@ def make_request(request):
             if message:
                 messages.add_message(request, type, message)
             return redirect
-    return HttpResponseRedirect(reverse('courseSearch'))
+    return render(request, 'index.html')
 
 
 def delete_favorite(request, favorite_id):
@@ -374,4 +387,18 @@ def reject_request(request):
             request.session["request_tab"] = tab
             redirect = handle_request_helper(requestID, adminResponse, accepted=False)
             return redirect
+    return HttpResponseRedirect(reverse('handleRequests'))
+
+def delete_request(request):
+    request.session["request_tab"] = "pending"
+    if request.method == "POST":
+        try:
+            requestID = request.POST["requestID"]
+            tab = request.POST["tab"]
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            request.session["request_tab"] = tab
+            TransferRequest.objects.filter(id=requestID).delete()
     return HttpResponseRedirect(reverse('handleRequests'))
