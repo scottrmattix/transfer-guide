@@ -10,7 +10,7 @@ from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
 from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
-from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper, sis_lookup_helper
 from django.contrib import messages
 from helpermethods import course_title_format
 
@@ -162,7 +162,7 @@ def submit_update(request):
             courseID = request.POST["id"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             collegeID = int(collegeID) if collegeID else -1
             mnemonic = mnemonic.upper()
@@ -187,7 +187,7 @@ def submit_search(request):
             name = request.POST["name"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["search"]["college"] = college
             request.session["search"]["mnemonic"] = mnemonic.upper()
@@ -291,7 +291,7 @@ def update_favorites(request):
             tab = request.POST["active-tab"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["course_tab"] = tab
             return update_favorites_helper(user, pid, sid, type)
@@ -327,7 +327,7 @@ def make_request(request):
             comment = request.POST["comment"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             collegeID = int(collegeID) if collegeID else -1
             mnemonic = mnemonic.upper()
@@ -366,7 +366,7 @@ def accept_request(request):
             tab = request.POST["tab"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["request_tab"] = tab
             redirect = handle_request_helper(requestID, adminResponse, accepted=True)
@@ -382,7 +382,7 @@ def reject_request(request):
             tab = request.POST["tab"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["request_tab"] = tab
             redirect = handle_request_helper(requestID, adminResponse, accepted=False)
@@ -397,8 +397,23 @@ def delete_request(request):
             tab = request.POST["tab"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["request_tab"] = tab
             TransferRequest.objects.filter(id=requestID).delete()
     return HttpResponseRedirect(reverse('handleRequests'))
+
+def sis_lookup(request):
+    if request.method == "POST":
+        try:
+            sisMnemonic = request.POST["sisMnemonic"]
+            sisNumber = request.POST["sisNumber"]
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.WARNING, message)
+        else:
+            redirect, type, message = sis_lookup_helper(sisMnemonic, sisNumber)
+            if message:
+                messages.add_message(request, type, message)
+            return redirect
+    return render(request, 'index.html')
