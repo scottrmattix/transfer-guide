@@ -160,28 +160,26 @@ def sis_lookup_helper(sisMnemonic, sisNumber):
 
     existing = InternalCourse.objects.filter(mnemonic=sisMnemonic,
                                              course_number=sisNumber).first()
-    if False:
+    if existing:
         existingURL = reverse(existing.get_model(), kwargs={'pk': existing.id})
         message = f"A <a href='{existingURL}' class='alert-link'>course</a> with this mnemonic and number already exists at this college."
         return redirect("courseSearch"), messages.INFO, message
     else:
         query = {'subject': sisMnemonic, 'catalog_nbr': sisNumber}
-        if True:
-        #try:
+        try:
             r = unique_id(request_data(query))[0]
             print(r)
             c = InternalCourse(
-                    #id=r['crse_id'],
+                    id=r['crse_id'],
                     mnemonic=r['subject'],
                     course_number=r['catalog_nbr'],
                     course_name=r['descr'],
-                    #credits=r['units'],
+                    credits=r['units'],
                 )
-        #except Exception as e:
-        #    message = f"An error occurred: {e}"
-        #    return redirect("courseSearch"), messages.INFO, message
-        #else:
-            print("SUCCESS")
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            return redirect("courseSearch"), messages.INFO, message
+        else:
             c.save()
             courseURL = reverse(c.get_model(), kwargs={'pk': c.id})
             message = f"Your <a href='{courseURL}' class='alert-link'>course</a> was successfully added to the database."
