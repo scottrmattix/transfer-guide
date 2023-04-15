@@ -1,31 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-import re
-from string import capwords
-
-# method to make course_title strings match those of SIS
-# ex: "The intro stars and The galaxies" -> "The Intro Stars and the Galaxies"
-# ex: "University Of Texas" -> "University of Texas"
-def course_title_format(s):
-    pattern = re.compile(r'\b(?:and|or|in|to|the|of)\b', re.IGNORECASE)
-
-    s = s.strip()
-    if not s:
-        return s
-
-    words = s.split() #split by space
-    title_words = []
-    if words[0].lower() == "the":
-        title_words.append("The") #dont change first word for courses starting with The (they exist for some reason)
-        words = words[1:]
-
-    for word in words:
-        title_word = capwords(word) #capwords capitalizes first letter of word()
-        if pattern.match(word):
-            title_word = title_word.lower() #if and,or,in, etc lowercase it
-        title_words.append(title_word)
-    return ' '.join(title_words)
-
+from helpermethods import course_title_format
 
 # Model representing an external University that may or may not be accepted
 class ExternalCollege(models.Model):
@@ -106,10 +81,15 @@ class InternalCourse(models.Model):
     #needs to support text characters for courses like 1000T
     course_number = models.CharField(max_length=30)
     course_name = models.CharField(max_length=200)
+    credits = models.CharField(max_length = 30, default=-1)
 
     # Feel free to change this for testing purposes
     def __str__(self):
-        return f"({self.id}) {self.mnemonic} {self.course_number}: {self.course_name}"
+        return f"{self.mnemonic} {self.course_number}: {self.course_name}"
+
+    def __repr__(self):
+        return f"({self.id}) [{self.credits}] {self.mnemonic} {self.course_number}: {self.course_name}"
+
 
     # WARNING: this method is written such that the return value matches a URL defined in urls.py, and it is used in multiple places to differentiate InternalCourse and ExternalCourse objects. Do not change.
     def get_model(self):
@@ -159,6 +139,17 @@ class TimeStampMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    NOTIFICATION_CHOICES = [
+            ('transfer','transfer'),
+    ]
+    notification = models.CharField(blank=True, choices=NOTIFICATION_CHOICES, max_length=10)
+    subject = models.ForeignKey(CourseTransfer, on_delete=models.CASCADE, default=None)
+    def __str__(self):
+        return f"User: {self.user} Type: {self.notification}"
 
 # Model representing a User-CourseTransfer relation
 class Favorites(TimeStampMixin):

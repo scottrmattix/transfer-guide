@@ -144,7 +144,10 @@ def handle_request_helper(requestID, adminResponse, accepted):
     request = TransferRequest.objects.get(id=requestID)
     request.transfer.accepted = accepted
     request.transfer.save()
-    TransferRequest.objects.filter(transfer=request.transfer).update(condition=condition, response=adminResponse, updated_at=timezone.now())
+    trs = TransferRequest.objects.filter(transfer=request.transfer)
+    trs.update(condition=condition, response=adminResponse, updated_at=timezone.now())
+    for tr in trs:
+        tr.save()
     return redirect("handleRequests")
 
 
