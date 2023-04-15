@@ -178,7 +178,7 @@ def sis_lookup_helper(sisMnemonic, sisNumber):
                 )
         except Exception as e:
             message = f"An error occurred: {e}"
-            return redirect("courseSearch"), messages.INFO, message
+            return redirect("courseSearch"), messages.WARNING, message
         else:
             c.save()
             courseURL = reverse(c.get_model(), kwargs={'pk': c.id})

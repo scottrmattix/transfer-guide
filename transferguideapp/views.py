@@ -162,7 +162,7 @@ def submit_update(request):
             courseID = request.POST["id"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             collegeID = int(collegeID) if collegeID else -1
             mnemonic = mnemonic.upper()
@@ -187,7 +187,7 @@ def submit_search(request):
             name = request.POST["name"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["search"]["college"] = college
             request.session["search"]["mnemonic"] = mnemonic.upper()
@@ -291,7 +291,7 @@ def update_favorites(request):
             tab = request.POST["active-tab"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["course_tab"] = tab
             return update_favorites_helper(user, pid, sid, type)
@@ -327,7 +327,7 @@ def make_request(request):
             comment = request.POST["comment"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             collegeID = int(collegeID) if collegeID else -1
             mnemonic = mnemonic.upper()
@@ -366,7 +366,7 @@ def accept_request(request):
             tab = request.POST["tab"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["request_tab"] = tab
             redirect = handle_request_helper(requestID, adminResponse, accepted=True)
@@ -382,7 +382,7 @@ def reject_request(request):
             tab = request.POST["tab"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["request_tab"] = tab
             redirect = handle_request_helper(requestID, adminResponse, accepted=False)
@@ -397,7 +397,7 @@ def delete_request(request):
             tab = request.POST["tab"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             request.session["request_tab"] = tab
             TransferRequest.objects.filter(id=requestID).delete()
@@ -410,7 +410,7 @@ def sis_lookup(request):
             sisNumber = request.POST["sisNumber"]
         except Exception as e:
             message = f"An error occurred: {e}"
-            messages.add_message(request, messages.DEBUG, message)
+            messages.add_message(request, messages.WARNING, message)
         else:
             redirect, type, message = sis_lookup_helper(sisMnemonic, sisNumber)
             if message:
