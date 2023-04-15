@@ -13,6 +13,60 @@ from .context import context_course, context_course_request, context_update_inte
 from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper
 from django.contrib import messages
 from helpermethods import course_title_format
+from shoppingcart import ShoppingCart
+
+def cart_TR(request):
+    # comment = request.POST['comment']
+    # ec_mnemonic = request.POST['external_course_mnemonic']
+    # ec_college = request.POST['external_course_college']
+    # ec_name = request.POST['external_course_name']
+    # ec_number = request.POST['external_course_number']
+    ec_id = request.POST['external_course_id']
+    ic_id = request.POST['internal_course_id']
+    # ic_number = request.POST['internal_course_number']
+    # ic_mnemonic = request.POST['internal_course_mnemonic']
+    # ic_name = request.POST['internal_course_name']
+
+    ic = InternalCourse.objects.get(id = ic_id)
+    ec = ExternalCourse.objects.get(id = ec_id)
+
+    
+    ct, created = CourseTransfer.objects.get_or_create(external_course = ec, internal_course = ic)
+    if created:
+        ct.save()
+
+    tr, created = TransferRequest.objects.get_or_create(user=request.user, transfer = ct)
+    if created:
+        tr.save()
+        print(tr)
+
+    return redirect('/handle_request')
+
+def add_to_cart(request):
+    if 'college' in request.POST:
+        college = request.POST['college']
+    else:
+       college = 'University of Virginia' 
+
+    course_id = request.POST['item_id']
+
+    if college == 'University of Virginia':
+        print("uva course detected")
+        course = InternalCourse.objects.get(pk=course_id)
+    else:
+        course = ExternalCourse.objects.get(pk=course_id)
+
+    cart = ShoppingCart(request)
+    cart.add(course)
+    request.session['cart'] = cart.cart
+    request.session.modified = True
+
+    context = {
+        'cart': cart
+    }
+
+    return render(request, 'search.html', context=context)
+
 
 def favorite_request(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
@@ -21,7 +75,7 @@ def favorite_request(request, favorite_id):
     if created:
         tr.save()
 
-    return redirect('/handle/request')
+    return redirect('/handle_request')
 
 
 def add_external_college(request):
@@ -193,6 +247,7 @@ def submit_search(request):
             request.session["search"]["mnemonic"] = mnemonic.upper()
             request.session["search"]["number"] = number.upper()
             request.session["search"]["name"] = name
+            
     return HttpResponseRedirect(reverse('courseSearch'))
 
 def handle_transfer_request(request):
