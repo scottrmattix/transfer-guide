@@ -176,6 +176,9 @@ def sis_lookup_helper(sisMnemonic, sisNumber):
                     course_name=r['descr'],
                     credits=r['units'],
                 )
+        except IndexError:
+            message = f"Your course could not be found."
+            return redirect("courseSearch"), messages.INFO, message
         except Exception as e:
             message = f"An error occurred: {e}"
             return redirect("courseSearch"), messages.WARNING, message
