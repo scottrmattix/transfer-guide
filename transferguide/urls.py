@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
-from transferguideapp.views import add_external_college, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage
+from transferguideapp.views import add_external_college, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup
 
 
 urlpatterns = [
@@ -33,6 +33,7 @@ urlpatterns = [
 
     path('search/', CourseSearch.as_view(), name='courseSearch'),
     path('search/clear/', submit_search, name='submit_search'), # this is for error handling
+    path('search/lookup/', sis_lookup, name="sis_lookup"),
 
     path('internal/<int:pk>', InternalCoursePage.as_view(), name='internalcourse'),
     path('external/<int:pk>', ExternalCoursePage.as_view(), name='externalcourse'),
@@ -55,4 +56,5 @@ urlpatterns = [
 
     path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),
     path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),
+
     ]

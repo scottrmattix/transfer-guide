@@ -12,7 +12,7 @@ from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
 from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
-from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper, sis_lookup_helper
 from django.contrib import messages
 
 # sorry for the spaghetti; using this to properly get() names from db
@@ -411,3 +411,18 @@ def delete_request(request):
             request.session["request_tab"] = tab
             TransferRequest.objects.filter(id=requestID).delete()
     return HttpResponseRedirect(reverse('handleRequests'))
+
+def sis_lookup(request):
+    if request.method == "POST":
+        try:
+            sisMnemonic = request.POST["sisMnemonic"]
+            sisNumber = request.POST["sisNumber"]
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.DEBUG, message)
+        else:
+            redirect, type, message = sis_lookup_helper(sisMnemonic, sisNumber)
+            if message:
+                messages.add_message(request, type, message)
+            return redirect
+    return render(request, 'index.html')
