@@ -40,4 +40,5 @@ def populate_models(sender, **kwargs):
         sa.sites.add(Site.objects.get(name='localhost:8000'))
         sa.sites.add(Site.objects.get(name='transfer-guide.herokuapp.com'))
         sa.save()
-    AdminKey.objects.update_or_create(key = "admin")
+    if(AdminKey.objects.all().count() == 0):
+        AdminKey.objects.update_or_create(key = "admin")
