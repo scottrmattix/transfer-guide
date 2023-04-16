@@ -18,7 +18,7 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
 
-from transferguideapp.views import favorite_request, add_external_college, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, add_to_cart, cart_TR
+from transferguideapp.views import favorite_request, add_external_college, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, add_to_cart, cart_TR, cart_add, sc_request
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -43,12 +43,14 @@ urlpatterns = [
     path('course/update/', UpdateCourses.as_view(), name='updateCourses'),
     path('course/update/submit', submit_update, name='submit_update'),
     path('course/update/add_external_college', add_external_college, name = 'add_external_college'),
+    path('course/shop/', cart_add, name='cart_add'),
 
     path('favorites/', favorites, name='favorites'),
     path('favorites/update/', update_favorites, name='update_favorites'),
 
     path('internal/<int:pk>/request', CourseRequest.as_view(), name='courseRequest'),
     path('course/request', make_request, name='make_request'),
+    path('course/request/cart', sc_request, name="sc_request"),
     path('handle_request', HandleRequests.as_view(), name='handleRequests'),
     path('handle_request/accept', accept_request, name='accept_request'),
     path('handle_request/reject', reject_request, name='reject_request'),
@@ -58,8 +60,6 @@ urlpatterns = [
     path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),
 
     path('favorites/<int:favorite_id>/', favorite_request, name='favorite_request'),
-    path('add_to_cart/', add_to_cart, name='add_to_cart'),
-    path('add_to_cart/submit', cart_TR, name='cart_TR'),
     path('add_to_cart/', add_to_cart, name='add_to_cart'),
     path('add_to_cart/submit', cart_TR, name='cart_TR'),
 

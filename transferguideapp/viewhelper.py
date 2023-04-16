@@ -138,6 +138,54 @@ def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url
     message = f"Your <a href='{requestsURL}' class='alert-link'>transfer request</a> is now pending."
     return redirect("internalcourse", pk=courseID), messages.SUCCESS, message
 
+def sc_request_helper(user, internalID, externalID, url, comment):
+    # check that no empty strings were provided
+    if not (url and comment):
+        message = "No fields may be left empty"
+        return redirect("searchCourse"), messages.ERROR, message
+
+    # check valid url
+    protocol = r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"
+    noProtocol = r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"
+    if not (re.fullmatch(protocol, url) or re.fullmatch(noProtocol, url)):
+        message = "Provided course link is invalid."
+        return redirect("courseSearch"), messages.ERROR, message
+
+    # Get Courses
+    internal = InternalCourse.objects.get(id=internalID)
+    external = ExternalCourse.objects.get(id=externalID)
+
+    # Get or Create CourseTransfer
+    try:
+        transfer = CourseTransfer.objects.get(internal_course=internal,
+                                              external_course=external)
+        if transfer.accepted:
+            externalURL = reverse("externalcourse",
+                                  kwargs={'pk': transfer.external_course.id})
+            message = f"This <a href='{externalURL}' class='alert-link'>course equivalency</a> has already been accepted."
+            return redirect("courseSearch"), messages.ERROR, message
+
+    except CourseTransfer.DoesNotExist:
+        transfer = CourseTransfer.objects.create(internal_course=internal,
+                                                 external_course=external,
+                                                 accepted=False)
+
+    # Get or Create TransferRequest
+    try:
+        request = TransferRequest.objects.get(user=user, transfer=transfer)
+        requestsURL = reverse("handleRequests")
+        message = f"You have already made a <a href='{requestsURL}' class='alert-link'>transfer request</a> for these two courses."
+        return redirect("courseSearch"), messages.ERROR, message
+    except TransferRequest.DoesNotExist:
+        request = TransferRequest.objects.create(user=user, transfer=transfer,
+                                                 condition=TransferRequest.pending,
+                                                 url=url, comment=comment)
+
+    # Return back to InternalCourse view without error
+    requestsURL = reverse("handleRequests")
+    message = f"Your <a href='{requestsURL}' class='alert-link'>transfer request</a> is now pending."
+    return redirect("courseSearch"), messages.SUCCESS, message
+
 
 def handle_request_helper(requestID, adminResponse, accepted):
     condition = TransferRequest.accepted if accepted else TransferRequest.rejected

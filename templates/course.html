@@ -52,6 +52,18 @@
           <a class="btn btn-primary" href="{% url 'courseRequest' course.pk %}" role="button">Make Request</a>
           {% endif %}
 
+          <!-- Add to Shopping Cart-->
+          <form action="{% url 'cart_add' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="courseID" name="courseID" value="{{ course.id }}">
+            <input type="hidden" id="model" name="model" value="{{ course.get_model }}">
+            {% if disabled %}
+              <button type="submit" class="btn btn-primary" disabled>Added to Cart</button>
+            {% else %}
+              <button type="submit" class="btn btn-primary">Add to Cart</button>
+            {% endif %}
+          </form>
+
         {% endif %}
       </div>
 

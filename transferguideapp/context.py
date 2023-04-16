@@ -13,7 +13,9 @@ from django.db.models.functions import Concat
 ########################################################################################
 
 def context_course(context, course, request):
-    context['foreign'], context['credits'] = set_foreign_credits(course)
+    context['foreign'] = set_foreign(course)
+    context['credits'] = set_credits(course)
+    context["disabled"] = set_disabled(course, request.session)
     context['tab'], collegeQ = handle_tab(course, request.session)
 
     if "course_tab" not in request.session:
@@ -61,15 +63,28 @@ def favorite_filters(course, user):
         specific = unspecific & Q(coursetransfer__external_course=course)
     return unspecific, specific
 
-def set_foreign_credits(course):
-    foreign = ""
-    credits = ""
+def set_foreign(course):
     if course.get_model() == "externalcourse":
         if not course.college.domestic_college:
-            foreign = "(Foreign)"
-    elif int(course.credits) >= 0:
-        credits = course.credits
-    return foreign, credits
+            return "(Foreign)"
+    return ""
+
+def set_credits(course):
+    if course.get_model() == "internalcourse":
+        if int(course.credits) >= 0:
+            return course.credits
+    return ""
+
+def set_disabled(course, session):
+    disabled = False
+    if "SC" in session:
+        if course.get_model() == "internalcourse":
+            if session["SC"]["internalID"] == course.id:
+                disabled = True
+        else:
+            if session["SC"]["externalID"] == course.id:
+                disabled = True
+    return disabled
 
 ########################################################################################
 # In order for us to reuse templates, the context dictionary entries of
