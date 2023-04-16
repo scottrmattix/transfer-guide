@@ -5,6 +5,7 @@
     <title>Search</title>
 </head>
 <body>
+
     {# Load the tag library #}
     {% extends "base.html" %}
     {% load bootstrap5 %}
@@ -19,8 +20,9 @@
     {% block content %}
     <content class>
       {% include "messages.html" with messages=messages%}
-
+        
       <div class="container-fluid px-5 py-2" align="left">
+
         <h3>Course Search</h3>
         <!--Form for entering a course search-->
         <form class="row gy-1 gx-15 align-items-center" action="{% url 'submit_search' %}" method="post">
@@ -70,7 +72,8 @@
               <div class="col-3">College</div>
               <div class="col-2">Mnemonic</div>
               <div class="col-2">Number</div>
-              <div class="col-5">Name</div>
+              <div class="col-2">Name</div>
+              <div class="col-1"></div>
             </div>
             <ul class="list-group">
               {% for course in course_list.all %}
@@ -78,8 +81,17 @@
                   <div class="col-3">{{ course.college_name }}</div>
                   <div class="col-2">{{ course.mnemonic }}</div>
                   <div class="col-2">{{ course.course_number }}</div>
-                  <div class="col-5">{{ course.course_name }}</div>
+                  <div class="col-2">{{ course.course_name }}</div>
+                  <div class="col-1"></div>
+                  <form method="POST" action="{% url 'add_to_cart' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="college" value= "{{ course.college_name }}">
+                    <input type="hidden" name="item_id" value="{{ course.id }}">
+                    <button type="submit">Add to Cart</button>
+                  </form>
+                </div>
                 </a>
+
                 <!--a href="{% url course.get_model course.id %}" class="list-group-item list-group-item-{% if user in course.get_users %}success{% else %}light{% endif %} list-group-item-action flex-column align-items-start">{{ course }}</a-->
               {% endfor %}
             </ul>
@@ -125,7 +137,79 @@
 
 
     </content>
+    {%if cart%}
+    <div class="container mt-4 text-left">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header text-left">
+              {% if cart %}
+                Your Cart (Holds one UVA course and one external Course)
+              {% endif %}
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  {% if cart.get_ic %}
+                  <div class="card">
+                    <div class="card-header">
+                      Internal Course
+                    </div>
+                    <div class="card-body">
+                      <p><strong>Name:</strong> {{ cart.get_ic.course_name }}</p>
+                      <p><strong>Mnemonic:</strong> {{ cart.get_ic.mnemonic }}</p>
+                      <p><strong>Number:</strong> {{ cart.get_ic.course_number }}</p>
+                      <p><strong>Credits:</strong> {{ cart.get_ic.credits }}</p>
+                    </div>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  {% if cart.get_ec %}
+                  <div class="card">
+                    <div class="card-header">
+                      External Course
+                    </div>
+                    <div class="card-body">
+                      <p><strong>College:</strong> {{ cart.get_ec.college }}</p>
+                      <p><strong>Name:</strong> {{ cart.get_ec.course_name }}</p>
+                      <p><strong>Mnemonic:</strong> {{ cart.get_ec.mnemonic }}</p>
+                      <p><strong>Number:</strong> {{ cart.get_ec.course_number }}</p>
+                    </div>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% if cart.get_ec and cart.get_ic %}
+    <form method="POST" action="{% url 'cart_TR' %}">
+      {% csrf_token %}
+      <h3>Enter optional comment for Transfer Request:</h3>
+      <textarea name="comment" cols="50" rows="5"></textarea>
+        <input type="hidden" name="external_course_number" value="{{ cart.get_ec.course_number }}">
+        <input type="hidden" name="external_course_college" value="{{ cart.get_ec.college }}">
+        <input type="hidden" name="external_course_name" value="{{ cart.get_ec.course_name }}">
+        <input type="hidden" name="external_course_mnemonic" value="{{ cart.get_ec.mnemonic}}">
+        <input type="hidden" name="external_course_id" value="{{ cart.get_ec.id}}">
+        <input type="hidden" name="internal_course_id" value="{{ cart.get_ic.id }}">
+        <input type="hidden" name="internal_course_number" value="{{ cart.get_ic.course_number }}">
+        <input type="hidden" name="internal_course_mnemonic" value="{{ cart.get_ic.mnemonic }}">
+        <input type="hidden" name="internal_course_name" value="{{ cart.get_ic.course_name }}">
+
+        <div class="row">
+        <div class="col-md-12">
+      <button type="submit">Submit Transfer Request</button>
+        </div>
+      </div>
+    </form>
+    {% endif %}
+    {% endif %}
+
     {% endblock %}
 </body>
-</html>
+
 
