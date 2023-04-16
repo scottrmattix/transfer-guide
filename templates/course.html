@@ -27,10 +27,11 @@
           <!-- List Course Attributes -->
           <h3>Course Attributes</h3>
           <ul>
-            <li>College: {{ course.college_name }} {{ foreign }}</li>
-            <li>Mnemonic: {{ course.mnemonic }}</li>
-            <li>Number: {{ course.course_number }}</li>
-            <li>Title: {{ course.course_name }}</li>
+            <li><b>College</b>: {{ course.college_name }} {{ foreign }}</li>
+            <li><b>Mnemonic</b>: {{ course.mnemonic }}</li>
+            <li><b>Number</b>: {{ course.course_number }}</li>
+            <li><b>Title</b>: {{ course.course_name }}</li>
+            {% if credits %}<li><b>Credits</b>: {{ credits }}</li>{% endif %}
           </ul>
 
           <!-- Search Similar Course Button -->

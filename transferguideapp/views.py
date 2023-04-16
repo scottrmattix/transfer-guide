@@ -13,7 +13,7 @@ from .context import context_course, context_course_request, context_update_inte
 from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper, sis_lookup_helper
 from django.contrib import messages
 from helpermethods import course_title_format
-from django.db.models import CharField, Value, Max, Count
+from django.db.models import CharField, Value, Max, Count, Sum
 from django.db.models.functions import Concat
 
 def favorite_request(request, favorite_id):
@@ -272,10 +272,9 @@ def submit_transfer_request(request):
 
 def favorites(request):
     f = Favorites.objects.filter(user=request.user).order_by('-created_at')
-    # f is the entire query set, to access individual fields do:
-    # f[0].in_course.course_name, f[0].ex_course.course_id, etc
-
-    return render(request, 'favorites2.html', {'favorites': f})
+    total = f.aggregate(total=Sum('transfer__internal_course__credits', filter=Q(transfer__internal_course__credits__gte=0)))['total']
+    total = 0 if (total is None) else total
+    return render(request, 'favorites2.html', {'favorites': f, 'total': total})
 
 #not super sure if this is the best way to do it. need to test on the real database
 def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_course_mnemonic=None, ex_course_number=None):

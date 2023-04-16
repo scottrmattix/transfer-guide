@@ -13,7 +13,7 @@ from django.db.models.functions import Concat
 ########################################################################################
 
 def context_course(context, course, request):
-    context['foreign'] = set_foreign(course)
+    context['foreign'], context['credits'] = set_foreign_credits(course)
     context['tab'], collegeQ = handle_tab(course, request.session)
 
     if "course_tab" not in request.session:
@@ -61,12 +61,15 @@ def favorite_filters(course, user):
         specific = unspecific & Q(coursetransfer__external_course=course)
     return unspecific, specific
 
-def set_foreign(course):
+def set_foreign_credits(course):
     foreign = ""
+    credits = ""
     if course.get_model() == "externalcourse":
         if not course.college.domestic_college:
             foreign = "(Foreign)"
-    return foreign
+    elif int(course.credits) >= 0:
+        credits = course.credits
+    return foreign, credits
 
 ########################################################################################
 # In order for us to reuse templates, the context dictionary entries of
