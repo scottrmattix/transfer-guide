@@ -28,7 +28,21 @@
     .pt-2:hover{
         color:rgba(0, 0, 0, 0.606)
     }
+    .dropdown{
+        position: relative;
+    }
 </style>
+<script>
+    invertTheme = function(){
+        theme = document.documentElement.getAttribute('data-bs-theme');
+        if(theme == 'dark'){
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+        }
+        else{
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+    }
+</script>
 {% endif %}
 <body class="d-flex flex-column align-items-center">
     {% if user.is_authenticated%}
@@ -47,36 +61,48 @@
                     <a href="{% url 'accept_request' %}" class="nav-link pt-2 ms-5"> View Requests </a>
                 {% endif %}
             </ul>
-            <button class="d-flex fkex-row align-items-center dropdown mx-2 btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
-                <a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
-                    <img width="40px" height="40px" href="#"
-                        src="https://www.pinclipart.com/picdir/middle/185-1850576_png-file-white-bell-notification-icon-transparent-clipart.png"> {{ user.notification_set.all.count }}
-                </a>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end">
-							{% for note in user.notification_set.all %}
-							<a class="dropdown-item"> Type: {{ note.notification }} </br> Subject: {{ note.subject }}</a>
-							{% endfor %}
-            </div>
-
-            <button class="d-flex fkex-row align-items-center dropdown mx-2 btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
-                <a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
-                    <img width="40px" height="40px" href="#"
-                        src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"> {{ user.username }}
-                </a>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end">
-                {% if user.groups.all.0.name == 'users' %}
-                    <a class="dropdown-item" href="{% url 'account_info' %}"> Account Information </a>
-                    <a class="dropdown-item" href="#"> Pending Requests </a>
-                    <a class="dropdown-item" href="{% url 'favorites' %}"> Favorites </a>
-                {% else %}
-                    <a class="dropdown-item" href="{% url 'account_info' %}"> Account Information </a>
-                    <a class="dropdown-item" href="#"> Resolved Requests </a>
-                    <a class="dropdown-item" href="{% url 'favorites' %}"> Favorites </a>
-                {% endif %}
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{% url 'logout' %}"> Log Out </a>
+            <div class="d-flex">
+                <button class="me-3 btn btn-outline-dark" onclick="invertTheme()">
+                    Invert Theme
+                </button>
+                <div class="dropdown">
+                    <button class="me-3 btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
+                        <a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
+                            <img width="40px" height="40px" href="#"
+                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Ic_notifications_none_48px.svg/1280px-Ic_notifications_none_48px.svg.png"> {{ user.notification_set.all.count }}
+                        </a>
+                    </button>
+                    <div class="dropdown-menu">
+                        {% if user.notification_set.all.count == 0 %}
+                            <a class="dropdown-item"> No Notifications </a>
+                        {% else %}
+                            {% for note in user.notification_set.all %}
+                            <a class="dropdown-item"> Type: {{ note.notification }} </br> Subject: {{ note.subject }}</a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="me-3 dropdown btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
+                        <a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
+                            <img width="40px" height="40px" href="#"
+                                src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"> {{ user.username }}
+                        </a>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        {% if user.groups.all.0.name == 'users' %}
+                            <a class="dropdown-item" href="{% url 'account_info' %}"> Account Information </a>
+                            <a class="dropdown-item" href="#"> Pending Requests </a>
+                            <a class="dropdown-item" href="{% url 'favorites' %}"> Favorites </a>
+                        {% else %}
+                            <a class="dropdown-item" href="{% url 'account_info' %}"> Account Information </a>
+                            <a class="dropdown-item" href="#"> Resolved Requests </a>
+                            <a class="dropdown-item" href="{% url 'favorites' %}"> Favorites </a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'logout' %}"> Log Out </a>
+                    </div>
+                </div>
             </div>
         </nav>
     {% endif %}

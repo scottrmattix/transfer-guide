@@ -30,6 +30,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'transfer-guide.herokuapp.com', 'testserver']
 
+# storing session data in the database for shopping cart 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Application definition
 
@@ -92,6 +96,7 @@ WSGI_APPLICATION = 'transferguide.wsgi.application'
 # }
 
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -102,6 +107,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
 
 
 #DATABASES = {}
@@ -166,6 +172,7 @@ if os.path.isfile(dotenv_file):
     dotenv.load_dotenv(dotenv_file)
 """
 #Error prevention
+
 try:
     if 'HEROKU' in os.environ:
         import django_heroku
