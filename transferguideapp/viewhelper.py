@@ -138,18 +138,19 @@ def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url
     message = f"Your <a href='{requestsURL}' class='alert-link'>transfer request</a> is now pending."
     return redirect("internalcourse", pk=courseID), messages.SUCCESS, message
 
+
 def sc_request_helper(user, internalID, externalID, url, comment):
     # check that no empty strings were provided
     if not (url and comment):
         message = "No fields may be left empty"
-        return redirect("searchCourse"), messages.ERROR, message
+        return redirect("submit_search"), messages.ERROR, message
 
     # check valid url
     protocol = r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"
     noProtocol = r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"
     if not (re.fullmatch(protocol, url) or re.fullmatch(noProtocol, url)):
         message = "Provided course link is invalid."
-        return redirect("courseSearch"), messages.ERROR, message
+        return redirect("submit_search"), messages.ERROR, message
 
     # Get Courses
     internal = InternalCourse.objects.get(id=internalID)
@@ -163,7 +164,7 @@ def sc_request_helper(user, internalID, externalID, url, comment):
             externalURL = reverse("externalcourse",
                                   kwargs={'pk': transfer.external_course.id})
             message = f"This <a href='{externalURL}' class='alert-link'>course equivalency</a> has already been accepted."
-            return redirect("courseSearch"), messages.ERROR, message
+            return redirect("submit_search"), messages.ERROR, message
 
     except CourseTransfer.DoesNotExist:
         transfer = CourseTransfer.objects.create(internal_course=internal,
@@ -175,7 +176,7 @@ def sc_request_helper(user, internalID, externalID, url, comment):
         request = TransferRequest.objects.get(user=user, transfer=transfer)
         requestsURL = reverse("handleRequests")
         message = f"You have already made a <a href='{requestsURL}' class='alert-link'>transfer request</a> for these two courses."
-        return redirect("courseSearch"), messages.ERROR, message
+        return redirect("submit_search"), messages.ERROR, message
     except TransferRequest.DoesNotExist:
         request = TransferRequest.objects.create(user=user, transfer=transfer,
                                                  condition=TransferRequest.pending,
@@ -184,7 +185,7 @@ def sc_request_helper(user, internalID, externalID, url, comment):
     # Return back to InternalCourse view without error
     requestsURL = reverse("handleRequests")
     message = f"Your <a href='{requestsURL}' class='alert-link'>transfer request</a> is now pending."
-    return redirect("courseSearch"), messages.SUCCESS, message
+    return redirect("submit_search"), messages.SUCCESS, message
 
 
 def handle_request_helper(requestID, adminResponse, accepted):
@@ -200,7 +201,7 @@ def handle_request_helper(requestID, adminResponse, accepted):
 def sis_lookup_helper(sisMnemonic, sisNumber):
     if not (sisMnemonic and sisNumber):
         message = f"No fields may be left empty"
-        return redirect("courseSearch"), messages.ERROR, message
+        return redirect("submit_search"), messages.ERROR, message
 
 
 
@@ -209,7 +210,7 @@ def sis_lookup_helper(sisMnemonic, sisNumber):
     if existing:
         existingURL = reverse(existing.get_model(), kwargs={'pk': existing.id})
         message = f"A <a href='{existingURL}' class='alert-link'>course</a> with this mnemonic and number already exists at this college."
-        return redirect("courseSearch"), messages.INFO, message
+        return redirect("submit_search"), messages.INFO, message
     else:
         query = {'subject': sisMnemonic, 'catalog_nbr': sisNumber}
         try:
@@ -224,13 +225,13 @@ def sis_lookup_helper(sisMnemonic, sisNumber):
                 )
         except IndexError:
             message = f"Your course could not be found."
-            return redirect("courseSearch"), messages.INFO, message
+            return redirect("submit_search"), messages.INFO, message
         except Exception as e:
             message = f"An error occurred: {e}"
-            return redirect("courseSearch"), messages.WARNING, message
+            return redirect("submit_search"), messages.WARNING, message
         else:
             c.save()
             courseURL = reverse(c.get_model(), kwargs={'pk': c.id})
             message = f"Your <a href='{courseURL}' class='alert-link'>course</a> was successfully added to the database."
-            return redirect("courseSearch"), messages.SUCCESS, message
+            return redirect("submit_search"), messages.SUCCESS, message
 

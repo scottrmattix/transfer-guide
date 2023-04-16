@@ -86,10 +86,10 @@ def sc_request(request):
             if message:
                 messages.add_message(request, type, message)
             return redirect
-    return HttpResponseRedirect(reverse('courseSearch'))
+    return HttpResponseRedirect(reverse('submit_search'))
 
 def cart_add(request):
-    cartURL = reverse("courseSearch")
+    cartURL = reverse("submit_search")
     if request.method == "POST":
         try:
             url = request.META.get('HTTP_REFERER')
@@ -284,7 +284,7 @@ def submit_update(request):
             if message:
                 messages.add_message(request, type, message)
             return redirect
-    return HttpResponseRedirect(reverse('courseSearch'))
+    return HttpResponseRedirect(reverse('submit_search'))
 
 # a session error arises when .../search/ is visited without calling submit_search beforehand
 # to bypass the issue, first visit .../search/clear/.
@@ -406,7 +406,7 @@ def update_favorites(request):
         else:
             request.session["course_tab"] = tab
             return update_favorites_helper(user, pid, sid, type)
-    return HttpResponseRedirect(reverse('courseSearch'))
+    return HttpResponseRedirect(reverse('submit_search'))
 
 
 class CourseRequest(generic.DetailView):
@@ -450,7 +450,7 @@ def make_request(request):
             if message:
                 messages.add_message(request, type, message)
             return redirect
-    return HttpResponseRedirect(reverse('courseSearch'))
+    return HttpResponseRedirect(reverse('submit_search'))
 
 
 def delete_favorite(request, favorite_id):
@@ -537,4 +537,4 @@ def sis_lookup(request):
             if message:
                 messages.add_message(request, type, message)
             return redirect
-    return HttpResponseRedirect(reverse('courseSearch'))
+    return HttpResponseRedirect(reverse('submit_search'))
