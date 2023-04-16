@@ -148,8 +148,6 @@ def handle_request_helper(requestID, adminResponse, accepted):
     trs.update(condition=condition, response=adminResponse, updated_at=timezone.now())
     for tr in trs:
         tr.save()
-    return redirect("handleRequests")
-
 
 def sis_lookup_helper(sisMnemonic, sisNumber):
     if not (sisMnemonic and sisNumber):

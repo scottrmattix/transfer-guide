@@ -98,11 +98,63 @@
 
       <!-- Container for Page Content -->
       <div class="container-fluid p-5" align="left">
-        <h3>Requests</h3>
+        <!-- Define Header -->
+        {% if profile %}
+        <h3><span style="color:gray">View Requests | </span>{% if name.strip %}{{ name }}{% else %}{{ profile.username }}{% endif %}</h3>
+        {% else %}
+          <h3>View Requests</h3>
+        {% endif %}
 
+        <!-- Show Error Messages -->
         {% include "messages.html" with messages=messages%}
 
-        {% if not isAdmin %}
+        <!-- Admin View for Specific User Requests -->
+        {% if profile %}
+          <!-- Link to General Requests Page -->
+          <a href="{% url 'handleRequests' %}" class="link-primary text-decoration-none">← Back to All Requests</a>
+          <!-- List User Profile Attributes -->
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-2 border-bottom"></div>
+          <h5>User Profile</h5>
+          <ul>
+            <li>Name: {% if name %}{{ name }}{% else %}Unknown{% endif %}</li>
+            <li>Username: {{ profile.username }}</li>
+            <li>Email: {{ profile.email }}</li>
+          </ul>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-2 border-bottom"></div>
+
+        <!-- Admin View for User Links -->
+        {% elif isAdmin %}
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-2 border-bottom"></div>
+          <h5>Recent Users</h5>
+
+          <!-- Table Headings -->
+          <div class="card pb-2 mb-2">
+            <div class="card-header d-flex">
+              <div class="col-4">Username</div>
+              <div class="col-4">Name</div>
+              <div class="col-1">#</div>
+              <div class="col-3">Time</div>
+            </div>
+
+            <ul class="list-group">
+              {% if user_list %}
+                {% for u in user_list %}
+                  <a href="{% url 'profilePage' u.username %}" class="list-group-item list-group-item-action d-flex">
+                    <div class="col-4">{{ u.username }}</div>
+                    <div class="col-4">{% if u.name.strip %}{{ u.name }}{% else %} - {% endif %}</div>
+                    <div class="col-1">{{ u.count }}</div>
+                    <div class="col-3">{{ u.time|timesince}}</div>
+                  </a>
+                {% endfor %}
+              {% else %}
+                <li class="list-group-item list-group-item-light d-flex">No Recent Users Found.</li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-2 border-bottom"></div>
+
+        <!-- Common User View for their Own Requests-->
+        {% else %}
           <!-- Progress Bar -->
           <div class="progress m-2">
             <!-- Accepted -->
@@ -114,6 +166,7 @@
           </div>
         {% endif %}
 
+        <h5>Recent Requests</h5>
         <!-- Define Tabs -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">

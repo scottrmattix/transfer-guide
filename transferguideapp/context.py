@@ -194,6 +194,44 @@ def context_view_requests(context, user, session):
         context["accepted_pct"] = 0
         context["rejected_pct"] = 0
 
+
+def context_profile_page(context, user, session, profile):
+    # set name
+    context['name'] = f"{profile.first_name} {profile.last_name}"
+
+    # control which elements are visible for admins vs. common users
+    context["isAdmin"] = True if (user.groups.filter(name='admins').exists()) else False
+
+    # set which tab is active
+    if "request_tab" not in session:
+        session["request_tab"] = "pending"
+    context["pending_tab"] = "show active" if (session["request_tab"] == "pending") else ""
+    context["accepted_tab"] = "show active" if (session["request_tab"] == "accepted") else ""
+    context["rejected_tab"] = "show active" if (session["request_tab"] == "rejected") else ""
+    context["all_tab"] = "show active" if (session["request_tab"] == "all") else ""
+
+    # annotate transfer requests with relevant attributes
+    requests = TransferRequest.objects.filter(user=profile).annotate(
+        color=Case(When(Q(condition=TransferRequest.pending), then=Value('light')),
+                   When(Q(condition=TransferRequest.accepted), then=Value('success')),
+                   When(Q(condition=TransferRequest.rejected), then=Value('danger')),
+                   output_field=CharField()),
+        btn=Case(When(Q(condition=TransferRequest.pending), then=Value('outline-dark')),
+                 When(Q(condition=TransferRequest.accepted), then=Value('outline-success')),
+                 When(Q(condition=TransferRequest.rejected), then=Value('outline-danger')),
+                 output_field=CharField()),
+
+        visibility=Case(When(Q(condition=TransferRequest.pending), then=Value("none")),
+                        When(~Q(condition=TransferRequest.pending), then=Value("block")),
+                        output_field=CharField()),
+    )
+
+    # filter which transfer requests are under each tab
+    context["all"] = requests.order_by('-created_at')
+    context["pending"] = requests.filter(condition=TransferRequest.pending).order_by('-created_at')
+    context["accepted"] = requests.filter(condition=TransferRequest.accepted).order_by('-updated_at')
+    context["rejected"] = requests.filter(condition=TransferRequest.rejected).order_by('-updated_at')
+
 ########################################################################################
 
 
