@@ -27,10 +27,11 @@
           <!-- List Course Attributes -->
           <h3>Course Attributes</h3>
           <ul>
-            <li>College: {{ course.college_name }} {{ foreign }}</li>
-            <li>Mnemonic: {{ course.mnemonic }}</li>
-            <li>Number: {{ course.course_number }}</li>
-            <li>Title: {{ course.course_name }}</li>
+            <li><b>College</b>: {{ course.college_name }} {{ foreign }}</li>
+            <li><b>Mnemonic</b>: {{ course.mnemonic }}</li>
+            <li><b>Number</b>: {{ course.course_number }}</li>
+            <li><b>Title</b>: {{ course.course_name }}</li>
+            {% if credits %}<li><b>Credits</b>: {{ credits }}</li>{% endif %}
           </ul>
 
           <!-- Search Similar Course Button -->
@@ -50,6 +51,18 @@
           {% if course.get_model == "internalcourse" %}
           <a class="btn btn-primary" href="{% url 'courseRequest' course.pk %}" role="button">Make Request</a>
           {% endif %}
+
+          <!-- Add to Shopping Cart-->
+          <form action="{% url 'cart_add' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="courseID" name="courseID" value="{{ course.id }}">
+            <input type="hidden" id="model" name="model" value="{{ course.get_model }}">
+            {% if disabled %}
+              <button type="submit" class="btn btn-primary" disabled>Added to Cart</button>
+            {% else %}
+              <button type="submit" class="btn btn-primary">Add to Cart</button>
+            {% endif %}
+          </form>
 
         {% endif %}
       </div>

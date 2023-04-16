@@ -10,10 +10,10 @@ from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
 from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests, context_profile_page
-from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper, sis_lookup_helper
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper, sis_lookup_helper, sc_request_helper
 from django.contrib import messages
 from helpermethods import course_title_format
-from django.db.models import CharField, Value, Max, Count
+from django.db.models import CharField, Value, Max, Count, Sum
 from django.db.models.functions import Concat
 from shoppingcart import ShoppingCart
 
@@ -32,7 +32,7 @@ def cart_TR(request):
     ic = InternalCourse.objects.get(id = ic_id)
     ec = ExternalCourse.objects.get(id = ec_id)
 
-    
+
     ct, created = CourseTransfer.objects.get_or_create(external_course = ec, internal_course = ic)
     if created:
         ct.save()
@@ -48,7 +48,7 @@ def add_to_cart(request):
     if 'college' in request.POST:
         college = request.POST['college']
     else:
-       college = 'University of Virginia' 
+       college = 'University of Virginia'
 
     course_id = request.POST['item_id']
 
@@ -67,7 +67,49 @@ def add_to_cart(request):
         'cart': cart
     }
 
-    return render(request, 'search.html', context=context)
+    return render(request, 'index.html', context=context)
+
+
+def sc_request(request):
+    if request.method == "POST":
+        try:
+            url = request.POST["url"]
+            comment = request.POST["comment"]
+            internalID = int(request.session["SC"]["internalID"])
+            externalID = int(request.session["SC"]["externalID"])
+            user = request.user
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.WARNING, message)
+        else:
+            redirect, type, message = sc_request_helper(user, internalID, externalID, url, comment)
+            if message:
+                messages.add_message(request, type, message)
+            return redirect
+    return HttpResponseRedirect(reverse('courseSearch'))
+
+def cart_add(request):
+    cartURL = reverse("courseSearch")
+    if request.method == "POST":
+        try:
+            url = request.META.get('HTTP_REFERER')
+            model = request.POST["model"]
+            courseID = int(request.POST["courseID"])
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.WARNING, message)
+        else:
+            SC = request.session["SC"] if ("SC" in request.session) else {"internalID": -1, "externalID": -1}
+            if model == "internalcourse":
+                SC["internalID"] = courseID
+            else:
+                SC["externalID"] = courseID
+            request.session["SC"] = SC
+            message = f"Course successfully added to <a href='{cartURL}' class='alert-link'>shopping cart</a>."
+            messages.add_message(request, messages.SUCCESS, message)
+            return redirect(url)
+    return HttpResponseRedirect(cartURL)
+
 
 
 def favorite_request(request, favorite_id):
@@ -166,6 +208,14 @@ class CourseSearch(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['colleges'] = ExternalCollege.objects.values_list('college_name', flat=True).order_by('college_name')
+        if "SC" in self.request.session:
+            internalID = self.request.session["SC"]["internalID"]
+            externalID = self.request.session["SC"]["externalID"]
+            context['cart_internal'] = InternalCourse.objects.filter(id=internalID).first()
+            context['cart_external'] = ExternalCourse.objects.filter(id=externalID).first()
+        else:
+            context['cart_internal'] = InternalCourse.objects.none()
+            context['cart_external'] = ExternalCourse.objects.none()
         return context
 
 class UpdateInternal(generic.DetailView):
@@ -234,7 +284,7 @@ def submit_update(request):
             if message:
                 messages.add_message(request, type, message)
             return redirect
-    return render(request, 'index.html')
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 # a session error arises when .../search/ is visited without calling submit_search beforehand
 # to bypass the issue, first visit .../search/clear/.
@@ -254,7 +304,7 @@ def submit_search(request):
             request.session["search"]["mnemonic"] = mnemonic.upper()
             request.session["search"]["number"] = number.upper()
             request.session["search"]["name"] = name
-            
+
     return HttpResponseRedirect(reverse('courseSearch'))
 
 def handle_transfer_request(request):
@@ -327,10 +377,9 @@ def submit_transfer_request(request):
 
 def favorites(request):
     f = Favorites.objects.filter(user=request.user).order_by('-created_at')
-    # f is the entire query set, to access individual fields do:
-    # f[0].in_course.course_name, f[0].ex_course.course_id, etc
-
-    return render(request, 'favorites2.html', {'favorites': f})
+    total = f.aggregate(total=Sum('transfer__internal_course__credits', filter=Q(transfer__internal_course__credits__gte=0)))['total']
+    total = 0 if (total is None) else total
+    return render(request, 'favorites2.html', {'favorites': f, 'total': total})
 
 #not super sure if this is the best way to do it. need to test on the real database
 def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_course_mnemonic=None, ex_course_number=None):
@@ -357,7 +406,7 @@ def update_favorites(request):
         else:
             request.session["course_tab"] = tab
             return update_favorites_helper(user, pid, sid, type)
-    return render(request, 'index.html')
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 
 class CourseRequest(generic.DetailView):
@@ -401,7 +450,7 @@ def make_request(request):
             if message:
                 messages.add_message(request, type, message)
             return redirect
-    return render(request, 'index.html')
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 
 def delete_favorite(request, favorite_id):
@@ -488,4 +537,4 @@ def sis_lookup(request):
             if message:
                 messages.add_message(request, type, message)
             return redirect
-    return render(request, 'index.html')
+    return HttpResponseRedirect(reverse('courseSearch'))
