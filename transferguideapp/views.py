@@ -377,8 +377,8 @@ def submit_transfer_request(request):
 
 def favorites(request):
     f = Favorites.objects.filter(user=request.user).order_by('-created_at')
-    total = f.aggregate(total=Sum('transfer__internal_course__credits', filter=Q(transfer__internal_course__credits__gte=0)))['total']
-    total = 0 if (total is None) else total
+    total = f.aggregate(total=Sum('transfer__internal_course__credits'))['total']
+
     return render(request, 'favorites2.html', {'favorites': f, 'total': total})
 
 #not super sure if this is the best way to do it. need to test on the real database
