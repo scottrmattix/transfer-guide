@@ -9,10 +9,12 @@ from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTrans
 from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
-from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests
+from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests, context_profile_page
 from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper, sis_lookup_helper
 from django.contrib import messages
 from helpermethods import course_title_format
+from django.db.models import CharField, Value, Max, Count
+from django.db.models.functions import Concat
 
 def favorite_request(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
@@ -57,17 +59,22 @@ def set_group(request, user_id):
     return redirect('home')
 
 class ProfilePage(generic.DetailView):
-    template_name = "profilePage.html"
+    template_name = "handleRequests.html"
     model = User
     slug_field = "username"
     slug_url_kwarg = "username"
     context_object_name = "profile"
 
     def get(self, request, *args, **kwargs):
-        if request.user == self.get_object() or request.user.groups.filter(name='admins').exists():
+        if request.user.groups.filter(name='admins').exists():
             return super(ProfilePage, self).get(request, *args, **kwargs)
         else:
-            return render(request, 'index.html')
+            return HttpResponseRedirect(reverse('handleRequests'))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context_profile_page(context, self.request.user, self.request.session, self.object)
+        return context
 
 class InternalCoursePage(generic.DetailView):
     template_name = 'course.html'
@@ -349,7 +356,13 @@ def delete_favorite(request, favorite_id):
 
 class HandleRequests(generic.ListView):
     template_name = 'handleRequests.html'
-    queryset = TransferRequest.objects.none()
+    context_object_name = 'user_list'
+    queryset = User.objects\
+        .filter(transferrequest__condition=TransferRequest.pending)\
+        .annotate(name=Concat('first_name', Value(' '), 'last_name', output_field=CharField()),
+                  time=Max('transferrequest__created_at'),
+                  count=Count('transferrequest'))\
+        .order_by('-time')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -364,13 +377,14 @@ def accept_request(request):
             requestID = request.POST["requestID"]
             adminResponse = request.POST["adminResponse"]
             tab = request.POST["tab"]
+            url = request.META.get('HTTP_REFERER')
         except Exception as e:
             message = f"An error occurred: {e}"
             messages.add_message(request, messages.WARNING, message)
         else:
             request.session["request_tab"] = tab
-            redirect = handle_request_helper(requestID, adminResponse, accepted=True)
-            return redirect
+            handle_request_helper(requestID, adminResponse, accepted=True)
+            return redirect(url)
     return HttpResponseRedirect(reverse('handleRequests'))
 
 def reject_request(request):
@@ -380,13 +394,14 @@ def reject_request(request):
             requestID = request.POST["requestID"]
             adminResponse = request.POST["adminResponse"]
             tab = request.POST["tab"]
+            url = request.META.get('HTTP_REFERER')
         except Exception as e:
             message = f"An error occurred: {e}"
             messages.add_message(request, messages.WARNING, message)
         else:
             request.session["request_tab"] = tab
-            redirect = handle_request_helper(requestID, adminResponse, accepted=False)
-            return redirect
+            handle_request_helper(requestID, adminResponse, accepted=False)
+            return redirect(url)
     return HttpResponseRedirect(reverse('handleRequests'))
 
 def delete_request(request):
@@ -395,12 +410,14 @@ def delete_request(request):
         try:
             requestID = request.POST["requestID"]
             tab = request.POST["tab"]
+            url = request.META.get('HTTP_REFERER')
         except Exception as e:
             message = f"An error occurred: {e}"
             messages.add_message(request, messages.WARNING, message)
         else:
             request.session["request_tab"] = tab
             TransferRequest.objects.filter(id=requestID).delete()
+            return redirect(url)
     return HttpResponseRedirect(reverse('handleRequests'))
 
 def sis_lookup(request):
