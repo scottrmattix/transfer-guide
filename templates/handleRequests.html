@@ -116,9 +116,9 @@
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-2 border-bottom"></div>
           <h5>User Profile</h5>
           <ul>
-            <li>Name: {% if name %}{{ name }}{% else %}Unknown{% endif %}</li>
-            <li>Username: {{ profile.username }}</li>
-            <li>Email: {{ profile.email }}</li>
+            <li><b>Name</b>: {% if name.strip %}{{ name }}{% else %}<i>Unknown</i>{% endif %}</li>
+            <li><b>Username</b>: {{ profile.username }}</li>
+            <li><b>Email</b>: {{ profile.email }}</li>
           </ul>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-2 border-bottom"></div>
 
@@ -203,7 +203,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="pending" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user_last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="pending" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user.last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -221,7 +221,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="accepted" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user_last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="accepted" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user.last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -239,7 +239,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="rejected" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user_last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="rejected" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user.last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -257,7 +257,7 @@
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
                       <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
-                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="all" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user_last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
+                      <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="all" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user.last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
                   {% endfor %}
                 {% else %}
