@@ -36,12 +36,22 @@
     }
 </style>
 <script>
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if(isDarkMode) {
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
+    }
+    else{
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+    }
+    
     invertTheme = function(){
         theme = document.documentElement.getAttribute('data-bs-theme');
         if(theme == 'dark'){
+            localStorage.setItem('darkMode', 'false');
             document.documentElement.setAttribute('data-bs-theme', 'light');
         }
         else{
+            localStorage.setItem('darkMode', 'true');
             document.documentElement.setAttribute('data-bs-theme', 'dark');
         }
     }
