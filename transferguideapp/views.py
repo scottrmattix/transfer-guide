@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
 from django.urls import reverse
 from django.shortcuts import redirect, render, get_object_or_404
@@ -5,7 +6,7 @@ from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.contrib.auth.models import Group, User
 from django.views import generic
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
-from .models import ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites, TransferRequest
+from .models import AdminKey, ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites, TransferRequest
 from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
@@ -16,6 +17,7 @@ from helpermethods import course_title_format
 from django.db.models import CharField, Value, Max, Count, Sum, IntegerField
 from django.db.models.functions import Concat, Cast
 from shoppingcart import ShoppingCart
+from django.contrib.auth.hashers import make_password
 
 def cart_TR(request):
     # comment = request.POST['comment']
@@ -134,6 +136,17 @@ def add_external_college(request):
             ExternalCollege(college_name=college_name, domestic_college=domestic_college).save()
         return HttpResponseRedirect('/course/update')
 
+def admin_upgrade(request):
+    if(request.method == 'POST'):
+        key = request.POST['key']
+        if(AdminKey.objects.filter(key=make_password(key,'idkthisissomething')).exists()):
+            admin_group = Group.objects.get(name='admins')
+            request.user.groups.clear()
+            request.user.groups.add(admin_group)
+            return render(request, 'account_info.html', {'user': request.user, 'permissions':"Admin"})
+        else:
+            return render(request, 'account_info.html', {'user': request.user,'permissions':"User"})
+    return redirect('home')
 
 def account_info(request):
     user = request.user
@@ -537,3 +550,4 @@ def sis_lookup(request):
                 messages.add_message(request, type, message)
             return redirect
     return HttpResponseRedirect(reverse('submit_search'))
+

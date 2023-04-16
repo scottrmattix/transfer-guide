@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'transfer-guide.herokuapp.com', 'testserver']
 
-# storing session data in the database for shopping cart 
+# storing session data in the database for shopping cart
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -87,15 +87,14 @@ WSGI_APPLICATION = 'transferguide.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+"""
 
 DATABASES = {
     'default': {
@@ -107,7 +106,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
 
 
 #DATABASES = {}

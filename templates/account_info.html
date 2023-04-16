@@ -32,9 +32,11 @@
 </table>
 
 {% if permissions != "Admin" %}
-    <button onClick="" class="btn btn-light mt-5 ">
-        Request Permission Change
-    </button>
+		<form action="{% url 'admin_upgrade' %}" method="post" class="form">
+			{% csrf_token %}
+      <input type="text" name="key" id="key"></br>
+			<input type="submit" value="Save", name="admin_upgrade" class="btn btn-light mt-5">
+		</form>
 {% else %}
 {% endif %}
 
