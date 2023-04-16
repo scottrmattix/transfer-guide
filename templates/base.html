@@ -62,9 +62,6 @@
                 {% endif %}
             </ul>
             <div class="d-flex">
-                <button class="me-3 btn btn-outline-dark" onclick="invertTheme()">
-                    Invert Theme
-                </button>
                 <div class="dropdown">
                     <button class="me-3 btn border border-dark" id="profile-dropdown" data-bs-toggle="dropdown">
                         <a class="nav-link d-flex flex-row align-items-center mx-0 dropdown-toggle">
@@ -92,12 +89,12 @@
                     <div class="dropdown-menu dropdown-menu-end">
                         {% if user.groups.all.0.name == 'users' %}
                             <a class="dropdown-item" href="{% url 'account_info' %}"> Account Information </a>
-                            <a class="dropdown-item" href="#"> Pending Requests </a>
                             <a class="dropdown-item" href="{% url 'favorites' %}"> Favorites </a>
+                            <button class="dropdown-item" onclick="invertTheme()"> Toggle Theme </button>
                         {% else %}
                             <a class="dropdown-item" href="{% url 'account_info' %}"> Account Information </a>
-                            <a class="dropdown-item" href="#"> Resolved Requests </a>
                             <a class="dropdown-item" href="{% url 'favorites' %}"> Favorites </a>
+                            <button class="dropdown-item" onclick="invertTheme()"> Toggle Theme </button>
                         {% endif %}
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'logout' %}"> Log Out </a>
