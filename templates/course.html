@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Course Page</title>
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column">
     {# Load the tag library #}
     {% extends "base.html" %}
     {% load bootstrap5 %}
@@ -19,7 +19,7 @@
 
     {% block content %}
     <content>
-      <div class="container-fluid p-5" align="left">
+      <div class="container-fluid px-5" align="left">
         {% if course %} <h6>{{ course.college_name }} | {{ course }}</h6>
 
         {% include "messages.html" with messages=messages%}
@@ -72,7 +72,7 @@
       <p>Specific: {{ equivalents_specific }}</p>
       -->
 
-      <div class="container-fluid px-5" align="left">
+      <div class="container-fluid px-5 pt-4" align="left">
 
         <!-- Setup Course Equivalency Header (this probably needs to be redone) -->
         {% if course %}<h6>{{ course.college_name }} | {{ course }}</h6>{% endif %}
