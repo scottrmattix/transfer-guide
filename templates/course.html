@@ -41,11 +41,11 @@
             <input type="hidden" id="mnemonic" name="mnemonic" value="{{ course.mnemonic }}">
             <input type="hidden" id="number" name="number" value="">
             <input type="hidden" id="name" name="name" value="">
-            <button type="submit" class="btn btn-primary">Search Similar Courses</button>
+            <button type="submit" class="btn btn-primary mb-2">Search Similar Courses</button>
           </form>
 
           <!-- Edit Course Button -->
-          <a class="btn btn-primary" href="{% url course.get_model|add:'Update' course.pk %}" role="button">Edit Course</a>
+          <a class="btn btn-primary me-1" href="{% url course.get_model|add:'Update' course.pk %}" role="button">Edit Course</a>
 
           <!-- Make Request Button -->
           {% if course.get_model == "internalcourse" %}
@@ -53,7 +53,7 @@
           {% endif %}
 
           <!-- Add to Shopping Cart-->
-          <form action="{% url 'cart_add' %}" method="post">
+          <form action="{% url 'cart_add' %}" method="post" class="mt-2">
             {% csrf_token %}
             <input type="hidden" id="courseID" name="courseID" value="{{ course.id }}">
             <input type="hidden" id="model" name="model" value="{{ course.get_model }}">
@@ -72,7 +72,7 @@
       <p>Specific: {{ equivalents_specific }}</p>
       -->
 
-      <div class="container-fluid p-5" align="left">
+      <div class="container-fluid px-5" align="left">
 
         <!-- Setup Course Equivalency Header (this probably needs to be redone) -->
         {% if course %}<h6>{{ course.college_name }} | {{ course }}</h6>{% endif %}
