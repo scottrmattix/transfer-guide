@@ -76,7 +76,7 @@
             var created = $(this).data('created');
             var updated = $(this).data('updated');
             var username = $(this).data('username');
-            var userURL = "profile/" + username;
+            var userURL = "{% url 'handleRequests' %}/" + username;
             var name = $(this).data('name');
             name = name.trim() === "" ? username : name;
 

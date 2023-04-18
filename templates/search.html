@@ -104,8 +104,10 @@
       <div class="container-fluid px-5 py-2" align="left">
         {% if request.session.SC %}
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom"></div>
-          <h5>Shopping Cart</h5>
-          <div class="card">
+          <h5><a class="text-decoration-none link-secondary" data-bs-toggle="collapse" href="#collapseBox" role="button" aria-expanded="false" aria-controls="collapseBox">
+            Shopping Cart ›
+          </a></h5>
+          <div class="card collapse {{ cart }}" id="collapseBox">
             <div class="card-header d-flex">
               <div class="col-3">College</div>
               <div class="col-2">Mnemonic</div>

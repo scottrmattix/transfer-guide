@@ -87,6 +87,8 @@ def sc_request(request):
             redirect, type, message = sc_request_helper(user, internalID, externalID, url, comment)
             if message:
                 messages.add_message(request, type, message)
+                if type == messages.SUCCESS:
+                    request.session["SC"] = {"internalID": -1, "externalID": -1}
             return redirect
     return HttpResponseRedirect(reverse('submit_search'))
 
@@ -226,9 +228,11 @@ class CourseSearch(generic.ListView):
             externalID = self.request.session["SC"]["externalID"]
             context['cart_internal'] = InternalCourse.objects.filter(id=internalID).first()
             context['cart_external'] = ExternalCourse.objects.filter(id=externalID).first()
+            context['cart'] = "show" if (context['cart_internal'] or context['cart_external']) else ""
         else:
             context['cart_internal'] = InternalCourse.objects.none()
             context['cart_external'] = ExternalCourse.objects.none()
+            context['cart'] = ""
         return context
 
 class UpdateInternal(generic.DetailView):

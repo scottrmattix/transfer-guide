@@ -13,6 +13,7 @@ from django.db.models.functions import Concat
 ########################################################################################
 
 def context_course(context, course, request):
+    context['isAdmin'] = True if (request.user.groups.filter(name='admins').exists()) else False
     context['foreign'] = set_foreign(course)
     context['credits'] = set_credits(course)
     context["disabled"] = set_disabled(course, request.session)
