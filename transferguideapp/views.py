@@ -394,7 +394,7 @@ def submit_transfer_request(request):
 
 def favorites(request):
     f = Favorites.objects.filter(user=request.user).order_by('-created_at')
-    total = f.aggregate(total=Sum(Cast('transfer__internal_course__credits', IntegerField())))['total']
+    total = f.values_list('transfer__internal_course', flat=True).distinct().aggregate(total=Sum(Cast('transfer__internal_course__credits', IntegerField())))['total']
     return render(request, 'favorites2.html', {'favorites': f, 'total': total})
 
 #not super sure if this is the best way to do it. need to test on the real database
@@ -478,11 +478,11 @@ class HandleRequests(generic.ListView):
     template_name = 'handleRequests.html'
     context_object_name = 'user_list'
     queryset = User.objects\
-        .filter(transferrequest__condition=TransferRequest.pending)\
+        .filter(transferrequest__isnull=False)\
         .annotate(name=Concat('first_name', Value(' '), 'last_name', output_field=CharField()),
                   time=Max('transferrequest__created_at'),
                   count=Count('transferrequest'))\
-        .order_by('-time')
+        .order_by('-time')[:10] # limit at 10
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
