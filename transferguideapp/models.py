@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from helpermethods import course_title_format
+from django.contrib.auth.hashers import make_password
 
 # Model representing an external University that may or may not be accepted
 class ExternalCollege(models.Model):
@@ -182,3 +183,10 @@ class TransferRequest(TimeStampMixin):
     def __str__(self):
         return f"{self.condition} | {self.user} | {self.transfer}"
 
+class AdminKey(models.Model):
+    key = models.CharField(max_length=256)
+
+    def save(self,*args, **kwargs):
+        some_salt = 'idkthisissomething'
+        self.key = make_password(self.key, some_salt)
+        super().save(*args, **kwargs)

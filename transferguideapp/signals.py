@@ -1,7 +1,7 @@
 from allauth.socialaccount.models import providers
 from allauth.socialaccount.providers.google.provider import GoogleProvider
 from django.dispatch import receiver
-from .models import Notification, CourseTransfer, TransferRequest
+from .models import AdminKey, Notification, CourseTransfer, TransferRequest
 
 def hook_save(sender, **kwargs):
     instance = kwargs['instance']
@@ -40,3 +40,5 @@ def populate_models(sender, **kwargs):
         sa.sites.add(Site.objects.get(name='localhost:8000'))
         sa.sites.add(Site.objects.get(name='transfer-guide.herokuapp.com'))
         sa.save()
+    if(AdminKey.objects.all().count() == 0):
+        AdminKey.objects.update_or_create(key = "admin")
