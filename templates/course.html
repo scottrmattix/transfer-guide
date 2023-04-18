@@ -55,44 +55,37 @@
           <div class="col-4 my-auto">
             <!-- Search Similar Course Button -->
             <div>
-              <form action="{% url 'submit_search' %}" method="post">
+              <form method="post">
                 {% csrf_token %}
+                <!-- Fields for Search Similar Courses-->
                 <input type="hidden" id="college" name="college" value="{{ course.college_name }}">
                 <input type="hidden" id="mnemonic" name="mnemonic" value="{{ course.mnemonic }}">
                 <input type="hidden" id="number" name="number" value="">
                 <input type="hidden" id="name" name="name" value="">
-                <button type="submit" class="btn btn-outline-primary w-100">Search Similar Courses</button>
+                <!-- Fields for Add to Cart -->
+                <input type="hidden" id="courseID" name="courseID" value="{{ course.id }}">
+                <input type="hidden" id="model" name="model" value="{{ course.get_model }}">
+
+                <!-- Search Similar Courses-->
+                <button formaction="{% url 'submit_search' %}" type="submit" class="btn btn-outline-primary w-100 my-1">Search Similar Courses</button>
+                {% if isAdmin %}
+                  <!-- Edit Course -->
+                  <a href="{% url course.get_model|add:'Update' course.pk %}" type="submit" class="btn btn-outline-primary w-100 my-1">Edit Course</a>
+                {% else %}
+                  {% if course.get_model == "internalcourse" %}
+                  <!-- Make Request-->
+                  <a href="{% url 'courseRequest' course.pk %}" type="submit" class="btn btn-outline-primary w-100 my-1">Make Request</a>
+                  {% endif %}
+                  {% if disabled %}
+                    <!-- Added to Cart (Disabled) -->
+                    <button formaction="{% url 'cart_add' %}" type="submit" class="btn btn-outline-secondary w-100 my-1" disabled>Added to Cart</button>
+                  {% else %}
+                    <!-- Add to Cart (Enabled)-->
+                    <button formaction="{% url 'cart_add' %}" type="submit" class="btn btn-outline-primary w-100 my-1">Add to Cart</button>
+                  {% endif %}
+                {% endif %}
               </form>
             </div>
-
-            <!-- Edit Course Button -->
-            {% if isAdmin %}
-              <div>
-                <a class="btn btn-outline-primary d-block my-2" href="{% url course.get_model|add:'Update' course.pk %}" role="button">Edit Course</a>
-              </div>
-            {% else %}
-              <!-- Make Request Button -->
-              {% if course.get_model == "internalcourse" %}
-                <div>
-                  <a class="btn btn-outline-primary d-block my-2" href="{% url 'courseRequest' course.pk %}" role="button">Make Request</a>
-              </div>
-              {% endif %}
-
-              <!-- Add to Shopping Cart-->
-              <div>
-                <form action="{% url 'cart_add' %}" method="post">
-                  {% csrf_token %}
-                  <input type="hidden" id="courseID" name="courseID" value="{{ course.id }}">
-                  <input type="hidden" id="model" name="model" value="{{ course.get_model }}">
-                  {% if disabled %}
-                    <button type="submit" class="btn btn-outline-secondary w-100" disabled>Added to Cart</button>
-                  {% else %}
-                    <button type="submit" class="btn btn-outline-primary w-100">Add to Cart</button>
-                  {% endif %}
-                </form>
-              </div>
-            {% endif %}
-
           </div>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom"></div>
         </div>
