@@ -7,18 +7,21 @@ from django.db.models import Q
 # mnemonic number, and name.
 
 def search(session):
-    inputCollege = session["search"]["college"]
-    inputMnemonic = session["search"]["mnemonic"]
-    inputNumber = session["search"]["number"]
-    inputName = session["search"]["name"]
+    if "search" in session:
+        inputCollege = session["search"]["college"]
+        inputMnemonic = session["search"]["mnemonic"]
+        inputNumber = session["search"]["number"]
+        inputName = session["search"]["name"]
 
-    q1, courses, college = filterCollege(inputCollege)
-    q2 = filterMnemonic(inputMnemonic)
-    q3 = filterNumber(inputNumber)
-    q4 = filterName(inputName)
+        q1, courses, college = filterCollege(inputCollege)
+        q2 = filterMnemonic(inputMnemonic)
+        q3 = filterNumber(inputNumber)
+        q4 = filterName(inputName)
 
-    set_user_college(session, college)
-    return courses, q1 & q2 & q3 & q4
+        set_user_college(session, college)
+        return courses, q1 & q2 & q3 & q4
+    else:
+        return InternalCourse.objects.none(), Q()
 
 
 def set_user_college(session, college):

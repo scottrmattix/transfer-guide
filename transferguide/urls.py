@@ -29,8 +29,6 @@ urlpatterns = [
     path('set_group/<int:user_id>', set_group , name='set_group'),
     path('account_info/', account_info , name='account_info'),
 
-    path('profile/<str:username>', ProfilePage.as_view(), name='profilePage'), # WARNING: hardcoded in handleRequests.html modal
-
     path('search/', CourseSearch.as_view(), name='courseSearch'),
     path('search/clear/', submit_search, name='submit_search'), # this is for error handling
     path('search/lookup/', sis_lookup, name="sis_lookup"),
@@ -55,6 +53,7 @@ urlpatterns = [
     path('handle_request/accept', accept_request, name='accept_request'),
     path('handle_request/reject', reject_request, name='reject_request'),
     path('handle_request/delete', delete_request, name='delete_request'),
+    path('handle_request/<str:username>', ProfilePage.as_view(), name='profilePage'), # WARNING: hardcoded in handleRequests.html modal
 
     path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),
     path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),

@@ -19,52 +19,81 @@
 
     {% block content %}
     <content>
-      <div class="container-fluid p-5" align="left">
-        {% if course %} <h6>{{ course.college_name }} | {{ course }}</h6>
-
+      <div class="container-fluid px-5 pb-4" align="left">
+        <a href="{% url 'courseSearch' %}" class="link-primary text-decoration-none">← Back to Search</a>
+        <div class="text-center">
+          <h3><span class="text-muted">{{ course.college_name }} |</span> <i>{{ course }}</i></h3>
+        </div>
+      </div>
+      <div class="container-fluid px-5" align="center">
         {% include "messages.html" with messages=messages%}
 
+        <div class="row justify-content-around">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom"></div>
+          <div class="col-4 my-auto"><h5>Course Attributes</h5></div>
+          <div class="col-4 my-auto"><h5>Actions</h5></div>
+        </div>
+
+        <div class="row justify-content-around">
+
           <!-- List Course Attributes -->
-          <h3>Course Attributes</h3>
-          <ul>
-            <li><b>College</b>: {{ course.college_name }} {{ foreign }}</li>
-            <li><b>Mnemonic</b>: {{ course.mnemonic }}</li>
-            <li><b>Number</b>: {{ course.course_number }}</li>
-            <li><b>Title</b>: {{ course.course_name }}</li>
-            {% if credits %}<li><b>Credits</b>: {{ credits }}</li>{% endif %}
-          </ul>
+          <div class="col-4 my-auto">
+            <table class="table table-borderless">
+              <tbody>
+                <tr><th>College:</th><td>{{ course.college_name }} {{ foreign }}</td></tr>
+                <tr><th>Mnemonic:</th><td>{{ course.mnemonic }}</td></tr>
+                <tr><th>Number:</th><td>{{ course.course_number }}</td></tr>
+                <tr><th>Title:</th><td>{{ course.course_name }}</td></tr>
+                {% if credits %}<tr><th>Credits:</th><td>{{ credits }}</td></tr>{% endif %}
+              </tbody>
+            </table>
+          </div>
 
-          <!-- Search Similar Course Button -->
-          <form action="{% url 'submit_search' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" id="college" name="college" value="{{ course.college_name }}">
-            <input type="hidden" id="mnemonic" name="mnemonic" value="{{ course.mnemonic }}">
-            <input type="hidden" id="number" name="number" value="">
-            <input type="hidden" id="name" name="name" value="">
-            <button type="submit" class="btn btn-primary">Search Similar Courses</button>
-          </form>
 
-          <!-- Edit Course Button -->
-          <a class="btn btn-primary" href="{% url course.get_model|add:'Update' course.pk %}" role="button">Edit Course</a>
+          <div class="col-4 my-auto">
+            <!-- Search Similar Course Button -->
+            <div>
+              <form action="{% url 'submit_search' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" id="college" name="college" value="{{ course.college_name }}">
+                <input type="hidden" id="mnemonic" name="mnemonic" value="{{ course.mnemonic }}">
+                <input type="hidden" id="number" name="number" value="">
+                <input type="hidden" id="name" name="name" value="">
+                <button type="submit" class="btn btn-outline-primary w-100">Search Similar Courses</button>
+              </form>
+            </div>
 
-          <!-- Make Request Button -->
-          {% if course.get_model == "internalcourse" %}
-          <a class="btn btn-primary" href="{% url 'courseRequest' course.pk %}" role="button">Make Request</a>
-          {% endif %}
-
-          <!-- Add to Shopping Cart-->
-          <form action="{% url 'cart_add' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" id="courseID" name="courseID" value="{{ course.id }}">
-            <input type="hidden" id="model" name="model" value="{{ course.get_model }}">
-            {% if disabled %}
-              <button type="submit" class="btn btn-primary" disabled>Added to Cart</button>
+            <!-- Edit Course Button -->
+            {% if isAdmin %}
+              <div>
+                <a class="btn btn-outline-primary d-block my-2" href="{% url course.get_model|add:'Update' course.pk %}" role="button">Edit Course</a>
+              </div>
             {% else %}
-              <button type="submit" class="btn btn-primary">Add to Cart</button>
-            {% endif %}
-          </form>
+              <!-- Make Request Button -->
+              {% if course.get_model == "internalcourse" %}
+                <div>
+                  <a class="btn btn-outline-primary d-block my-2" href="{% url 'courseRequest' course.pk %}" role="button">Make Request</a>
+              </div>
+              {% endif %}
 
-        {% endif %}
+              <!-- Add to Shopping Cart-->
+              <div>
+                <form action="{% url 'cart_add' %}" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" id="courseID" name="courseID" value="{{ course.id }}">
+                  <input type="hidden" id="model" name="model" value="{{ course.get_model }}">
+                  {% if disabled %}
+                    <button type="submit" class="btn btn-outline-secondary w-100" disabled>Added to Cart</button>
+                  {% else %}
+                    <button type="submit" class="btn btn-outline-primary w-100">Add to Cart</button>
+                  {% endif %}
+                </form>
+              </div>
+            {% endif %}
+
+          </div>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom"></div>
+        </div>
       </div>
 
       <!--For Testing Purposes Only
@@ -72,11 +101,10 @@
       <p>Specific: {{ equivalents_specific }}</p>
       -->
 
-      <div class="container-fluid p-5" align="left">
-
-        <!-- Setup Course Equivalency Header (this probably needs to be redone) -->
-        {% if course %}<h6>{{ course.college_name }} | {{ course }}</h6>{% endif %}
-        <h3>Course Equivalencies</h3>
+      <div class="container-fluid px-5 pt-4" align="left">
+        <div class="text-center">
+          <h5>Course Equivalencies</h5>
+        </div>
 
         <!-- Define Tabs -->
         {% if tab %}
