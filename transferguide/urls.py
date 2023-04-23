@@ -18,7 +18,7 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
 
-from transferguideapp.views import admin_upgrade, favorite_request, add_external_college, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, add_to_cart, cart_TR, cart_add, sc_request
+from transferguideapp.views import admin_upgrade, favorite_request, add_external_college, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, add_to_cart, cart_TR, cart_add, sc_request, auto_accept
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -53,6 +53,7 @@ urlpatterns = [
     path('handle_request/accept', accept_request, name='accept_request'),
     path('handle_request/reject', reject_request, name='reject_request'),
     path('handle_request/delete', delete_request, name='delete_request'),
+    path('handle_request/auto', auto_accept, name='auto_accept'),
     path('handle_request/<str:username>', ProfilePage.as_view(), name='profilePage'), # WARNING: hardcoded in handleRequests.html modal
 
     path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),

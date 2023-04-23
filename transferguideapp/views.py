@@ -555,3 +555,11 @@ def sis_lookup(request):
             return redirect
     return HttpResponseRedirect(reverse('submit_search'))
 
+
+def auto_accept(request):
+    requests = TransferRequest.objects.filter(user=request.user, condition=TransferRequest.pending)
+    for r in requests:
+        response = "Your transfer request has been accepted by the auto-accept bot."
+        handle_request_helper(r.id, response, accepted=True)
+    return HttpResponseRedirect(reverse('handleRequests'))
+
