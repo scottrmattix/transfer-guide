@@ -48,7 +48,7 @@
                 {% csrf_token %}
                 <input type="hidden" id="transfer" name="transfer" value="{{ ct.pk }}">
                 <input type="hidden" id="type" name="type" value="internal">
-                <button type="submit" class="btn btn-primary">Favorite</button>
+                <button type="submit" class="btn">Favorite</button>
               </form>
               {% endif %}
             {% endfor %}
