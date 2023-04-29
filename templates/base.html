@@ -43,7 +43,7 @@
     else{
         document.documentElement.setAttribute('data-bs-theme', 'light');
     }
-    
+
     invertTheme = function(){
         theme = document.documentElement.getAttribute('data-bs-theme');
         if(theme == 'dark'){
@@ -93,6 +93,7 @@
                             {% for note in user.notification_set.all %}
                             <a class="dropdown-item"> Type: {{ note.notification }} </br> Subject: {{ note.subject }}</a>
                             {% endfor %}
+                            <a class="dropdown-item" href="{% url 'handle_notifications' %}"><b>View and Dismiss</b></a>
                         {% endif %}
                     </div>
                 </div>
