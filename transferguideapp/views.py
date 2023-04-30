@@ -288,6 +288,7 @@ def submit_update(request):
             number = request.POST["number"]
             name = request.POST["name"]
             courseID = request.POST["id"]
+            credits = request.POST["credits"]
         except Exception as e:
             message = f"An error occurred: {e}"
             messages.add_message(request, messages.WARNING, message)
@@ -296,8 +297,9 @@ def submit_update(request):
             mnemonic = mnemonic.upper()
             number = number.upper()
             courseID = int(courseID) if courseID else -1
+            credits = int(credits) if credits else -1
 
-            redirect, type, message = update_course_helper(collegeID, mnemonic, number, name, courseID)
+            redirect, type, message = update_course_helper(collegeID, mnemonic, number, name, courseID, credits)
             if message:
                 messages.add_message(request, type, message)
             return redirect

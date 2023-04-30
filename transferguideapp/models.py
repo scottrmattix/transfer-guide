@@ -27,6 +27,7 @@ class ExternalCourse(models.Model):
     mnemonic = models.CharField(max_length=20)
     course_number = models.CharField(max_length=20)
     course_name = models.CharField(max_length=200)
+    admin = models.BooleanField(default=True)
 
     # Feel free to change this for testing purposes
     def __str__(self):

@@ -101,6 +101,19 @@
             <div class="form-text">Try full names or key terms.</div>
           </div>
 
+          <!-- Input Course Credits (Internal Course Add/Update) -->
+          {% if credits %}
+            <div class="form-outline">
+              <label for="internal-credits" class="form-label">Credits</label>
+              <input type="number" min="0" max="6" id="internal-credits" name="credits" class="form-control" value="{{ course.credits }}"/>
+              <div class="form-text">Only considered for UVA courses.</div>
+            </div>
+          {% else %}
+            <div class="form-outline">
+              <input type="hidden" id="external-credits" name="credits" class="form-control" value=""/>
+            </div>
+          {% endif %}
+
           <!-- Input Course Link (Transfer Request) -->
           {% if link %}
             <div class="form-outline">
