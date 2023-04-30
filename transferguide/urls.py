@@ -21,7 +21,7 @@ from django.contrib.auth.views import LogoutView
 from transferguideapp.views import admin_upgrade, add_college, handle_notifications, set_group, account_info, favorites, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, cart_add, sc_request, auto_accept
 
 # Out of Date Views ???
-# from transferguideapp.views import favorite_request, submit_transfer_request, add_favorite, delete_favorite, add_to_cart, cart_TR
+from transferguideapp.views import favorite_request, submit_transfer_request, add_favorite, delete_favorite, add_to_cart, cart_TR
 
 urlpatterns = [
     # Login / Logout / Account Info
@@ -69,11 +69,11 @@ urlpatterns = [
     path('handle_request/<str:username>', ProfilePage.as_view(), name='profilePage'), # WARNING: hardcoded
 
     # Out of Date Views ???
-    # path('request/', submit_transfer_request, name='request'),
-    # path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),
-    # path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),
-    # path('favorites/<int:favorite_id>/', favorite_request, name='favorite_request'),
-    # path('add_to_cart/', add_to_cart, name='add_to_cart'),
-    # path('add_to_cart/submit', cart_TR, name='cart_TR'),
+    path('request/', submit_transfer_request, name='request'),
+    path('add_favorite/<str:in_course_mnemonic>/<str:in_course_number>/<str:ex_course_mnemonic>/<str:ex_course_number>/', add_favorite, name='add_favorite'),
+    path('favorites/delete/<int:favorite_id>/', delete_favorite, name='delete_favorite'),
+    path('favorites/<int:favorite_id>/', favorite_request, name='favorite_request'),
+    path('add_to_cart/', add_to_cart, name='add_to_cart'),
+    path('add_to_cart/submit', cart_TR, name='cart_TR'),
 
     ]

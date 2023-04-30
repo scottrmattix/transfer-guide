@@ -22,7 +22,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-"""
 def cart_TR(request):
     # comment = request.POST['comment']
     # ec_mnemonic = request.POST['external_course_mnemonic']
@@ -49,10 +48,8 @@ def cart_TR(request):
         print(tr)
 
     return redirect('/handle_request')
-"""
 
 
-"""
 def add_to_cart(request):
     if 'college' in request.POST:
         college = request.POST['college']
@@ -77,7 +74,6 @@ def add_to_cart(request):
     }
 
     return render(request, 'index.html', context=context)
-"""
 
 
 def sc_request(request):
@@ -124,7 +120,6 @@ def cart_add(request):
     return HttpResponseRedirect(cartURL)
 
 
-"""
 def favorite_request(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
 
@@ -133,7 +128,6 @@ def favorite_request(request, favorite_id):
         tr.save()
 
     return redirect('/handle_request')
-"""
 
 
 def add_college(request):
@@ -334,7 +328,6 @@ def submit_search(request):
     return HttpResponseRedirect(reverse('courseSearch'))
 
 
-"""
 def handle_transfer_request(request):
     transfer_form = TransferRequestForm(request.POST)
     if transfer_form.is_valid():
@@ -368,10 +361,8 @@ def handle_transfer_request(request):
 
 
         return redirect('home')
-"""
 
 
-"""
 def handle_sis_request(request):
     sis_form = SisSearchForm(request.GET)
     transfer_form = TransferRequestForm()
@@ -404,7 +395,6 @@ def submit_transfer_request(request):
         transfer_form = TransferRequestForm()
         sis_form = SisSearchForm()
     return render(request, 'request.html', {'transfer_form' : transfer_form , 'sis_form' : sis_form, 'r' : r})
-"""
 
 
 def favorites(request):
@@ -413,7 +403,6 @@ def favorites(request):
     return render(request, 'favorites2.html', {'favorites': f, 'total': total})
 
 
-"""
 #not super sure if this is the best way to do it. need to test on the real database
 def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_course_mnemonic=None, ex_course_number=None):
     if in_course_mnemonic and in_course_number and ex_course_mnemonic and ex_course_number:
@@ -424,7 +413,6 @@ def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_cou
         return redirect('favorites')
     else:
         raise Http404("Missing course information")
-"""
 
 
 def update_favorites(request):
@@ -483,12 +471,10 @@ def make_request(request):
     return HttpResponseRedirect(reverse('submit_search'))
 
 
-"""
 def delete_favorite(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
     favorite.delete()
     return redirect('favorites')
-"""
 
 
 class HandleRequests(generic.ListView):
