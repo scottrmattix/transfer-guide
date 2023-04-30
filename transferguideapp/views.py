@@ -18,8 +18,17 @@ from django.db.models import CharField, Value, Max, Count, Sum, IntegerField
 from django.db.models.functions import Concat, Cast
 from shoppingcart import ShoppingCart
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+
+def admin_check(user):
+    return user.groups.filter(name='admins').exists()
+
+
+def error_404(request, exception):
+    context = {"message": "404: Page Not Found"}
+    return render(request, "error.html", context)
 
 
 @login_required(login_url="home")
@@ -200,7 +209,7 @@ class ProfilePage(LoginRequiredMixin, generic.DetailView):
     context_object_name = "profile"
 
     def get(self, request, *args, **kwargs):
-        if request.user.groups.filter(name='admins').exists():
+        if admin_check(request.user):
             return super(ProfilePage, self).get(request, *args, **kwargs)
         else:
             return HttpResponseRedirect(reverse('handleRequests'))
@@ -230,6 +239,12 @@ class ExternalCoursePage(LoginRequiredMixin, generic.DetailView):
     template_name = 'course.html'
     model = ExternalCourse
     context_object_name = 'course'
+
+    def get(self, request, *args, **kwargs):
+        if self.get_object().admin or self.get_object().coursetransfer_set.filter(accepted=True).exists():
+            return super(ExternalCoursePage, self).get(request, *args, **kwargs)
+        else:
+            raise Http404()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -267,7 +282,7 @@ class CourseSearch(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class UpdateInternal(LoginRequiredMixin, generic.DetailView):
+class UpdateInternal(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
     login_url = "home"
     redirect_field_name = "redirect_to"
     template_name = 'generalForm.html'
@@ -279,8 +294,14 @@ class UpdateInternal(LoginRequiredMixin, generic.DetailView):
         context_update_internal(context, self.object)
         return context
 
+    def test_func(self):
+        return admin_check(self.request.user)
 
-class UpdateExternal(LoginRequiredMixin, generic.DetailView):
+    def handle_no_permission(self):
+        return redirect("home")
+
+
+class UpdateExternal(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
     login_url = "home"
     redirect_field_name = "redirect_to"
     template_name = 'generalForm.html'
@@ -292,8 +313,14 @@ class UpdateExternal(LoginRequiredMixin, generic.DetailView):
         context_update_external(context, self.object)
         return context
 
+    def test_func(self):
+        return admin_check(self.request.user)
 
-class UpdateCourses(LoginRequiredMixin, generic.ListView):
+    def handle_no_permission(self):
+        return redirect("home")
+
+
+class UpdateCourses(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
     login_url = "home"
     redirect_field_name = "redirect_to"
     template_name = 'generalForm.html'
@@ -304,7 +331,14 @@ class UpdateCourses(LoginRequiredMixin, generic.ListView):
         context_update_course(context)
         return context
 
+    def test_func(self):
+        return admin_check(self.request.user)
 
+    def handle_no_permission(self):
+        return redirect("home")
+
+
+@user_passes_test(admin_check, login_url="home")
 @login_required(login_url="home")
 def submit_update(request):
     if request.method == "POST":
@@ -530,7 +564,12 @@ class HandleRequests(LoginRequiredMixin, generic.ListView):
         context_view_requests(context, self.request.user, self.request.session)
         return context
 
+@login_required(login_url="home")
+def refresh_request(request):
+    request.session["request_tab"] = "pending"
+    return HttpResponseRedirect(reverse('handleRequests'))
 
+@user_passes_test(admin_check, login_url="home")
 @login_required(login_url="home")
 def accept_request(request):
     request.session["request_tab"] = "pending"
@@ -550,6 +589,7 @@ def accept_request(request):
     return HttpResponseRedirect(reverse('handleRequests'))
 
 
+@user_passes_test(admin_check, login_url="home")
 @login_required(login_url="home")
 def reject_request(request):
     request.session["request_tab"] = "pending"
@@ -569,6 +609,7 @@ def reject_request(request):
     return HttpResponseRedirect(reverse('handleRequests'))
 
 
+@user_passes_test(admin_check, login_url="home")
 @login_required(login_url="home")
 def delete_request(request):
     request.session["request_tab"] = "pending"

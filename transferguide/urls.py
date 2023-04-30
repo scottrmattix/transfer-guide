@@ -17,8 +17,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
+from django.conf.urls import handler404, handler500, handler403, handler400
 
-from transferguideapp.views import admin_upgrade, add_college, handle_notifications, set_group, account_info, favorites, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, cart_add, sc_request, auto_accept
+from transferguideapp.views import admin_upgrade, add_college, handle_notifications, set_group, account_info, favorites, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, cart_add, sc_request, auto_accept, refresh_request, error_404
 
 # Out of Date Views ???
 from transferguideapp.views import favorite_request, submit_transfer_request, add_favorite, delete_favorite, add_to_cart, cart_TR
@@ -62,6 +63,7 @@ urlpatterns = [
 
     # Handle Requests
     path('handle_request', HandleRequests.as_view(), name='handleRequests'),
+    path('handle_request/refresh', refresh_request, name='refresh_request'),
     path('handle_request/accept', accept_request, name='accept_request'),
     path('handle_request/reject', reject_request, name='reject_request'),
     path('handle_request/delete', delete_request, name='delete_request'),
@@ -77,3 +79,6 @@ urlpatterns = [
     path('add_to_cart/submit', cart_TR, name='cart_TR'),
 
     ]
+
+# handling the 404 error
+handler404 = error_404
