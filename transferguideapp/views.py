@@ -22,6 +22,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
+@login_required(login_url="home")
 def cart_TR(request):
     # comment = request.POST['comment']
     # ec_mnemonic = request.POST['external_course_mnemonic']
@@ -50,6 +51,7 @@ def cart_TR(request):
     return redirect('/handle_request')
 
 
+@login_required(login_url="home")
 def add_to_cart(request):
     if 'college' in request.POST:
         college = request.POST['college']
@@ -76,6 +78,7 @@ def add_to_cart(request):
     return render(request, 'index.html', context=context)
 
 
+@login_required(login_url="home")
 def sc_request(request):
     if request.method == "POST":
         try:
@@ -97,6 +100,7 @@ def sc_request(request):
     return HttpResponseRedirect(reverse('submit_search'))
 
 
+@login_required(login_url="home")
 def cart_add(request):
     cartURL = reverse("submit_search")
     if request.method == "POST":
@@ -120,6 +124,7 @@ def cart_add(request):
     return HttpResponseRedirect(cartURL)
 
 
+@login_required(login_url="home")
 def favorite_request(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
 
@@ -130,6 +135,7 @@ def favorite_request(request, favorite_id):
     return redirect('/handle_request')
 
 
+@login_required(login_url="home")
 def add_college(request):
     if request.method == "POST":
         try:
@@ -147,6 +153,7 @@ def add_college(request):
     return HttpResponseRedirect(reverse('courseSearch'))
 
 
+@login_required(login_url="home")
 def admin_upgrade(request):
     if(request.method == 'POST'):
         key = request.POST['key']
@@ -160,6 +167,7 @@ def admin_upgrade(request):
     return redirect('home')
 
 
+@login_required(login_url="home")
 def account_info(request):
     user = request.user
     permissions = "User"
@@ -171,6 +179,7 @@ def account_info(request):
         return redirect('home')
 
 
+@login_required(login_url="home")
 def set_group(request, user_id):
     if(request.method == 'POST'):
         group = request.POST.get('usertype', None)
@@ -181,7 +190,9 @@ def set_group(request, user_id):
     return redirect('home')
 
 
-class ProfilePage(generic.DetailView):
+class ProfilePage(LoginRequiredMixin, generic.DetailView):
+    login_url = "home"
+    redirect_field_name = "redirect_to"
     template_name = "handleRequests.html"
     model = User
     slug_field = "username"
@@ -200,7 +211,9 @@ class ProfilePage(generic.DetailView):
         return context
 
 
-class InternalCoursePage(generic.DetailView):
+class InternalCoursePage(LoginRequiredMixin, generic.DetailView):
+    login_url = "home"
+    redirect_field_name = "redirect_to"
     template_name = 'course.html'
     model = InternalCourse
     context_object_name = 'course'
@@ -211,7 +224,9 @@ class InternalCoursePage(generic.DetailView):
         return context
 
 
-class ExternalCoursePage(generic.DetailView):
+class ExternalCoursePage(LoginRequiredMixin, generic.DetailView):
+    login_url = "home"
+    redirect_field_name = "redirect_to"
     template_name = 'course.html'
     model = ExternalCourse
     context_object_name = 'course'
@@ -222,7 +237,9 @@ class ExternalCoursePage(generic.DetailView):
         return context
 
 
-class CourseSearch(generic.ListView):
+class CourseSearch(LoginRequiredMixin, generic.ListView):
+    login_url = "home"
+    redirect_field_name = "redirect_to"
     template_name = 'search.html'
     model = InternalCourse
     context_object_name = 'course_list'
@@ -250,7 +267,9 @@ class CourseSearch(generic.ListView):
         return context
 
 
-class UpdateInternal(generic.DetailView):
+class UpdateInternal(LoginRequiredMixin, generic.DetailView):
+    login_url = "home"
+    redirect_field_name = "redirect_to"
     template_name = 'generalForm.html'
     model = InternalCourse
     # context_object_name = 'course'
@@ -261,7 +280,9 @@ class UpdateInternal(generic.DetailView):
         return context
 
 
-class UpdateExternal(generic.DetailView):
+class UpdateExternal(LoginRequiredMixin, generic.DetailView):
+    login_url = "home"
+    redirect_field_name = "redirect_to"
     template_name = 'generalForm.html'
     model = ExternalCourse
     # context_object_name = 'course'
@@ -272,7 +293,9 @@ class UpdateExternal(generic.DetailView):
         return context
 
 
-class UpdateCourses(generic.ListView):
+class UpdateCourses(LoginRequiredMixin, generic.ListView):
+    login_url = "home"
+    redirect_field_name = "redirect_to"
     template_name = 'generalForm.html'
     queryset = InternalCourse.objects.none()
 
@@ -282,6 +305,7 @@ class UpdateCourses(generic.ListView):
         return context
 
 
+@login_required(login_url="home")
 def submit_update(request):
     if request.method == "POST":
         try:
@@ -308,6 +332,7 @@ def submit_update(request):
     return HttpResponseRedirect(reverse('submit_search'))
 
 
+@login_required(login_url="home")
 def submit_search(request):
     request.session["search"] = {"college": "", "mnemonic": "", "number": "", "name": ""}
     if request.method == "POST":
@@ -328,6 +353,7 @@ def submit_search(request):
     return HttpResponseRedirect(reverse('courseSearch'))
 
 
+@login_required(login_url="home")
 def handle_transfer_request(request):
     transfer_form = TransferRequestForm(request.POST)
     if transfer_form.is_valid():
@@ -363,6 +389,7 @@ def handle_transfer_request(request):
         return redirect('home')
 
 
+@login_required(login_url="home")
 def handle_sis_request(request):
     sis_form = SisSearchForm(request.GET)
     transfer_form = TransferRequestForm()
@@ -379,6 +406,8 @@ def handle_sis_request(request):
         r = unique_id(request_data(query))
     return render(request, 'request.html', {'transfer_form' : transfer_form , 'sis_form' : sis_form, 'r' : r})
 
+
+@login_required(login_url="home")
 def submit_transfer_request(request):
     r = [{}]
     if request.method == "POST":
@@ -397,6 +426,7 @@ def submit_transfer_request(request):
     return render(request, 'request.html', {'transfer_form' : transfer_form , 'sis_form' : sis_form, 'r' : r})
 
 
+@login_required(login_url="home")
 def favorites(request):
     f = Favorites.objects.filter(user=request.user).order_by('-created_at')
     total = f.values_list('transfer__internal_course', flat=True).distinct().aggregate(total=Sum(Cast('transfer__internal_course__credits', IntegerField())))['total']
@@ -404,6 +434,7 @@ def favorites(request):
 
 
 #not super sure if this is the best way to do it. need to test on the real database
+@login_required(login_url="home")
 def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_course_mnemonic=None, ex_course_number=None):
     if in_course_mnemonic and in_course_number and ex_course_mnemonic and ex_course_number:
         in_course = get_object_or_404(InternalCourse, mnemonic=in_course_mnemonic, course_number=in_course_number)
@@ -415,6 +446,7 @@ def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_cou
         raise Http404("Missing course information")
 
 
+@login_required(login_url="home")
 def update_favorites(request):
     if request.method == "POST":
         try:
@@ -432,7 +464,9 @@ def update_favorites(request):
     return HttpResponseRedirect(reverse('submit_search'))
 
 
-class CourseRequest(generic.DetailView):
+class CourseRequest(LoginRequiredMixin, generic.DetailView):
+    login_url = "home"
+    redirect_field_name = "redirect_to"
     model = InternalCourse
     template_name = "generalForm.html"
     # context_object_name = "course"
@@ -443,6 +477,7 @@ class CourseRequest(generic.DetailView):
         return context
 
 
+@login_required(login_url="home")
 def make_request(request):
     if request.method == "POST":
         try:
@@ -471,13 +506,16 @@ def make_request(request):
     return HttpResponseRedirect(reverse('submit_search'))
 
 
+@login_required(login_url="home")
 def delete_favorite(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
     favorite.delete()
     return redirect('favorites')
 
 
-class HandleRequests(generic.ListView):
+class HandleRequests(LoginRequiredMixin, generic.ListView):
+    login_url = "home"
+    redirect_field_name = "redirect_to"
     template_name = 'handleRequests.html'
     context_object_name = 'user_list'
     queryset = User.objects\
@@ -493,6 +531,7 @@ class HandleRequests(generic.ListView):
         return context
 
 
+@login_required(login_url="home")
 def accept_request(request):
     request.session["request_tab"] = "pending"
     if request.method == "POST":
@@ -511,6 +550,7 @@ def accept_request(request):
     return HttpResponseRedirect(reverse('handleRequests'))
 
 
+@login_required(login_url="home")
 def reject_request(request):
     request.session["request_tab"] = "pending"
     if request.method == "POST":
@@ -529,6 +569,7 @@ def reject_request(request):
     return HttpResponseRedirect(reverse('handleRequests'))
 
 
+@login_required(login_url="home")
 def delete_request(request):
     request.session["request_tab"] = "pending"
     if request.method == "POST":
@@ -546,6 +587,7 @@ def delete_request(request):
     return HttpResponseRedirect(reverse('handleRequests'))
 
 
+@login_required(login_url="home")
 def sis_lookup(request):
     if request.method == "POST":
         try:
@@ -562,6 +604,7 @@ def sis_lookup(request):
     return HttpResponseRedirect(reverse('submit_search'))
 
 
+@login_required(login_url="home")
 def auto_accept(request):
     requests = TransferRequest.objects.filter(user=request.user, condition=TransferRequest.pending)
     for r in requests:
@@ -569,6 +612,8 @@ def auto_accept(request):
         handle_request_helper(r.id, response, accepted=True)
     return HttpResponseRedirect(reverse('handleRequests'))
 
+
+@login_required(login_url="home")
 def handle_notifications(request):
     user = request.user;
     Notification.objects.filter(user = user).delete();
