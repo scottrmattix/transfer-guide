@@ -18,7 +18,11 @@ from django.db.models import CharField, Value, Max, Count, Sum, IntegerField
 from django.db.models.functions import Concat, Cast
 from shoppingcart import ShoppingCart
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
+
+"""
 def cart_TR(request):
     # comment = request.POST['comment']
     # ec_mnemonic = request.POST['external_course_mnemonic']
@@ -45,7 +49,10 @@ def cart_TR(request):
         print(tr)
 
     return redirect('/handle_request')
+"""
 
+
+"""
 def add_to_cart(request):
     if 'college' in request.POST:
         college = request.POST['college']
@@ -70,6 +77,7 @@ def add_to_cart(request):
     }
 
     return render(request, 'index.html', context=context)
+"""
 
 
 def sc_request(request):
@@ -91,6 +99,7 @@ def sc_request(request):
                     request.session["SC"] = {"internalID": -1, "externalID": -1}
             return redirect
     return HttpResponseRedirect(reverse('submit_search'))
+
 
 def cart_add(request):
     cartURL = reverse("submit_search")
@@ -115,7 +124,7 @@ def cart_add(request):
     return HttpResponseRedirect(cartURL)
 
 
-
+"""
 def favorite_request(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
 
@@ -124,6 +133,7 @@ def favorite_request(request, favorite_id):
         tr.save()
 
     return redirect('/handle_request')
+"""
 
 
 def add_college(request):
@@ -142,6 +152,7 @@ def add_college(request):
             return redirect(url)
     return HttpResponseRedirect(reverse('courseSearch'))
 
+
 def admin_upgrade(request):
     if(request.method == 'POST'):
         key = request.POST['key']
@@ -154,6 +165,7 @@ def admin_upgrade(request):
             return render(request, 'account_info.html', {'user': request.user,'permissions':"User"})
     return redirect('home')
 
+
 def account_info(request):
     user = request.user
     permissions = "User"
@@ -164,6 +176,7 @@ def account_info(request):
     else:
         return redirect('home')
 
+
 def set_group(request, user_id):
     if(request.method == 'POST'):
         group = request.POST.get('usertype', None)
@@ -172,6 +185,7 @@ def set_group(request, user_id):
         user.groups.add(g)
         user.save()
     return redirect('home')
+
 
 class ProfilePage(generic.DetailView):
     template_name = "handleRequests.html"
@@ -190,6 +204,7 @@ class ProfilePage(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context_profile_page(context, self.request.user, self.request.session, self.object)
         return context
+
 
 class InternalCoursePage(generic.DetailView):
     template_name = 'course.html'
@@ -211,6 +226,7 @@ class ExternalCoursePage(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context_course(context, self.object, self.request)
         return context
+
 
 class CourseSearch(generic.ListView):
     template_name = 'search.html'
@@ -239,6 +255,7 @@ class CourseSearch(generic.ListView):
             context['cart'] = ""
         return context
 
+
 class UpdateInternal(generic.DetailView):
     template_name = 'generalForm.html'
     model = InternalCourse
@@ -246,12 +263,9 @@ class UpdateInternal(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['colleges'] = ExternalCollege.objects.order_by('college_name')
-        # context['collegeID'] = ""
-        # context['college'] = "University of Virginia"
-        # context['action'] = 'submit_update'
         context_update_internal(context, self.object)
         return context
+
 
 class UpdateExternal(generic.DetailView):
     template_name = 'generalForm.html'
@@ -260,11 +274,6 @@ class UpdateExternal(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # q = Q(id=self.object.college.id)
-        # context['colleges'] = ExternalCollege.objects.filter(~q).order_by('college_name')
-        # context['collegeID'] = self.object.college.id
-        # context['college'] = self.object.college.college_name
-        # context['action'] = 'submit_update'
         context_update_external(context, self.object)
         return context
 
@@ -273,16 +282,11 @@ class UpdateCourses(generic.ListView):
     template_name = 'generalForm.html'
     queryset = InternalCourse.objects.none()
 
-    # def get_queryset(self):
-    #     return ExternalCollege.objects.order_by('college_name')
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['collegeID'] = ""
-        # context['college'] = "University of Virginia"
-        # context['action'] = 'submit_update'
         context_update_course(context)
         return context
+
 
 def submit_update(request):
     if request.method == "POST":
@@ -309,8 +313,7 @@ def submit_update(request):
             return redirect
     return HttpResponseRedirect(reverse('submit_search'))
 
-# a session error arises when .../search/ is visited without calling submit_search beforehand
-# to bypass the issue, first visit .../search/clear/.
+
 def submit_search(request):
     request.session["search"] = {"college": "", "mnemonic": "", "number": "", "name": ""}
     if request.method == "POST":
@@ -330,6 +333,8 @@ def submit_search(request):
 
     return HttpResponseRedirect(reverse('courseSearch'))
 
+
+"""
 def handle_transfer_request(request):
     transfer_form = TransferRequestForm(request.POST)
     if transfer_form.is_valid():
@@ -363,7 +368,10 @@ def handle_transfer_request(request):
 
 
         return redirect('home')
+"""
 
+
+"""
 def handle_sis_request(request):
     sis_form = SisSearchForm(request.GET)
     transfer_form = TransferRequestForm()
@@ -396,6 +404,7 @@ def submit_transfer_request(request):
         transfer_form = TransferRequestForm()
         sis_form = SisSearchForm()
     return render(request, 'request.html', {'transfer_form' : transfer_form , 'sis_form' : sis_form, 'r' : r})
+"""
 
 
 def favorites(request):
@@ -403,6 +412,8 @@ def favorites(request):
     total = f.values_list('transfer__internal_course', flat=True).distinct().aggregate(total=Sum(Cast('transfer__internal_course__credits', IntegerField())))['total']
     return render(request, 'favorites2.html', {'favorites': f, 'total': total})
 
+
+"""
 #not super sure if this is the best way to do it. need to test on the real database
 def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_course_mnemonic=None, ex_course_number=None):
     if in_course_mnemonic and in_course_number and ex_course_mnemonic and ex_course_number:
@@ -413,6 +424,8 @@ def add_favorite(request, in_course_mnemonic=None, in_course_number=None, ex_cou
         return redirect('favorites')
     else:
         raise Http404("Missing course information")
+"""
+
 
 def update_favorites(request):
     if request.method == "POST":
@@ -438,14 +451,9 @@ class CourseRequest(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # q = Q(id=self.request.session['user_college_id'])
-        # context['colleges'] = ExternalCollege.objects.filter(~q).order_by(
-        #     'college_name')
-        # context['collegeID'] = self.request.session['user_college_id']
-        # context['college'] = self.request.session['user_college']
-        # context['action'] = 'make_request'
         context_course_request(context, self.object, self.request.session)
         return context
+
 
 def make_request(request):
     if request.method == "POST":
@@ -475,10 +483,13 @@ def make_request(request):
     return HttpResponseRedirect(reverse('submit_search'))
 
 
+"""
 def delete_favorite(request, favorite_id):
     favorite = get_object_or_404(Favorites, id=favorite_id, user=request.user)
     favorite.delete()
     return redirect('favorites')
+"""
+
 
 class HandleRequests(generic.ListView):
     template_name = 'handleRequests.html'
@@ -513,6 +524,7 @@ def accept_request(request):
             return redirect(url)
     return HttpResponseRedirect(reverse('handleRequests'))
 
+
 def reject_request(request):
     request.session["request_tab"] = "pending"
     if request.method == "POST":
@@ -530,6 +542,7 @@ def reject_request(request):
             return redirect(url)
     return HttpResponseRedirect(reverse('handleRequests'))
 
+
 def delete_request(request):
     request.session["request_tab"] = "pending"
     if request.method == "POST":
@@ -545,6 +558,7 @@ def delete_request(request):
             TransferRequest.objects.filter(id=requestID).delete()
             return redirect(url)
     return HttpResponseRedirect(reverse('handleRequests'))
+
 
 def sis_lookup(request):
     if request.method == "POST":
