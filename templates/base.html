@@ -43,7 +43,7 @@
     else{
         document.documentElement.setAttribute('data-bs-theme', 'light');
     }
-    
+
     invertTheme = function(){
         theme = document.documentElement.getAttribute('data-bs-theme');
         if(theme == 'dark'){
@@ -67,12 +67,12 @@
                 <ul class="navbar-nav">
                     {% if user.groups.all.0.name == 'users' %}
                         <a href="{% url 'submit_search' %}" class="nav-link left pt-2 mx-3"> Home </a>
-                        <a href="{% url 'request' %}" class="nav-link pt-2 mx-3"> Request Form </a>
+                        <!-- <a href="{% url 'request' %}" class="nav-link pt-2 mx-3"> Request Form </a> -->
                         <a href="{% url 'accept_request' %}" class="nav-link pt-2 mx-3"> View Requests </a>
-                        <a href="#" class="nav-link pt-2 mx-3"> Help </a>
+                        <!-- <a href="#" class="nav-link pt-2 mx-3"> Help </a> -->
                     {% else %}
                         <a href="{% url 'submit_search' %}" class="nav-link pt-2 mx-3"> Home </a>
-                        <a href="#" class="nav-link pt-2 mx-3"> Resolve Help Requests </a>
+                        <!-- <a href="#" class="nav-link pt-2 mx-3"> Resolve Help Requests </a> -->
                         <a href="{% url 'updateCourses' %}" class="nav-link pt-2 mx-3"> Add Course </a>
                         <a href="{% url 'accept_request' %}" class="nav-link pt-2 mx-3"> View Requests </a>
                     {% endif %}
@@ -93,6 +93,7 @@
                             {% for note in user.notification_set.all %}
                             <a class="dropdown-item"> Type: {{ note.notification }} </br> Subject: {{ note.subject }}</a>
                             {% endfor %}
+                            <a class="dropdown-item" href="{% url 'handle_notifications' %}"><b>View and Dismiss</b></a>
                         {% endif %}
                     </div>
                 </div>
