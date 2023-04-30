@@ -93,10 +93,10 @@ def set_disabled(course, session):
 ########################################################################################
 
 # define context for CourseRequest view
-def context_course_request(context, course, request):
-    if "user_college" in request.session:
-        collegeID = request.session["user_college_id"]
-        college = request.session["user_college"]
+def context_course_request(context, course, session):
+    if "user_college" in session:
+        collegeID = session["user_college_id"]
+        college = session["user_college"]
         q = Q(id=collegeID)
     else:
         collegeID = ""

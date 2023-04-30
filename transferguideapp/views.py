@@ -11,7 +11,7 @@ from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
 from .context import context_course, context_course_request, context_update_internal, context_update_external, context_update_course, context_view_requests, context_profile_page
-from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper, sis_lookup_helper, sc_request_helper
+from .viewhelper import update_favorites_helper, update_course_helper, request_course_helper, handle_request_helper, sis_lookup_helper, sc_request_helper, add_college_helper
 from django.contrib import messages
 from helpermethods import course_title_format
 from django.db.models import CharField, Value, Max, Count, Sum, IntegerField
@@ -126,17 +126,21 @@ def favorite_request(request, favorite_id):
     return redirect('/handle_request')
 
 
-def add_external_college(request):
-
-    if(request.method == 'POST'):
-        college_name = request.POST['college']
-        domestic_college = True
-        if request.POST.get('domestic') == 'off':
-            domestic_college = False
-        normalized_name = course_title_format(college_name)
-        if not ExternalCollege.objects.filter(college_name=normalized_name, domestic_college=domestic_college).exists():
-            ExternalCollege(college_name=college_name, domestic_college=domestic_college).save()
-        return HttpResponseRedirect('/course/update')
+def add_college(request):
+    if request.method == "POST":
+        try:
+            url = request.META.get('HTTP_REFERER')
+            name = request.POST['college']
+            domestic = True if "domestic" in request.POST else False
+        except Exception as e:
+            message = f"An error occurred: {e}"
+            messages.add_message(request, messages.WARNING, message)
+        else:
+            type, message = add_college_helper(name, domestic, request.session)
+            if message:
+                messages.add_message(request, type, message)
+            return redirect(url)
+    return HttpResponseRedirect(reverse('courseSearch'))
 
 def admin_upgrade(request):
     if(request.method == 'POST'):
@@ -440,7 +444,7 @@ class CourseRequest(generic.DetailView):
         # context['collegeID'] = self.request.session['user_college_id']
         # context['college'] = self.request.session['user_college']
         # context['action'] = 'make_request'
-        context_course_request(context, self.object, self.request)
+        context_course_request(context, self.object, self.request.session)
         return context
 
 def make_request(request):

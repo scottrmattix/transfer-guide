@@ -6,6 +6,7 @@ import re
 from django.utils import timezone
 from django.urls import reverse
 from .sis import request_data, unique_id
+from helpermethods import course_title_format
 # helper methods for views
 
 def update_favorites_helper(user, pid, sid, type):
@@ -235,3 +236,26 @@ def sis_lookup_helper(sisMnemonic, sisNumber):
             message = f"Your <a href='{courseURL}' class='alert-link'>course</a> was successfully added to the database."
             return redirect("submit_search"), messages.SUCCESS, message
 
+
+def add_college_helper(name, domestic, session):
+    aliases = ["uva", "university of virginia", "the university of virginia"]
+    name = course_title_format(name)
+    if not name:
+        message = "No fields may be left empty"
+        return messages.ERROR, message
+    elif name.lower() in aliases:
+        message = "The college you entered already exists"
+        return messages.INFO, message
+
+    existing = ExternalCollege.objects.filter(college_name=name).first()
+    if existing:
+        message = "The college you entered already exists"
+        session["user_college_id"] = existing.id
+        session["user_college"] = existing.college_name
+        return messages.INFO, message
+    else:
+        college = ExternalCollege.objects.create(college_name=name, domestic_college=domestic)
+        message = "College successfully created."
+        session["user_college_id"] = college.id
+        session["user_college"] = college.college_name
+        return messages.SUCCESS, message

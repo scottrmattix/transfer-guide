@@ -17,8 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
-
-from transferguideapp.views import admin_upgrade, favorite_request, add_external_college, handle_notifications, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, add_to_cart, cart_TR, cart_add, sc_request, auto_accept
+from transferguideapp.views import admin_upgrade, favorite_request, add_college, handle_notifications, set_group, submit_transfer_request, account_info, favorites, add_favorite, delete_favorite, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, add_to_cart, cart_TR, cart_add, sc_request, auto_accept
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,7 +39,7 @@ urlpatterns = [
     path('external/<int:pk>/update', UpdateExternal.as_view(), name='externalcourseUpdate'),
     path('course/update/', UpdateCourses.as_view(), name='updateCourses'),
     path('course/update/submit', submit_update, name='submit_update'),
-    path('course/update/add_external_college', add_external_college, name = 'add_external_college'),
+    path('course/update/add_college', add_college, name= 'add_college'),
     path('course/shop/', cart_add, name='cart_add'),
 
     path('favorites/', favorites, name='favorites'),

@@ -31,15 +31,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
 
-              <form method = "POST" action ="{% url 'add_external_college' %}">
+              <form method = "POST" action ="{% url 'add_college' %}">
                 {% csrf_token %}
                 <div class="modal-body">
                   <div class="form-group mb-2">
-                    <label for="college">Name</label>
-                    <input type="text" class="form-control" name = 'college' id="college" placeholder="University of Virginia">
+                    <label for="college">College Name</label>
+                    <input type="text" class="form-control" name="college" id="college" placeholder="University of Virginia" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)">
+                    <div class="form-text">Enter full names only. No acronyms.</div>
                   </div>
                   <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name = "domestic" id="domestic">
+                    <input type="checkbox" checked class="form-check-input" name="domestic" id="domestic">
                     <label class="form-check-label" for="domestic">Domestic</label>
                   </div>
                 </div>
@@ -73,7 +74,11 @@
                 {% endfor %}
               </select>
               <div class="input-group-append">
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCollege">Add</button>
+                {%if course.get_model == "internalcourse"%}
+                  <button type="button" disabled class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addCollege">Add</button>
+                {% else %}
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCollege">Add</button>
+                {% endif %}
               </div>
             </div>
             <div class="form-text">Defaults to UVA.</div>
