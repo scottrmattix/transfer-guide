@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.contrib.auth.models import Group, User
 from django.views import generic
 from transferguideapp.forms import SisSearchForm, TransferRequestForm
-from .models import AdminKey, ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites, TransferRequest
+from .models import AdminKey, ExternalCourse, InternalCourse, ExternalCollege, CourseTransfer, Favorites, Notification, TransferRequest
 from .sis import request_data, unique_id
 from django.db.models import Q
 from .searchfilters import search
@@ -583,3 +583,7 @@ def auto_accept(request):
         handle_request_helper(r.id, response, accepted=True)
     return HttpResponseRedirect(reverse('handleRequests'))
 
+def handle_notifications(request):
+    user = request.user;
+    Notification.objects.filter(user = user).delete();
+    return HttpResponseRedirect(reverse('handleRequests'))

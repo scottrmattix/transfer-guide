@@ -18,10 +18,10 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
 
-from transferguideapp.views import admin_upgrade, add_college, set_group, account_info, favorites, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, cart_add, sc_request, auto_accept
+from transferguideapp.views import admin_upgrade, add_college, handle_notifications, set_group, account_info, favorites, update_favorites, CourseSearch, submit_search, InternalCoursePage, ExternalCoursePage, UpdateInternal, UpdateExternal, UpdateCourses, submit_update, make_request, CourseRequest, HandleRequests, accept_request, reject_request, delete_request, ProfilePage, sis_lookup, cart_add, sc_request, auto_accept
 
 # Out of Date Views ???
-# from transferguideapp.views import favorite_request, delete_favorite, submit_transfer_request, add_favorite, add_to_cart, cart_TR
+# from transferguideapp.views import favorite_request, submit_transfer_request, add_favorite, delete_favorite, add_to_cart, cart_TR
 
 urlpatterns = [
     # Login / Logout / Account Info
@@ -32,6 +32,7 @@ urlpatterns = [
     path('set_group/<int:user_id>', set_group , name='set_group'),
     path('account_info/', account_info , name='account_info'),
     path('admin_upgrade', admin_upgrade , name='admin_upgrade'),
+    path('handle_notifications', handle_notifications, name='handle_notifications'),
 
     # Course Search
     path('search/', CourseSearch.as_view(), name='courseSearch'),
