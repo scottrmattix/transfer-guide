@@ -112,6 +112,7 @@ def context_course_request(context, course, request):
     context['title'] = "Course Transfer Request"
     context['link'] = True
     context['comment'] = True
+    context['credits'] = False
 
 # define context for UpdateInternal view
 def context_update_internal(context, course):
@@ -124,6 +125,7 @@ def context_update_internal(context, course):
     context['title'] = "Edit UVA Course"
     context['link'] = False
     context['comment'] = False
+    context['credits'] = True
 
 # define context for UpdateExternal view
 def context_update_external(context, course):
@@ -137,6 +139,7 @@ def context_update_external(context, course):
     context['title'] = "Edit External Course"
     context['link'] = False
     context['comment'] = False
+    context['credits'] = False
 
 # define context for UpdateCourses view
 def context_update_course(context):
@@ -149,6 +152,7 @@ def context_update_course(context):
     context['title'] = "Add Course"
     context['link'] = False
     context['comment'] = False
+    context['credits'] = True
 
 ########################################################################################
 # Context for ViewRequests view

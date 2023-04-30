@@ -31,7 +31,7 @@ def update_favorites_helper(user, pid, sid, type):
     return response
 
 
-def update_course_helper(collegeID, mnemonic, number, name, courseID):
+def update_course_helper(collegeID, mnemonic, number, name, courseID, credits):
     # Load External Course
     try:
         college = ExternalCollege.objects.get(id=collegeID)
@@ -45,7 +45,7 @@ def update_course_helper(collegeID, mnemonic, number, name, courseID):
     # Load Internal Course
     except ExternalCollege.DoesNotExist:
         courses = InternalCourse.objects
-        vals = {'mnemonic': mnemonic, 'course_number': number, 'course_name': name}
+        vals = {'mnemonic': mnemonic, 'course_number': number, 'course_name': name, 'credits': credits}
         check = Q(mnemonic=mnemonic, course_number=number) & ~Q(id=courseID)
         errorURL = "internalcourseUpdate"
 
@@ -111,7 +111,7 @@ def request_course_helper(user, collegeID, mnemonic, number, name, courseID, url
     try:
         external = ExternalCourse.objects.get(college=college, mnemonic=mnemonic, course_number=number)
     except ExternalCourse.DoesNotExist:
-        external = ExternalCourse.objects.create(college=college, mnemonic=mnemonic, course_number=number, course_name=name)
+        external = ExternalCourse.objects.create(college=college, mnemonic=mnemonic, course_number=number, course_name=name, admin=False)
 
     # Get or Create CourseTransfer
     try:
