@@ -46,6 +46,12 @@
                     <div class="col-4 text-center"><a href="{% url 'externalcourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.external_course }}</a></div>
                     <div class="col-4 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course }}</a></div>
                     <div class="col-1 text-center"><button class="list-group-item list-group-item-danger list-group-item-action h-100 align-items-center">╳</button></div>
+                    <!-- <div class="col-1 text-center">
+                      <button class="list-group-item list-group-item-danger list-group-item-action h-100 align-items-center">
+                        <img width="25px" height="25px" href="#"
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/OOjs_UI_icon_trash_apex.svg/1280px-OOjs_UI_icon_trash_apex.svg.png">
+                      </button>
+                    </div> -->
                   </li>
                 </form>
               {% endfor %}
