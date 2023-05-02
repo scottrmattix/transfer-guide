@@ -10,16 +10,16 @@ A website to assist students transferring into UVA transfer their credits: <http
 5) **Students can see the status of their request**: met by View Requests page (button in header for users)
 
 # Additional Features:
-1) shopping cart 
-    *stores one interal course and one external course
-    *tied to session (clears on logout, browser close, etc)
-    *holds one internal course and one external course
+1) **shopping cart** 
+    * stores one interal course and one external course
+    * tied to session (clears on logout, browser close, etc)
+    * holds one internal course and one external course
     
-2) favorite feature
-    *stores known course transfers
-    *allows user to save for later and view cummulative credits
+2) **favorite feature**
+    * stores known course transfers
+    * allows user to save for later and view cummulative credits
 
-3) Notifications
-4) Upgrade to Admin
-5) Account Information
-6) Toggle Theme
+3) **Notifications**
+4) **Upgrade to Admin**
+5) **Account Information**
+6) **Toggle Theme**
