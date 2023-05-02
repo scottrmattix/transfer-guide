@@ -27,4 +27,4 @@ A website to assist students transferring into UVA transfer their credits: <http
 3) **Notifications**
 4) **Upgrade to Admin**
 5) **Account Information**
-6) **Toggle Theme**
+6) **Toggle Theme** 
