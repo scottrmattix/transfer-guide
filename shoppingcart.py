@@ -5,6 +5,7 @@ from transferguideapp.models import InternalCourse, ExternalCourse
 class ShoppingCart:
     def __init__(self, request):
         self.session = request.session
+        # https://stackoverflow.com/questions/69016487/cart-session-in-django
         cart = self.session.get('cart')
         if not cart:
             cart = self.session['cart'] = [None, None]
