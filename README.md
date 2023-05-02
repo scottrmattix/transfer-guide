@@ -2,7 +2,7 @@
 
 A website to assist students transferring into UVA transfer their credits: <https://transfer-guide.herokuapp.com/>
 
-# Requirements and corresponding features: 
+# Requirements and Corresponding Features: 
 1) **Search course by attributes** 
     * met by search on the Home page
 3) **Submit request to be evaluated by student's advisor**
