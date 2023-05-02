@@ -27,10 +27,10 @@
         {% if favorites %}
           <div class="card">
             <div class="card-header d-flex">
-              <div class="col-3 text-center">College</div>
-              <div class="col-4 text-center">Course</div>
+              <div class="col-3 text-center">External College</div>
+              <div class="col-4 text-center">External Course</div>
               <div class="col-4 text-center">UVA Equivalent</div>
-              <div class="col-1 text-center"></div>
+              <div class="col-1 text-center">Delete</div>
             </div>
             <ul class="list-group">
               {% for f in favorites %}
@@ -45,7 +45,13 @@
                     <div class="col-3 text-center"><a class="list-group-item list-group-item-light disabled h-100">{{ f.transfer.external_course.college_name }}</a></div>
                     <div class="col-4 text-center"><a href="{% url 'externalcourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.external_course }}</a></div>
                     <div class="col-4 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course }}</a></div>
-                    <div class="col-1 text-center"><button class="list-group-item list-group-item-light list-group-item-action h-100 align-items-center">╳</button></div>
+                    <div class="col-1 text-center"><button class="list-group-item list-group-item-danger list-group-item-action h-100 align-items-center">╳</button></div>
+                    <!-- <div class="col-1 text-center">
+                      <button class="list-group-item list-group-item-danger list-group-item-action h-100 align-items-center">
+                        <img width="25px" height="25px" href="#"
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/OOjs_UI_icon_trash_apex.svg/1280px-OOjs_UI_icon_trash_apex.svg.png">
+                      </button>
+                    </div> -->
                   </li>
                 </form>
               {% endfor %}
