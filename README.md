@@ -17,7 +17,7 @@ A website to assist students transferring into UVA transfer their credits: <http
 
 ## Transfer-Guide-Specific Requirements
 1) **Search Course by Attributes**
-    - Locate the "Search Course" on the "Home" page.
+    - Locate the "Course Search" on the "Home" page.
     - It will search UVA courses by default if no external college is provided.
     - To see a course's equivalencies, locate that course in the search results and view the "Course Equivalencies" list on its course page.
 
