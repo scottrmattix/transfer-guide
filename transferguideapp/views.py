@@ -462,7 +462,7 @@ def submit_transfer_request(request):
 
 @login_required(login_url="home")
 def favorites(request):
-    f = Favorites.objects.filter(user=request.user).order_by('-created_at')
+    f = Favorites.objects.filter(user=request.user, transfer__accepted=True).order_by('-created_at')
     total = f.values_list('transfer__internal_course', flat=True).distinct().aggregate(total=Sum(Cast('transfer__internal_course__credits', IntegerField())))['total']
     return render(request, 'favorites2.html', {'favorites': f, 'total': total})
 
