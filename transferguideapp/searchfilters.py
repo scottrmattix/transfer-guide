@@ -43,7 +43,7 @@ def filterCollege(inputCollege):
         courses = InternalCourse.objects.all()
         q = Q()
     else:
-        courses = ExternalCourse.objects.filter(Q(coursetransfer__accepted=True) | Q(admin=True))
+        courses = ExternalCourse.objects.filter(Q(coursetransfer__accepted=True) | Q(admin=True)).distinct()
         q = Q(college=college)
     return q, courses, college
 
