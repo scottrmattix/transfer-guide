@@ -64,7 +64,7 @@
           {% csrf_token %}
 
           <!-- Select College From List -->
-          <div>
+          <div class="m-2">
             <label for="collegeID" class="form-label">College</label>
             <div class="input-group">
               <select class="form-select" id="collegeID" name="collegeID" aria-label=".form-select-sm example" aria-describedby="basic-addon2">
@@ -81,34 +81,34 @@
                 {% endif %}
               </div>
             </div>
-            <div class="form-text">Defaults to UVA.</div>
+            <div class="form-text">Locate an institution in the dropdown, or click "add."</div>
           </div>
 
 
           <!-- Load / Input Course Mnemonic -->
-          <div>
+          <div class="m-2">
             <label for="mnemonic" class="form-label">Mnemonic:</label>
             <input type="text" id="mnemonic" name="mnemonic" maxlength="4" class="form-control" value="{{ course.mnemonic }}" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
             <div class="form-text">Accepts SIS mnemonics only.</div>
           </div>
 
           <!-- Load / Input Course Number -->
-          <div>
+          <div class="m-2">
             <label for="number" class="form-label">Number:</label>
             <input type="text" id="number" name="number" maxlength="4" class="form-control" value="{{ course.course_number }}" onkeydown="return /[a-zA-Z0-9]/i.test(event.key)">
-            <div class="form-text">Enter a full or partial course number.</div>
+            <div class="form-text">Enter the full course number.</div>
           </div>
 
           <!-- Load / Input Course Name -->
-          <div>
+          <div class="m-2">
             <label for="name" class="form-label">Title:</label>
             <input type="text" id="name" name="name" maxlength="200" class="form-control" value="{{ course.course_name }}" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)">
-            <div class="form-text">Try full names or key terms.</div>
+            <div class="form-text">Enter the full course title.</div>
           </div>
 
           <!-- Input Course Credits (Internal Course Add/Update) -->
           {% if credits %}
-            <div class="form-outline">
+            <div class="form-outline m-2">
               <label for="internal-credits" class="form-label">Credits</label>
               <input type="number" min="0" max="6" id="internal-credits" name="credits" class="form-control" value="{{ course.credits }}"/>
               <div class="form-text">Only considered for UVA courses.</div>
@@ -121,7 +121,7 @@
 
           <!-- Input Course Link (Transfer Request) -->
           {% if link %}
-            <div class="form-outline">
+            <div class="form-outline m-2">
               <label for="url" class="form-label">Course Link</label>
               <input type="url" id="url" name="url" maxlength="200" class="form-control" placeholder="https://example.com"/>
               <div class="form-text">Provide a link to the course homepage.</div>
@@ -130,7 +130,7 @@
 
           <!-- Input User Comment (Transfer Request) -->
           {% if comment %}
-            <div class="form-outline">
+            <div class="form-outline m-2">
               <label for="url" class="form-label">Explanation</label>
               <textarea id="comment" name="comment" maxlength="200" class="form-control" onkeydown="return /[A-Za-z0-9-',/&:.()?! ]/i.test(event.key)"></textarea>
               <div class="form-text">Provide your reasoning for making this request.</div>
@@ -143,7 +143,7 @@
           </div>
 
           <!-- Button for Form Submission -->
-          <div>
+          <div class="text-center">
             <button type="submit" class="btn btn-primary">Submit</button>
           </div>
 

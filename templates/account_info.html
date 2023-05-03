@@ -6,30 +6,18 @@
 
 {% block content %}
 
-<table class="table h4 mt-5 w-auto">
+<div class="container-fluid p-5" align="center">
+  <h3>Account Information</h3>
+  <table class="table h5 mt-3 w-auto">
     <tbody>
-      <tr>
-        <th scope="row"> Username: </th>
-        <td> {{ user.username }} </td>
-      </tr>
-      <tr>
-        <th scope="row"> First Name: </th>
-        <td> {{ user.first_name }} </td>
-      </tr>
-      <tr>
-        <th scope="row"> Last Name: </th>
-        <td> {{ user.last_name }} </td>
-      </tr>
-      <tr>
-        <th scope="row"> Email Address: </th>
-        <td> {{ user.email }} </td>
-      </tr>
-      <tr>
-        <th scope="row"> Permissions: </th>
-        <td> {{ permissions }} </td>
-      </tr>
+      <tr><th scope="row"> Username: </th><td> {{ user.username }} </td></tr>
+      <tr><th scope="row"> First Name: </th><td> {{ user.first_name }} </td></tr>
+      <tr><th scope="row"> Last Name: </th><td> {{ user.last_name }} </td></tr>
+      <tr><th scope="row"> Email Address: </th><td> {{ user.email }} </td></tr>
+      <tr><th scope="row"> Permissions: </th><td> {{ permissions }} </td></tr>
     </tbody>
-</table>
+  </table>
+</div>
 
 <div class="container-fluid px-5 py-2" align="center">
   {% if permissions != "Admin" %}

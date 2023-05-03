@@ -20,7 +20,9 @@
     {% block content %}
     <content>
       <div class="container-fluid p-5" align="left">
-        <h3>Favorites</h3>
+        <div class="pb-2">
+          <h3>Favorites</h3>
+        </div>
 
         {% include "messages.html" with messages=messages%}
 
@@ -43,7 +45,7 @@
 
                   <li class="list-group-item list-group-item-light d-flex">
                     <div class="col-3 text-center"><a class="list-group-item list-group-item-light disabled h-100">{{ f.transfer.external_course.college_name }}</a></div>
-                    <div class="col-4 text-center"><a href="{% url 'externalcourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.external_course }}</a></div>
+                    <div class="col-4 text-center"><a href="{% url 'externalcourse' f.transfer.external_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.external_course.mnemonic }} {{ f.transfer.external_course.course_number }}: {{ f.transfer.external_course.course_name }}</a></div>
                     <div class="col-4 text-center"><a href="{% url 'internalcourse' f.transfer.internal_course.pk %}" class="list-group-item list-group-item-light list-group-item-action h-100">{{ f.transfer.internal_course }}</a></div>
                     <div class="col-1 text-center"><button class="list-group-item list-group-item-danger list-group-item-action h-100 align-items-center">╳</button></div>
                     <!-- <div class="col-1 text-center">
@@ -57,7 +59,9 @@
               {% endfor %}
             </ul>
           </div>
-          <h6 class="m-2">Total Credits: {{ total }}</h6>
+          <div class="p-3">
+            <h6>Total Credits: {{ total }}</h6>
+          </div>
         {% else %}
           <p>No Favorites Found.</p>
         {% endif %}
