@@ -22,7 +22,7 @@ A website to assist students transferring into UVA transfer their credits: <http
     - To see a course's equivalencies, locate that course in the search results and view the "Course Equivalencies" list on its course page.
 
 2) **Submit Request to Be Evaluated by Student's Advisor**
-    - Click on a course in the search results and locate the "Make Request" button on its course page.
+    - Click on a UVA course in the search results and locate the "Make Request" button on its course page.
     - Alternatively, see the [shopping cart](#additional-features) in the additional features.
 
 3) **Admins Can Add/Edit Courses**
