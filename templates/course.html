@@ -23,7 +23,7 @@
       <div class="container-fluid px-5 pb-4" align="left">
         <a href="{% url 'courseSearch' %}" class="link-primary text-decoration-none">← Back to Search</a>
         <div class="text-center">
-          <h3><span class="text-muted">{{ course.college_name }} |</span> <i>{{ course }}</i></h3>
+          <h3><span class="text-muted">{{ course.college_name }} |</span> <i>{{ course.mnemonic }} {{ course.course_number }}: {{ course.course_name }}</i></h3>
         </div>
       </div>
       <div class="container-fluid px-5" align="center">
