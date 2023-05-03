@@ -553,7 +553,7 @@ class HandleRequests(LoginRequiredMixin, generic.ListView):
     template_name = 'handleRequests.html'
     context_object_name = 'user_list'
     queryset = User.objects\
-        .filter(transferrequest__isnull=False)\
+        .filter(transferrequest__condition=TransferRequest.pending)\
         .annotate(name=Concat('first_name', Value(' '), 'last_name', output_field=CharField()),
                   time=Max('transferrequest__created_at'),
                   count=Count('transferrequest'))\

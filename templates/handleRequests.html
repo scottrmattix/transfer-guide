@@ -151,7 +151,7 @@
               {% endif %}
             </ul>
           </div>
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-2 border-bottom"></div>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom"></div>
 
         <!-- Common User View for their Own Requests-->
         {% else %}
@@ -201,7 +201,7 @@
                   {% for r in pending %}
                     <li class="list-group-item list-group-item-{{ r.color }} d-flex">
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
-                      <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
+                      <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course.mnemonic }} {{ r.transfer.external_course.course_number }}: {{ r.transfer.external_course.course_name }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
                       <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="pending" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user.last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
@@ -219,7 +219,7 @@
                   {% for r in accepted %}
                     <li class="list-group-item list-group-item-{{ r.color }} d-flex">
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
-                      <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
+                      <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course.mnemonic }} {{ r.transfer.external_course.course_number }}: {{ r.transfer.external_course.course_name }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
                       <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="accepted" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user.last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
@@ -237,7 +237,7 @@
                   {% for r in rejected %}
                     <li class="list-group-item list-group-item-{{ r.color }} d-flex">
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
-                      <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
+                      <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course.mnemonic }} {{ r.transfer.external_course.course_number }}: {{ r.transfer.external_course.course_name }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
                       <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="rejected" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user.last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
@@ -255,7 +255,7 @@
                   {% for r in all %}
                     <li class="list-group-item list-group-item-{{ r.color }} d-flex">
                       <div class="col-3 text-center"><a class="list-group-item list-group-item-{{ r.color }} h-100">{{ r.transfer.external_course.college_name }}</a></div>
-                      <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course }}</a></div>
+                      <div class="col-4 text-center"><a href="{{ r.url }}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.external_course.mnemonic }} {{ r.transfer.external_course.course_number }}: {{ r.transfer.external_course.course_name }}</a></div>
                       <div class="col-4 text-center"><a href="{% url 'internalcourse' r.transfer.internal_course.pk %}" class="list-group-item list-group-item-{{ r.color }} list-group-item-action h-100">{{ r.transfer.internal_course }}</a></div>
                       <div class="col-1 text-center"><button type="button" data-id="{{ r.id }}" data-comment="{{ r.comment }}" data-response="{{ r.response }}" data-style="{{ r.visibility }}" data-tab="all" data-created="{{ r.created_at|timesince }}" data-updated="{{ r.updated_at|timesince }}" data-name="{{ r.user.first_name }} {{ r.user.last_name }}" data-username="{{ r.user.username }}" class="open-ActionModal btn btn-{{ r.btn }}" data-bs-toggle="modal" data-bs-target="#actionModal">⋮</button></div>
                     </li>
