@@ -1,6 +1,10 @@
-# Team B-27 Transfer Guide Project
+# Transfer Guide Project
 
-A website to assist students transferring into UVA transfer their credits: <https://transfer-guide.herokuapp.com/>
+A website to assist students transferring into UVA transfer their credits
+
+# Personal Contributions
+
+This was initially a projected in a private repo made for in the UVA Advanced Software Development course. It was built using Django and PostgreSQL. As a member of the 5 man team that worked on this, my major contributions were to the login system, notifications system, and devlops areas. This includes the continuous integration system as well as deployment and general tech support. 
 
 ## Common Requirements
 1) **Google Login**
