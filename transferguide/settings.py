@@ -95,18 +95,7 @@ DATABASES = {
     }
 }
 """
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd91okdepde0qki',
-        'USER': 'rtvsisurfamdhr',
-        'PASSWORD': '39772c6d00d368f0c4f6fa5779b24f28570b0c5a7bc00010b9b1f7010b62d509',
-        'HOST': 'ec2-54-227-248-71.compute-1.amazonaws.com',
-        'PORT': '5432',
-    }
-}
-"""
+
 
 DATABASES = {}
 # Password validation
